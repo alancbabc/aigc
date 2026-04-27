@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Storyboard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "title",
+    "genre",
+    "duration",
+    "scenes"
+  ],
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "genre": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "string"
+    },
+    "total_shots": {
+      "type": "integer"
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scene_no",
+          "environment",
+          "shots"
+        ],
+        "properties": {
+          "scene_no": {
+            "type": "integer"
+          },
+          "environment": {
+            "type": "object"
+          },
+          "narrative_type": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "sound_design": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "ambience_base": {
+                "type": "string"
+              },
+              "key_cues": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "silence_moment": {
+                "type": "string"
+              }
+            }
+          },
+          "transition_to_next": {
+            "type": "string"
+          },
+          "transition_notes": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "visual_bridge",
+              "reason",
+              "execution_notes"
+            ],
+            "properties": {
+              "visual_bridge": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "execution_notes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "shots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "shot_function": {
+                  "type": "string"
+                },
+                "duration_basis": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "sound_cues": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

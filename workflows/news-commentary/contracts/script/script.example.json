@@ -1,0 +1,154 @@
+{
+  "title": "GPT-5 即将发布，AI 能力再上新台阶",
+  "duration_estimate": "4分15秒",
+  "series_mode": "recurring",
+  "anchors": {
+    "host": "小林",
+    "guest": "老张"
+  },
+  "segments": [
+    {
+      "segment_no": 1,
+      "type": "opening",
+      "duration": "18秒",
+      "segment_goal": "让观众快速知道今天的话题和讨论方式",
+      "takeaway": "今天不是单纯播报发布会消息，而是要判断 GPT-5 的真正意义。",
+      "fact_layer": "OpenAI 将在 2026 年上半年发布 GPT-5。",
+      "explanation_layer": "这意味着新一轮模型迭代窗口已经打开。",
+      "meaning_layer": "用户和开发者都可能迎来新一轮产品重构。",
+      "source_ref": "src-01",
+      "ltx2_prompt": {
+        "visual_prompt": "A professional female news anchor speaking confidently in a modern news studio with blue LED screens, she gestures naturally while talking, professional broadcast lighting, 4k cinematic",
+        "audio_description": "clear female voice, professional tone, moderate pace",
+        "camera_movement": "static",
+        "image_mode": "female_solo"
+      },
+      "lines": [
+        {
+          "line_no": 1,
+          "speaker": "host",
+          "text": "大家好，欢迎收看今天的科技解读。我是小林。",
+          "emotion": "friendly",
+          "pause_after": 0.5
+        },
+        {
+          "line_no": 2,
+          "speaker": "guest",
+          "text": "大家好，我是老张。今天这条新闻不只是新品发布这么简单，更像是 AI 竞争进入下一阶段的信号。",
+          "emotion": "casual",
+          "pause_after": 0.3
+        }
+      ]
+    },
+    {
+      "segment_no": 2,
+      "type": "headline",
+      "duration": "25秒",
+      "segment_goal": "交代 headline，并建立第一层信息密度",
+      "repetition_risk": "low",
+      "takeaway": "关键不只是发布时间，而是 GPT-5 被赋予了能力跃迁预期。",
+      "fact_layer": "GPT-5 预计 2026 年上半年发布。",
+      "explanation_layer": "行业关注点集中在多模态和更复杂任务能力。",
+      "meaning_layer": "这会影响开发者路线和用户预期。",
+      "key_point_id": 1,
+      "source_ref": "src-01",
+      "source_refs": ["src-01", "src-02"],
+      "ltx2_prompt": {
+        "visual_prompt": "A professional female news anchor speaking seriously in a modern news studio, large LED screen showing tech news, professional lighting, 4k cinematic",
+        "audio_description": "serious female voice, news anchor tone",
+        "camera_movement": "static",
+        "image_mode": "female_solo"
+      },
+      "lines": [
+        {
+          "line_no": 1,
+          "speaker": "host",
+          "text": "今天的头条，OpenAI 官方确认，GPT-5 将在 2026 年上半年正式发布。",
+          "emotion": "serious",
+          "pause_after": 0.5
+        },
+        {
+          "line_no": 2,
+          "speaker": "guest",
+          "text": "对，这里面最值得关注的，不只是时间点，而是市场已经默认它要承担一次能力升级的任务。",
+          "emotion": "thoughtful",
+          "pause_after": 0.3
+        }
+      ]
+    },
+    {
+      "segment_no": 3,
+      "type": "discussion",
+      "duration": "55秒",
+      "segment_goal": "把参数提升这类抽象表述翻译成观众能理解的变化",
+      "scripting_rules": [
+        "Keep each single spoken line short enough for direct TTS generation.",
+        "If one speaker needs a long explanation, split it into multiple consecutive lines with the same speaker instead of writing one oversized paragraph."
+      ],
+      "repetition_risk": "medium",
+      "takeaway": "参数更大不等于体验一定更好，关键在能力结构和落地成本。",
+      "fact_layer": "外界预测 GPT-5 参数规模可能远高于 GPT-4。",
+      "explanation_layer": "真正重要的是它是否能稳定处理更复杂的多模态任务。",
+      "meaning_layer": "这将决定它是噱头升级还是生产力升级。",
+      "key_point_id": 2,
+      "visual_hint": "GPT-4 vs GPT-5 参数与能力对比图",
+      "source_ref": "src-01",
+      "source_refs": ["src-01", "src-02"],
+      "ltx2_prompt": {
+        "visual_prompt": "A middle-aged male news commentator speaking thoughtfully in a news studio, wearing glasses and dark suit, he nods while making a point, warm studio lighting, 4k realistic",
+        "audio_description": "deep male voice, analytical tone",
+        "camera_movement": "static",
+        "image_mode": "male_solo"
+      },
+      "lines": [
+        {
+          "line_id": "seg03_line01",
+          "line_no": 1,
+          "speaker": "host",
+          "text": "老张，我看到有报道说，GPT-5 的参数规模可能是 GPT-4 的十倍。这个数字该怎么理解？",
+          "estimated_duration_seconds": 6.2,
+          "emotion": "neutral",
+          "pause_after": 0.5
+        },
+        {
+          "line_id": "seg03_line02",
+          "line_no": 2,
+          "speaker": "guest",
+          "text": "你别说，这个数字确实抓眼球。但参数更大，不 automatically 等于体验更好。",
+          "estimated_duration_seconds": 7.8,
+          "split_group_id": "seg03_guest_explainer_01",
+          "emotion": "thoughtful",
+          "pause_after": 0.2
+        },
+        {
+          "line_id": "seg03_line03",
+          "line_no": 3,
+          "speaker": "guest",
+          "text": "关键要看它是不是能更稳地处理视频、长上下文和复杂任务链。",
+          "estimated_duration_seconds": 6.4,
+          "split_group_id": "seg03_guest_explainer_01",
+          "emotion": "thoughtful",
+          "pause_after": 0.3
+        },
+        {
+          "line_id": "seg03_line04",
+          "line_no": 4,
+          "speaker": "host",
+          "text": "也就是说，观众不需要纠结十倍这个数字本身，而要看它最终能不能把以前做不好的事做成？",
+          "estimated_duration_seconds": 7.1,
+          "emotion": "neutral",
+          "pause_after": 0.3
+        },
+        {
+          "line_id": "seg03_line05",
+          "line_no": 5,
+          "speaker": "guest",
+          "text": "没错。我的观点是，真正的分水岭不是参数，而是能力结构、稳定性和成本三件事能不能一起成立。",
+          "estimated_duration_seconds": 8.4,
+          "emotion": "serious",
+          "pause_after": 0.5
+        }
+      ]
+    }
+  ]
+}

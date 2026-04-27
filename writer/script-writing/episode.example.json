@@ -1,0 +1,52 @@
+{
+  "series_title": "《战神归来》",
+  "episode_no": 1,
+  "episode_title": "归来之日",
+  "platform": "抖音",
+  "target_duration": "90秒",
+  "hook": "战神男主在婚礼现场高调归来，所有人都以为他是个废物",
+  "summary": "男主隐藏身份回到城市，在前妻婚礼现场第一次反击羞辱者。",
+  "beats": [
+    {
+      "beat_no": 1,
+      "function": "开场钩子",
+      "duration": "10秒",
+      "event": "婚礼现场众人嘲讽男主寒酸到场"
+    },
+    {
+      "beat_no": 2,
+      "function": "身份悬念",
+      "duration": "30秒",
+      "event": "男主平静入场，前妻和宾客不断羞辱他"
+    },
+    {
+      "beat_no": 3,
+      "function": "第一次反转",
+      "duration": "35秒",
+      "event": "男主一句话点破新郎家的秘密，全场震惊"
+    },
+    {
+      "beat_no": 4,
+      "function": "集尾悬念",
+      "duration": "15秒",
+      "event": "战区车队抵达酒店门口，镜头停在众人错愕表情上"
+    }
+  ],
+  "scenes": [
+    {
+      "scene_no": 1,
+      "location": "酒店宴会厅",
+      "time_of_day": "白天",
+      "event": "男主进入婚礼现场，被宾客围观羞辱",
+      "characters": [
+        {
+          "character": "萧临",
+          "state_num": 1,
+          "parenthetical": "平静站立",
+          "dialogue": "我今天来，不是祝福，是来收回属于我的东西。"
+        }
+      ]
+    }
+  ],
+  "ending_hook": "门外传来急刹车声，礼堂大门缓缓打开。"
+}

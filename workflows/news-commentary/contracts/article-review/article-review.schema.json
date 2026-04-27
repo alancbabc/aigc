@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArticleReview",
+  "description": "Review checklist for commentary-ready article analysis",
+  "type": "object",
+  "required": ["coverage_ok", "meaning_extraction_ok", "audience_ready_ok"],
+  "properties": {
+    "coverage_ok": { "type": "boolean" },
+    "meaning_extraction_ok": { "type": "boolean" },
+    "audience_ready_ok": { "type": "boolean" },
+    "has_uncertainty": { "type": "boolean" },
+    "has_counterpoint": { "type": "boolean" },
+    "missing_points": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "notes": { "type": "string" }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "transition_type": "AERIAL MATCH CUT",
+  "transition_goal": "Keep emotional and visual continuity across locations",
+  "visual_bridge": "Paper airplane rises into the sky -> sky reveals the next scene",
+  "reason": "Both segments share a sky-based bridge and the emotion stays continuous, so an aerial match cut is the most natural transition choice.",
+  "execution_notes": [
+    "End the first segment with the paper airplane moving away in a clear direction",
+    "Use a clean sky-only intermediate frame without introducing a new subject",
+    "Start the next segment from the sky and move downward to reveal the girl in the meadow"
+  ],
+  "frame_requirement": {
+    "needs_extra_frames": true,
+    "recommended_frames": [
+      "first",
+      "intermediate",
+      "last"
+    ]
+  },
+  "prompt_hint": "aerial match cut, camera follows the paper airplane upward into the sky, sky bridge into the next scene, camera dollies down to reveal the girl in the meadow",
+  "transition_clip_needed": true,
+  "transition_clip": {
+    "clip_id": "transition_scene01_shot01_to_scene02_shot01",
+    "clip_type": "transition",
+    "from_shot_id": "scene01_shot01",
+    "to_shot_id": "scene02_shot01",
+    "from_last_frame": "keyframes/scene01_shot01_last.png",
+    "to_first_frame": "keyframes/scene02_shot01_first.png",
+    "transition_type": "AERIAL MATCH CUT",
+    "visual_bridge": "Paper airplane rises into the sky -> sky reveals the next scene",
+    "bridge_logic": "Use the outgoing skyward airplane frame as the launch state, pass briefly through a clean sky bridge, then reveal the next scene from the same upward-to-downward directional logic.",
+    "raw_prompt": "Create a short aerial match cut transition clip between the boy's final airplane release frame and the girl's opening meadow frame, using the sky as the main bridge and keeping the same hopeful motion direction.",
+    "optimized_prompt": "Cinematic transition shot that begins from the final frame of a paper airplane rising into a bright open sky above a grassy hillside in warm late-afternoon light. The airplane continues upward for a brief readable moment as the frame simplifies into a clean sky bridge, then the camera gently shifts downward to reveal a meadow scene with continuous hopeful visual tone. The transition keeps the same motion direction and emotional continuity, using the sky as the bridge instead of introducing unrelated action. The camera movement stays smooth and simple so the bridge reads clearly between the two connected shots. Soft wind and open-air ambience carry across the transition while the mood remains light, calm, and forward-moving.",
+    "target_duration_seconds": 3,
+    "ltx_request_stub": {
+      "mode": "text_image_to_video_high_quality",
+      "images": [
+        "keyframes/scene01_shot01_last.png",
+        "keyframes/scene02_shot01_first.png"
+      ],
+      "video_seconds": 3
+    }
+  }
+}

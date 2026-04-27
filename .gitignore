@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+.env
+.env.local
+
+memory/
+result/
+outputs/
+keyframes/
+scenes/
+characters/
+
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.mp4
+
+nul
+
+# 本地/流水线试跑输出（不纳入版本库）
+test_music/test_output/

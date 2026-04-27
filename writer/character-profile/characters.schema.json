@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Characters",
+  "type": "object",
+  "required": ["project_title", "genre", "characters"],
+  "properties": {
+    "project_title": { "type": "string" },
+    "genre": { "type": "string" },
+    "characters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "role", "states"],
+        "properties": {
+          "name": { "type": "string" },
+          "age": { "type": "string" },
+          "role": { "type": "string" },
+          "character_type": { "type": "string" },
+          "personality": { "type": "string" },
+          "background": { "type": "string" },
+          "goals": { "type": "string" },
+          "relationships": { "type": "array", "items": { "type": "string" } },
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["state_num", "state_name", "description", "views"],
+              "properties": {
+                "state_num": { "type": "integer" },
+                "state_name": { "type": "string" },
+                "description": { "type": "string" },
+                "scene_reference": { "type": "string" },
+                "views": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

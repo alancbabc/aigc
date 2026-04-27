@@ -1,0 +1,21 @@
+{
+  "scene_no": 1,
+  "review_image": "scene-design/scene_01_board.png",
+  "review_mode": "multi_view",
+  "reference_count": 2,
+  "pass_review": true,
+  "setting_match": true,
+  "lighting_match": true,
+  "scene_base_consistency": true,
+  "view_set_quality": true,
+  "style_consistency_score": 0.92,
+  "issues": [],
+  "strengths": [
+    "The environment matches the hillside setting",
+    "Late-afternoon lighting is clear and visually stable",
+    "All view references stay consistent with the same scene base",
+    "The view set provides meaningful variation without drifting into a different scene",
+    "No unwanted character appears in the scene reference"
+  ],
+  "fix_suggestions": []
+}

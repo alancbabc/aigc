@@ -1,0 +1,62 @@
+{
+  "title": "《纸飞机》",
+  "genre": "都市成长",
+  "subgenre": "温情儿童短片",
+  "duration": "5分钟",
+  "visual_style": {
+    "keywords": ["warm sunlight", "hand-drawn 2D", "soft colors"],
+    "references": ["Ghibli", "children short film"]
+  },
+  "narrative_focus": "围绕留守男孩小树第一次给远方母亲写信展开",
+  "core_theme": "爱与希望能跨越距离",
+  "characters": [
+    {
+      "name": "小树",
+      "role": "主角",
+      "gender": "男"
+    }
+  ],
+  "structure": {
+    "act_1": {
+      "duration": "1分钟",
+      "description": "建立环境与愿望",
+      "key_events": [
+        {
+          "order": 1,
+          "event": "放学独行",
+          "description": "小树放学后独自走上山坡"
+        }
+      ]
+    },
+    "act_2": {
+      "duration": "3分钟",
+      "description": "写信与尝试",
+      "key_events": [
+        {
+          "order": 2,
+          "event": "写下心愿",
+          "description": "小树给远方母亲写信并折成纸飞机"
+        }
+      ]
+    },
+    "act_3": {
+      "duration": "1分钟",
+      "description": "放飞与回应",
+      "key_events": [
+        {
+          "order": 3,
+          "event": "纸飞机飞远",
+          "description": "小树放飞纸飞机，重新获得希望"
+        }
+      ]
+    }
+  },
+  "scenes": [
+    {
+      "scene_no": 1,
+      "name": "山坡放学路",
+      "location": "小镇外山坡",
+      "function": "建立角色孤独状态"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "title": "Paper Airplane",
+  "genre": "Coming-of-age",
+  "duration": "5 minutes",
+  "total_shots": 2,
+  "scenes": [
+    {
+      "scene_no": 1,
+      "environment": {
+        "setting": "A grassy hillside with a few small trees and a distant town below",
+        "lighting": "Warm late-afternoon backlight",
+        "dynamic_elements": "A gentle breeze moving the grass"
+      },
+      "narrative_type": "standard-scene",
+      "summary": "A boy writes a note and folds a paper airplane on the hillside",
+      "sound_design": {
+        "ambience_base": "soft hillside wind and distant town ambience",
+        "key_cues": [
+          "paper folding",
+          "light cloth rustle"
+        ],
+        "silence_moment": ""
+      },
+      "transition_to_next": "AERIAL MATCH CUT",
+      "transition_notes": {
+        "visual_bridge": "Paper airplane rises into the sky -> sky reveals the next scene",
+        "reason": "The two scenes share a sky-based bridge and keep the same hopeful emotion",
+        "execution_notes": [
+          "End the scene with the airplane moving upward and away",
+          "Preserve the upward motion direction into the next scene reveal"
+        ]
+      },
+      "shots": [
+        {
+          "shot_no": 1,
+          "shot_function": "establish setting and carry the full paper-folding action in one beat",
+          "shot_type": "wide shot",
+          "camera_angle": "eye-level",
+          "camera_movement": "static",
+          "composition": "The boy sits in the lower-right area of the frame and the hillside fills most of the image",
+          "description": "Establish the hillside and the lonely but hopeful mood",
+          "duration": 4,
+          "duration_basis": [
+            "environment information",
+            "readable action progression",
+            "emotional hold"
+          ],
+          "sound_cues": [
+            "soft wind through grass",
+            "paper folding close detail"
+          ],
+          "characters": [
+            {
+              "name": "Boy",
+              "state_num": 1,
+              "action": "Sits on the grass and folds the note into a paper airplane",
+              "expression": "Calm and focused"
+            }
+          ],
+          "dialogue": "",
+          "sound": "wind ambience",
+          "VFX": ""
+        }
+      ]
+    }
+  ]
+}

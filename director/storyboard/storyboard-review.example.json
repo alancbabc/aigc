@@ -1,0 +1,15 @@
+{
+  "scene_reviews": [
+    {
+      "scene_no": 1,
+      "redundant_shot_risk": "low",
+      "duration_support_risk": "low",
+      "merge_suggestions": [],
+      "duration_adjustments": [],
+      "notes": [
+        "The scene currently uses one shot to carry one complete beat.",
+        "The planned duration is supported by environment setup, readable action, and emotional hold."
+      ]
+    }
+  ]
+}

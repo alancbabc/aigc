@@ -1,0 +1,47 @@
+{
+  "skill": "flux-image-edit",
+  "request": {
+    "prompt": "The woman from image 1 and the man from image 2 are talking in the room from image 3, cinematic keyframe",
+    "model": "FLUX.2-klein-9B",
+    "size": "1024x576",
+    "task_types": [
+      "id",
+      "style"
+    ],
+    "images": [
+      {
+        "slot": 1,
+        "file_path": "references/character-1.png",
+        "purpose": "main woman identity"
+      },
+      {
+        "slot": 2,
+        "file_path": "references/character-2.png",
+        "purpose": "main man identity"
+      },
+      {
+        "slot": 3,
+        "file_path": "references/room.png",
+        "purpose": "scene background"
+      }
+    ],
+    "num_inference_steps": 4,
+    "guidance_scale": 1
+  },
+  "response_handling": {
+    "transport": "json",
+    "image_data_field": "data[i].b64_json",
+    "decode_required": true,
+    "output_extensions": [
+      "png",
+      "jpg"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "outputs/flux-image-edit/keyframe-01.png",
+      "mime_type": "image/png",
+      "role": "primary"
+    }
+  ]
+}

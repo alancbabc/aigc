@@ -1,0 +1,43 @@
+{
+  "skill": "mineru25-ocr",
+  "request": {
+    "file_path": "inputs/page-photo.png",
+    "model": "MinerU2.5",
+    "is_ocr": true,
+    "include_image_base64": true,
+    "formula_enable": true,
+    "table_enable": true,
+    "layout_model": "doclayout_yolo",
+    "output_format": "md"
+  },
+  "response_handling": {
+    "transport": "multipart-form",
+    "async": true,
+    "task_id_field": "task_id",
+    "status_endpoint_pattern": "https://ai.gitee.com/api/v1/task/{task_id}",
+    "preferred_result_fields": [
+      "output.markdown_url",
+      "output.file_url",
+      "markdown_url",
+      "file_url",
+      "output.markdown",
+      "markdown"
+    ],
+    "output_extensions": [
+      "md",
+      "json"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "outputs/mineru25-ocr/document.md",
+      "mime_type": "text/markdown",
+      "role": "primary"
+    },
+    {
+      "path": "outputs/mineru25-ocr/document.status.json",
+      "mime_type": "application/json",
+      "role": "debug"
+    }
+  ]
+}

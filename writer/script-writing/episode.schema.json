@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Episode Script",
+  "type": "object",
+  "required": [
+    "series_title",
+    "episode_no",
+    "episode_title",
+    "target_duration",
+    "hook",
+    "summary",
+    "beats",
+    "scenes",
+    "ending_hook"
+  ],
+  "properties": {
+    "series_title": { "type": "string" },
+    "episode_no": { "type": "integer" },
+    "episode_title": { "type": "string" },
+    "platform": { "type": "string" },
+    "target_duration": { "type": "string" },
+    "hook": { "type": "string" },
+    "summary": { "type": "string" },
+    "beats": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["beat_no", "function", "duration", "event"],
+        "properties": {
+          "beat_no": { "type": "integer" },
+          "function": { "type": "string" },
+          "duration": { "type": "string" },
+          "event": { "type": "string" }
+        }
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scene_no", "location", "event", "characters"],
+        "properties": {
+          "scene_no": { "type": "integer" },
+          "location": { "type": "string" },
+          "time_of_day": { "type": "string" },
+          "event": { "type": "string" },
+          "characters": { "type": "array" }
+        }
+      }
+    },
+    "ending_hook": { "type": "string" }
+  }
+}

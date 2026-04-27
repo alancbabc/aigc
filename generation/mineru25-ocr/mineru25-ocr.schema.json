@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MinerU2.5 OCR Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skill",
+    "request",
+    "response_handling",
+    "artifacts"
+  ],
+  "properties": {
+    "skill": {
+      "const": "mineru25-ocr"
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_path",
+        "model",
+        "is_ocr",
+        "output_format"
+      ],
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "const": "MinerU2.5"
+        },
+        "is_ocr": {
+          "type": "boolean",
+          "const": true
+        },
+        "include_image_base64": {
+          "type": "boolean",
+          "default": true
+        },
+        "formula_enable": {
+          "type": "boolean",
+          "default": true
+        },
+        "table_enable": {
+          "type": "boolean",
+          "default": true
+        },
+        "layout_model": {
+          "type": "string",
+          "minLength": 1,
+          "default": "doclayout_yolo"
+        },
+        "output_format": {
+          "type": "string",
+          "const": "md"
+        }
+      }
+    },
+    "response_handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transport",
+        "async",
+        "task_id_field",
+        "status_endpoint_pattern",
+        "preferred_result_fields",
+        "output_extensions"
+      ],
+      "properties": {
+        "transport": {
+          "type": "string",
+          "const": "multipart-form"
+        },
+        "async": {
+          "type": "boolean",
+          "const": true
+        },
+        "task_id_field": {
+          "type": "string",
+          "const": "task_id"
+        },
+        "status_endpoint_pattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preferred_result_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "output_extensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "md",
+              "json"
+            ]
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "mime_type",
+          "role"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mime_type": {
+            "type": "string",
+            "enum": [
+              "text/markdown",
+              "application/json"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "debug"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

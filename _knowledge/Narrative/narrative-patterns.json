@@ -1,0 +1,180 @@
+{
+  "story_level": [
+    {
+      "id": "three-act-structure",
+      "use_when": [
+        "Need a stable full-story structure",
+        "Need setup, escalation, and payoff",
+        "Need a midpoint or major turn"
+      ],
+      "best_for": [
+        "feature film",
+        "short film",
+        "narrative video"
+      ],
+      "output_impact": [
+        "outline.structure",
+        "outline.key_events",
+        "payoff order"
+      ],
+      "avoid_when": [
+        "The project is only a short conceptual fragment"
+      ]
+    },
+    {
+      "id": "heros-journey",
+      "use_when": [
+        "The protagonist goes through visible trials",
+        "The story needs a transformational arc"
+      ],
+      "best_for": [
+        "fantasy",
+        "adventure",
+        "growth story"
+      ],
+      "output_impact": [
+        "character arc",
+        "trial sequence",
+        "return with change"
+      ],
+      "avoid_when": [
+        "ensemble story",
+        "single-event short"
+      ]
+    }
+  ],
+  "scene_level": [
+    {
+      "id": "standard-scene",
+      "use_when": [
+        "Need clear goal-obstacle-result progression",
+        "Need the scene to directly move the story"
+      ],
+      "output_impact": [
+        "scene.event",
+        "scene.duration",
+        "storyboard.narrative_type"
+      ],
+      "avoid_when": [
+        "Time needs to be compressed instead of played out"
+      ]
+    },
+    {
+      "id": "summary-scene",
+      "use_when": [
+        "Need to compress time",
+        "Need to summarize repeated actions"
+      ],
+      "output_impact": [
+        "compressed events",
+        "reduced scene count"
+      ],
+      "avoid_when": [
+        "A key conflict must happen on screen"
+      ]
+    },
+    {
+      "id": "transition-scene",
+      "use_when": [
+        "Need a bridge between two stronger scenes",
+        "Need to move relationship or setting without heavy conflict"
+      ],
+      "output_impact": [
+        "scene bridge",
+        "lower narrative weight"
+      ],
+      "avoid_when": [
+        "The story should enter conflict immediately"
+      ]
+    },
+    {
+      "id": "flashback",
+      "use_when": [
+        "Past information changes the meaning of the present",
+        "The reveal has emotional or structural payoff"
+      ],
+      "output_impact": [
+        "reveal strategy",
+        "emotion shift"
+      ],
+      "avoid_when": [
+        "The only purpose is exposition"
+      ]
+    },
+    {
+      "id": "flash-forward",
+      "use_when": [
+        "Need anticipation or fate pressure",
+        "Need a future image to frame the present"
+      ],
+      "output_impact": [
+        "future hint",
+        "suspense setup"
+      ],
+      "avoid_when": [
+        "It weakens present-tense tension"
+      ]
+    },
+    {
+      "id": "montage-structure",
+      "use_when": [
+        "Need to compress a multi-step process",
+        "Need visible passage of effort or accumulation"
+      ],
+      "output_impact": [
+        "compressed progression",
+        "faster pacing"
+      ],
+      "avoid_when": [
+        "The process only has one meaningful beat"
+      ]
+    },
+    {
+      "id": "progress-montage",
+      "use_when": [
+        "Need to show practice, growth, preparation, or upgrade"
+      ],
+      "output_impact": [
+        "visible progress beats",
+        "training or prep sequence"
+      ],
+      "avoid_when": [
+        "There is no visible change across steps"
+      ]
+    },
+    {
+      "id": "routine-loop",
+      "use_when": [
+        "Need to establish repetition before breaking it",
+        "Need contrast between routine and disruption"
+      ],
+      "output_impact": [
+        "pattern setup",
+        "pattern break payoff"
+      ],
+      "avoid_when": [
+        "Pacing is already slow"
+      ]
+    },
+    {
+      "id": "season-transition",
+      "use_when": [
+        "Need visible passage of time",
+        "Need an atmospheric time jump"
+      ],
+      "output_impact": [
+        "time shift",
+        "visual bridge"
+      ],
+      "avoid_when": [
+        "The scene should preserve immediate tension"
+      ]
+    }
+  ],
+  "diagnostic_rules": [
+    "If a scene ends without changing the situation, it is probably weak.",
+    "If exposition lasts longer than conflict, the story will flatten.",
+    "If every scene uses the same engine, pacing will feel monotone.",
+    "If the midpoint does not raise risk or change understanding, escalation is weak."
+  ]
+}

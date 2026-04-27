@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "project_title": "Paper Airplane",
+  "prompt_drafts_ref": "video-prompt-drafts.json",
+  "prompt_guide": "_prompts/ModelGuides/LTX-Video/SKILL.md",
+  "optimization_notes": "Each optimized prompt stays in English and follows the LTX guide's single-flowing-paragraph rule.",
+  "entries": [
+    {
+      "prompt_id": "scene01_shot01_ltx",
+      "source_prompt_id": "scene01_shot01",
+      "scene_no": 1,
+      "shot_no": 1,
+      "scene_id": "scene_01",
+      "shot_id": "scene_01_shot_01",
+      "clip_type": "shot",
+      "render_mode": "text_image_to_video_high_quality",
+      "optimized_prompt": "Cinematic wide shot of a young boy standing on a grassy hillside in warm late-afternoon light with a quiet town spread below him in the distance. He holds a paper airplane close to his chest for a brief moment, then smoothly extends his arm and releases it upward into the open sky. The paper airplane rises clearly above him as the action unfolds in one readable motion, while his posture shifts from focused preparation to hopeful release. The camera stays at eye level and gently tracks the movement upward without abrupt motion, keeping the composition simple and emotionally clear. Soft wind moves through the grass and the scene remains calm, bright, and lightly cinematic. Hope and anticipation are shown through the boy's upward gaze, still posture after release, and the clean skyward motion of the airplane.",
+      "optimization_focus": "Clarified the action sequence, tightened camera movement, and made lighting and emotion more visually explicit for LTX.",
+      "target_duration_seconds": 5
+    },
+    {
+      "prompt_id": "scene01_transition_to_scene02_ltx",
+      "source_prompt_id": "scene01_transition_to_scene02",
+      "scene_no": 1,
+      "shot_no": 99,
+      "scene_id": "scene_01",
+      "shot_id": "transition_scene_01_to_scene_02",
+      "clip_type": "transition",
+      "render_mode": "text_image_to_video_high_quality",
+      "transition_type": "AERIAL MATCH CUT",
+      "from_shot_id": "scene_01_shot_01",
+      "to_shot_id": "scene_02_shot_01",
+      "from_last_frame": "keyframes/scene_01_shot_01_last.png",
+      "to_first_frame": "keyframes/scene_02_shot_01_first.png",
+      "visual_bridge": "Paper airplane rises into the sky -> sky reveals the next scene",
+      "optimized_prompt": "Cinematic transition shot that begins from the final frame of a paper airplane rising into a bright open sky above a grassy hillside in warm late-afternoon light. The outgoing motion continues briefly and cleanly into a sky-only bridge, then the camera gently descends to reveal the next meadow scene while preserving the same hopeful tone and directional continuity. The transition remains visually simple, readable, and purpose-built to connect the two neighboring shots without adding unrelated action. The sky acts as the bridge surface between the two frames, and the camera movement stays smooth and restrained so the match cut reads clearly. Soft wind ambience and open-air continuity hold the emotional line across the transition.",
+      "optimization_focus": "Converted the raw bridge description into a clean LTX-readable transition clip with explicit sky bridge, motion continuity, and reveal logic.",
+      "target_duration_seconds": 3
+    }
+  ]
+}

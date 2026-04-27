@@ -1,0 +1,11 @@
+{
+  "name": "aigc-skill-contract-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate:skills": "node tools/validate-skills.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
+  }
+}

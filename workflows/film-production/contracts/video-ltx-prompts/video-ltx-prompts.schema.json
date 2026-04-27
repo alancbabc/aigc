@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FilmProductionVideoLTXPrompts",
+  "description": "LTX-optimized video prompts derived from raw video prompt drafts for film-production workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project_title", "prompt_drafts_ref", "prompt_guide", "entries"],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "project_title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt_drafts_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt_guide": {
+      "type": "string",
+      "minLength": 1
+    },
+    "optimization_notes": {
+      "type": "string"
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "prompt_id",
+          "source_prompt_id",
+          "scene_no",
+          "shot_no",
+          "clip_type",
+          "render_mode",
+          "optimized_prompt"
+        ],
+        "properties": {
+          "prompt_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_prompt_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "References the raw prompt entry in video-prompt-drafts.json."
+          },
+          "scene_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "shot_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string"
+          },
+          "shot_id": {
+            "type": "string"
+          },
+          "clip_type": {
+            "type": "string",
+            "enum": ["shot", "transition"]
+          },
+          "render_mode": {
+            "type": "string",
+            "enum": ["audio_to_video", "text_image_to_video_high_quality"]
+          },
+          "transition_type": {
+            "type": "string"
+          },
+          "from_shot_id": {
+            "type": "string"
+          },
+          "to_shot_id": {
+            "type": "string"
+          },
+          "from_last_frame": {
+            "type": "string"
+          },
+          "to_first_frame": {
+            "type": "string"
+          },
+          "visual_bridge": {
+            "type": "string"
+          },
+          "optimized_prompt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Final English prompt optimized for LTX-2 execution."
+          },
+          "optimization_focus": {
+            "type": "string",
+            "description": "What changed most during optimization, such as action clarity, camera readability, or lighting specificity."
+          },
+          "target_duration_seconds": {
+            "type": "number",
+            "minimum": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "clip_type": { "const": "transition" }
+            }
+          },
+          "then": {
+            "required": [
+              "transition_type",
+              "from_last_frame",
+              "to_first_frame",
+              "visual_bridge"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

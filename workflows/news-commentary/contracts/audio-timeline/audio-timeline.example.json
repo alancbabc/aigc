@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "title": "国产算力入局食品安全：沐曦与江南大学的合作意味着什么？",
+  "audio_format": "mp3",
+  "entries": [
+    {
+      "entry_id": "seg01_line01",
+      "script_line_id": "seg01_line01",
+      "segment_no": 1,
+      "segment_type": "opening",
+      "line_no": 1,
+      "speaker": "host",
+      "text": "大家好，欢迎收看今天的产业解读，我是小曦。",
+      "emotion": "friendly",
+      "audio_path": "audio/host/line_001.mp3",
+      "duration_seconds": 3.6,
+      "pause_before": 0.0,
+      "pause_after": 0.3,
+      "split_part_no": 1,
+      "split_part_total": 1,
+      "source_line_text": "大家好，欢迎收看今天的产业解读，我是小曦。",
+      "resynthesis_round": 0,
+      "needs_resynthesis": false,
+      "voice_source": {
+        "mode": "mixed",
+        "tts_voice_id": "female-zh-01",
+        "voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_female.wav"
+      }
+    },
+    {
+      "entry_id": "seg01_line03_part01",
+      "script_line_id": "seg01_line03",
+      "segment_no": 1,
+      "segment_type": "opening",
+      "line_no": 3,
+      "speaker": "guest",
+      "text": "大家好，我是沐哥。",
+      "emotion": "thoughtful",
+      "audio_path": "audio/guest/line_003_part01.mp3",
+      "duration_seconds": 1.9,
+      "pause_before": 0.0,
+      "pause_after": 0.0,
+      "split_part_no": 1,
+      "split_part_total": 2,
+      "split_group_id": "seg01_line03_split",
+      "source_line_text": "大家好，我是沐哥。这条新闻的关键不是谁签了协议，而是国产算力企业开始认真思考：除了大模型，还能往哪落？",
+      "resynthesis_round": 0,
+      "needs_resynthesis": false,
+      "voice_source": {
+        "mode": "mixed",
+        "tts_voice_id": "male-zh-02",
+        "voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_male.wav"
+      }
+    },
+    {
+      "entry_id": "seg01_line03_part02",
+      "script_line_id": "seg01_line03",
+      "segment_no": 1,
+      "segment_type": "opening",
+      "line_no": 3,
+      "speaker": "guest",
+      "text": "这条新闻的关键不是谁签了协议，而是国产算力企业开始认真思考：除了大模型，还能往哪落？",
+      "emotion": "thoughtful",
+      "audio_path": "audio/guest/line_003_part02.mp3",
+      "duration_seconds": 6.8,
+      "pause_before": 0.0,
+      "pause_after": 0.5,
+      "split_part_no": 2,
+      "split_part_total": 2,
+      "split_group_id": "seg01_line03_split",
+      "source_line_text": "大家好，我是沐哥。这条新闻的关键不是谁签了协议，而是国产算力企业开始认真思考：除了大模型，还能往哪落？",
+      "resynthesis_round": 0,
+      "needs_resynthesis": false,
+      "voice_source": {
+        "mode": "mixed",
+        "tts_voice_id": "male-zh-02",
+        "voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_male.wav"
+      }
+    }
+  ]
+}

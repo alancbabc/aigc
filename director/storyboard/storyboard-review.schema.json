@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Storyboard Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scene_reviews"
+  ],
+  "properties": {
+    "scene_reviews": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scene_no",
+          "redundant_shot_risk",
+          "duration_support_risk",
+          "merge_suggestions",
+          "duration_adjustments",
+          "notes"
+        ],
+        "properties": {
+          "scene_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "redundant_shot_risk": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "duration_support_risk": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "merge_suggestions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "shots",
+                "reason"
+              ],
+              "properties": {
+                "shots": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "duration_adjustments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "shot_no",
+                "action",
+                "reason"
+              ],
+              "properties": {
+                "shot_no": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "action": {
+                  "type": "string",
+                  "enum": ["shorten", "merge", "enrich"]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

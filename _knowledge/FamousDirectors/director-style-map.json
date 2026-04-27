@@ -1,0 +1,165 @@
+{
+  "directors": [
+    {
+      "id": "wong-kar-wai",
+      "aliases": ["wong-kar-wai", "Wong Kar-wai", "wangjiawei"],
+      "best_for": [
+        "melancholic urban romance",
+        "memory-driven emotional stories",
+        "stylized longing"
+      ],
+      "narrative_traits": [
+        "fragmented time",
+        "emotion over plot",
+        "memory and yearning",
+        "elliptical storytelling"
+      ],
+      "visual_traits": [
+        "neon night",
+        "tight interiors",
+        "reflections",
+        "slow-motion intimacy"
+      ],
+      "camera_traits": [
+        "close-up emphasis",
+        "obstructed framing",
+        "lingering looks",
+        "slow-motion passage"
+      ],
+      "dialogue_traits": [
+        "voice-over",
+        "elliptical lines",
+        "repetition with emotional drift"
+      ],
+      "character_traits": [
+        "emotionally restrained",
+        "misaligned relationships",
+        "quiet longing"
+      ],
+      "color_traits": [
+        "green-gold contrast",
+        "neon red",
+        "night reflections"
+      ],
+      "rhythm_traits": [
+        "slow and suspended",
+        "pauses with emotional residue"
+      ],
+      "prompt_keywords": [
+        "melancholic neon atmosphere",
+        "tight urban intimacy",
+        "memory-like slow motion"
+      ],
+      "anti_patterns": [
+        "do not imitate specific scenes from Chungking Express or In the Mood for Love"
+      ]
+    },
+    {
+      "id": "stephen-chow",
+      "aliases": ["stephen-chow", "Stephen Chow", "zhouxingchi"],
+      "best_for": [
+        "absurd comedy",
+        "underdog emotional rise",
+        "comic-action with sincerity"
+      ],
+      "narrative_traits": [
+        "underdog rise",
+        "humiliation to breakthrough",
+        "absurdity with emotional core",
+        "comedy turning into payoff"
+      ],
+      "visual_traits": [
+        "expressive reaction shots",
+        "exaggerated props",
+        "playful staging",
+        "comic-to-heroic contrast"
+      ],
+      "camera_traits": [
+        "expressive close-up",
+        "reaction-shot rhythm",
+        "sudden reveal emphasis",
+        "dynamic comic-action framing"
+      ],
+      "dialogue_traits": [
+        "absurd logic delivered seriously",
+        "fast punchy exchanges",
+        "repetition with escalation"
+      ],
+      "character_traits": [
+        "underestimated protagonist",
+        "comic but sincere hero",
+        "scene-stealing supporting roles"
+      ],
+      "color_traits": [
+        "playful contrast",
+        "heightened comedic accents",
+        "status-signaling costume contrast"
+      ],
+      "rhythm_traits": [
+        "fast comic beat",
+        "escalating gag structure",
+        "sudden emotional drop",
+        "strong payoff release"
+      ],
+      "prompt_keywords": [
+        "absurd comedy energy",
+        "expressive reaction shot",
+        "underdog hero transformation",
+        "comic sincerity"
+      ],
+      "anti_patterns": [
+        "do not copy iconic scenes, lines, or props from specific Stephen Chow films"
+      ]
+    },
+    {
+      "id": "tsui-hark",
+      "aliases": ["tsui-hark", "Tsui Hark", "xuke"],
+      "best_for": [
+        "high-energy wuxia",
+        "fantastical action",
+        "heroic spectacle"
+      ],
+      "narrative_traits": [
+        "jianghu tension",
+        "romanticized conflict",
+        "heroic and eccentric momentum"
+      ],
+      "visual_traits": [
+        "bold color contrast",
+        "fantastical movement",
+        "stylized action pressure"
+      ],
+      "camera_traits": [
+        "dynamic motion",
+        "impact-driven framing",
+        "strong angle changes"
+      ],
+      "dialogue_traits": [
+        "direct exchanges",
+        "theatrical tension"
+      ],
+      "character_traits": [
+        "larger-than-life silhouettes",
+        "heroic presence",
+        "eccentric supporting roles"
+      ],
+      "color_traits": [
+        "bold red",
+        "gold contrast",
+        "deep shadow accents"
+      ],
+      "rhythm_traits": [
+        "fast escalation",
+        "burst-like action rhythm"
+      ],
+      "prompt_keywords": [
+        "dynamic wuxia energy",
+        "fantastical action framing",
+        "heroic martial spectacle"
+      ],
+      "anti_patterns": [
+        "do not copy iconic fight choreography from specific Tsui Hark films"
+      ]
+    }
+  ]
+}

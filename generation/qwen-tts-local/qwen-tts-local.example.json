@@ -1,0 +1,13 @@
+{
+  "input": {
+    "text": "你是谁，你从哪里来？",
+    "speaker": "Vivian",
+    "language": "auto",
+    "instruct": "清脆开心的声音",
+    "output": "outputs/qwen_tts_vivian.wav"
+  },
+  "output": {
+    "audio_path": "outputs/qwen_tts_vivian.wav"
+  },
+  "example": true
+}

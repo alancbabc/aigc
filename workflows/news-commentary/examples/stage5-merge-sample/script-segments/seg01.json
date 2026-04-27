@@ -1,0 +1,28 @@
+{
+  "segment_no": 1,
+  "type": "opening",
+  "duration": "18秒",
+  "segment_goal": "让观众快速知道今天的话题和讨论方式",
+  "takeaway": "今天不是单纯播报发布会消息，而是要判断 GPT-5 的真正意义。",
+  "lines": [
+    {
+      "line_id": "seg01_line01",
+      "line_no": 1,
+      "speaker": "host",
+      "text": "大家好，欢迎收看今天的科技解读。我是小林。",
+      "estimated_duration_seconds": 3.8,
+      "emotion": "friendly",
+      "pause_after": 0.5
+    },
+    {
+      "line_id": "seg01_line02",
+      "line_no": 2,
+      "speaker": "guest",
+      "text": "大家好，我是老张。今天这条新闻不只是新品发布这么简单，更像是 AI 竞争进入下一阶段的信号。",
+      "estimated_duration_seconds": 8.9,
+      "split_group_id": "seg01_guest_intro",
+      "emotion": "casual",
+      "pause_after": 0.3
+    }
+  ]
+}

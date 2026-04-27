@@ -1,0 +1,24 @@
+{
+  "skill": "ltx23-video",
+  "request": {
+    "mode": "audio_to_video",
+    "audio": "/path/to/audio.wav",
+    "prompt": "A formal news opening shot where the left female anchor, wearing a suit, is speaking directly to the camera while the co-anchor listens naturally",
+    "save_path": "./output.mp4",
+    "video_seconds": 5,
+    "a2v_audio_insert_video_time": 0.0,
+    "images": []
+  },
+  "response_handling": {
+    "transport": "async_job",
+    "poll_interval": 20,
+    "max_retries": 3
+  },
+  "artifacts": [
+    {
+      "path": "./output.mp4",
+      "mime_type": "video/mp4",
+      "role": "primary"
+    }
+  ]
+}

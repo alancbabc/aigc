@@ -1,0 +1,36 @@
+{
+  "template_id": "default-news-duo-v1",
+  "display_name": "Default News Duo V1",
+  "description": "Builtin default dual-anchor package for news-commentary workflow.",
+  "anchors": {
+    "host": {
+      "name": "小曦",
+      "gender": "female",
+      "tts_voice_id": "female-zh-01",
+      "voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_female.wav",
+      "local_tts": {
+        "speaker": "Serena",
+        "language": "chinese",
+        "instruction": "中文女主持人，活泼自然，语速中等偏快，吐字清楚。"
+      }
+    },
+    "guest": {
+      "name": "沐哥",
+      "gender": "male",
+      "tts_voice_id": "male-zh-02",
+      "voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_male.wav",
+      "local_tts": {
+        "speaker": "Ryan",
+        "language": "chinese",
+        "instruction": "中文男性主播，语速快，发音清晰，声音明亮爽朗，自然有交流感"
+      }
+    }
+  },
+  "visual_asset_mapping": {
+    "female_solo": "builtin-anchor-templates/default-news-duo-v1/visuals/anchors/female_solo.png",
+    "male_solo": "builtin-anchor-templates/default-news-duo-v1/visuals/anchors/male_solo.png",
+    "duo_frame": "builtin-anchor-templates/default-news-duo-v1/visuals/anchors/duo_close.png",
+    "duo_far": "builtin-anchor-templates/default-news-duo-v1/visuals/anchors/duo_far.png",
+    "duo_close": "builtin-anchor-templates/default-news-duo-v1/visuals/anchors/duo_close.png"
+  }
+}

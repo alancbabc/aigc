@@ -1,0 +1,20 @@
+{
+  "scene_no": 1,
+  "shot_reviews": [
+    {
+      "shot_no": 1,
+      "pass_review": true,
+      "frame_progression_ok": true,
+      "character_consistency_ok": true,
+      "scene_consistency_ok": true,
+      "intent_match_ok": true,
+      "issues": [],
+      "strengths": [
+        "The three frames show a clear action progression from preparation to release to sky-bridge ending state",
+        "Character appearance remains stable across all frames",
+        "The hillside environment stays visually consistent across the shot"
+      ],
+      "fix_suggestions": []
+    }
+  ]
+}

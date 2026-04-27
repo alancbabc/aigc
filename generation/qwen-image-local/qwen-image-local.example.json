@@ -1,0 +1,26 @@
+{
+  "skill": "qwen-image-local",
+  "request": {
+    "prompt": "a girl with a red hat",
+    "mode": "text_to_image",
+    "width": 1328,
+    "height": 1328,
+    "num_inference_steps": 50,
+    "base_url": "http://10.42.1.2:9000",
+    "output_path": "outputs/case-text.png"
+  },
+  "response_handling": {
+    "transport": "binary_download",
+    "submit_endpoint": "/submit",
+    "status_endpoint": "/status/{task_id}",
+    "download_endpoint": "/download/{task_id}",
+    "poll_until": "done"
+  },
+  "artifacts": [
+    {
+      "path": "outputs/case-text.png",
+      "mime_type": "image/png",
+      "role": "primary"
+    }
+  ]
+}

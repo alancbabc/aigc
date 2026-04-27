@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ScriptReview",
+  "description": "Review checklist for commentary script quality",
+  "type": "object",
+  "required": [
+    "dialogue_flow_ok",
+    "role_separation_ok",
+    "depth_ok",
+    "source_fidelity_ok",
+    "spoken_density_ok",
+    "evidence_usage_ok",
+    "promo_tone_ok"
+  ],
+  "properties": {
+    "dialogue_flow_ok": { "type": "boolean" },
+    "role_separation_ok": { "type": "boolean" },
+    "depth_ok": { "type": "boolean" },
+    "source_fidelity_ok": {
+      "type": "boolean",
+      "description": "Whether the script preserves the source article's factual boundaries without drifting, overstating, or dropping core evidence."
+    },
+    "spoken_density_ok": {
+      "type": "boolean",
+      "description": "Whether the spoken lines are light enough for host/guest delivery instead of sounding like compressed source prose."
+    },
+    "evidence_usage_ok": {
+      "type": "boolean",
+      "description": "Whether major commentary claims are backed by source evidence rather than slogan-like summary."
+    },
+    "promo_tone_ok": {
+      "type": "boolean",
+      "description": "Whether the script avoids unnecessary hype, promo language, or unsupported triumphal phrasing."
+    },
+    "too_generic_lines": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "overcompressed_source_blocks": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Lines that feel like compressed source paragraphs rather than spoken commentary."
+    },
+    "missing_explanations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "missing_meaning_layers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "missing_hard_evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Important evidence or concrete source details that should remain in the script."
+    },
+    "unsupported_commentary_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Interpretive or evaluative claims that are not sufficiently supported by the source pack."
+    },
+    "promo_tone_risk_lines": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Lines that should be rewritten into a more neutral or evidence-first tone."
+    },
+    "visual_should_replace_spoken": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Details better moved to cards, charts, or source visuals rather than spoken aloud."
+    },
+    "notes": { "type": "string" }
+  }
+}

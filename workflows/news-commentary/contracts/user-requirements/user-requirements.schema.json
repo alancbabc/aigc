@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentaryUserRequirements",
+  "description": "Preflight intake contract for news-commentary workflow",
+  "type": "object",
+  "required": [
+    "style",
+    "target_duration",
+    "language",
+    "series_mode",
+    "output_goal",
+    "model_preference",
+    "confirmation_mode",
+    "anchor_asset_mode",
+    "missing_anchor_assets_policy"
+  ],
+  "properties": {
+    "style": {
+      "type": "string",
+      "enum": ["professional", "casual", "humorous"]
+    },
+    "target_duration": {
+      "type": "string",
+      "enum": ["3min", "5min", "10min"]
+    },
+    "language": {
+      "type": "string",
+      "enum": ["zh-CN", "en-US"]
+    },
+    "anchor_preference": {
+      "type": ["object", "null"],
+      "properties": {
+        "host_gender": {"type": "string"},
+        "guest_gender": {"type": "string"},
+        "style": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "anchor_asset_mode": {
+      "type": "string",
+      "enum": ["user_provided", "builtin_template", "mixed"]
+    },
+    "builtin_anchor_template_id": {
+      "type": ["string", "null"],
+      "description": "Builtin template identifier used when anchor_asset_mode is builtin_template or mixed"
+    },
+    "missing_anchor_assets_policy": {
+      "type": "string",
+      "enum": ["ask", "auto_fill"],
+      "description": "How to handle missing anchor images, names, or voices after role-based resolution"
+    },
+    "anchor_image_inputs": {
+      "type": ["object", "null"],
+      "properties": {
+        "female_solo": {"type": "string"},
+        "male_solo": {"type": "string"},
+        "duo_frame": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "anchor_name_inputs": {
+      "type": ["object", "null"],
+      "description": "Optional role-keyed name overrides resolved by host and guest role",
+      "properties": {
+        "host_name": {"type": "string"},
+        "guest_name": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "anchor_voice_inputs": {
+      "type": ["object", "null"],
+      "description": "Optional role-keyed voice overrides resolved by host and guest role",
+      "properties": {
+        "host_tts_voice_id": {"type": "string"},
+        "guest_tts_voice_id": {"type": "string"},
+        "host_voice_reference_audio": {"type": "string"},
+        "guest_voice_reference_audio": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "series_mode": {
+      "type": "string",
+      "enum": ["one_off", "recurring"]
+    },
+    "series_profile": {
+      "type": ["string", "null"]
+    },
+    "output_goal": {
+      "type": "string",
+      "enum": ["full_video", "video_segments", "audio_only", "script_only", "analysis_only"]
+    },
+    "model_preference": {
+      "type": "string",
+      "enum": ["LTX-2", "fallback", "none"]
+    },
+    "confirmation_mode": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "anchor_asset_mode": {"enum": ["builtin_template", "mixed"]}
+        }
+      },
+      "then": {
+        "required": ["builtin_anchor_template_id"]
+      }
+    }
+  ]
+}

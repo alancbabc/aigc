@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LTX-2.3 Video Generation Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skill",
+    "request",
+    "response_handling",
+    "artifacts"
+  ],
+  "properties": {
+    "skill": {
+      "const": "ltx23-video"
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "prompt",
+        "save_path"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["audio_to_video", "text_image_to_video_high_quality"],
+          "description": "调用模式：有音频走 audio_to_video；只有图文走 text_image_to_video_high_quality"
+        },
+        "audio": {
+          "type": "string",
+          "minLength": 1,
+          "description": "音频文件路径（.wav 或 .mp3）"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "视频内容描述"
+        },
+        "save_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "输出视频路径"
+        },
+        "video_seconds": {
+          "type": "number",
+          "minimum": 1,
+          "default": 5,
+          "description": "视频时长（秒）"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "参考图像路径列表"
+        },
+        "image_idxs": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "图像插帧位置，支持整数、负整数和 0-1 比例"
+        },
+        "image_strengths": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "图像强度列表"
+        },
+        "height": {
+          "type": "integer",
+          "description": "视频高度"
+        },
+        "width": {
+          "type": "integer",
+          "description": "视频宽度"
+        },
+        "frame_rate": {
+          "type": "number",
+          "default": 24.0,
+          "description": "帧率"
+        },
+        "num_inference_steps": {
+          "type": "integer",
+          "default": 30,
+          "description": "推理步数"
+        },
+        "seed": {
+          "type": "integer",
+          "description": "随机种子"
+        },
+        "a2v_audio_insert_video_time": {
+          "type": "number",
+          "default": 0.0,
+          "description": "视频插入音频的时间点（秒），控制口型对齐"
+        },
+        "a2v_audio_start_time": {
+          "type": "number",
+          "default": 0.0,
+          "description": "音频起始时间（秒）"
+        },
+        "a2v_audio_max_duration": {
+          "type": "number",
+          "description": "音频最大时长（秒）"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": { "const": "audio_to_video" }
+            }
+          },
+          "then": {
+            "required": ["audio"],
+            "properties": {
+              "height": { "default": 1024 },
+              "width": { "default": 1536 },
+              "num_inference_steps": { "default": 30 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": { "const": "text_image_to_video_high_quality" }
+            }
+          },
+          "then": {
+            "properties": {
+              "height": { "default": 1088 },
+              "width": { "default": 1920 },
+              "num_inference_steps": { "default": 15 }
+            }
+          }
+        }
+      ]
+    },
+    "response_handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transport",
+        "poll_interval",
+        "max_retries"
+      ],
+      "properties": {
+        "transport": {
+          "type": "string",
+          "const": "async_job"
+        },
+        "poll_interval": {
+          "type": "integer",
+          "const": 20
+        },
+        "max_retries": {
+          "type": "integer",
+          "const": 3
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "mime_type",
+          "role"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mime_type": {
+            "type": "string",
+            "const": "video/mp4"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "primary"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

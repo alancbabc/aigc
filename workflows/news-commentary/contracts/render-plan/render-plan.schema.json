@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentaryRenderPlan",
+  "description": "Canonical mixed render plan for news-commentary workflow",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "title", "clip_plan_ref", "render_items"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "title": { "type": "string" },
+    "clip_plan_ref": { "type": "string" },
+    "source_visual_assets_ref": { "type": "string" },
+    "render_items": {
+      "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["clip_id", "render_mode", "anchor_binding", "audio_paths", "output_path"],
+          "properties": {
+            "clip_id": { "type": "string" },
+            "render_mode": { "type": "string", "enum": ["ltx", "image_audio_ffmpeg"] },
+            "anchor_binding": {
+              "type": "string",
+              "enum": ["solo", "duo", "document"]
+            },
+            "character_bindings": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["host", "guest"]
+              },
+              "uniqueItems": true
+            },
+            "audio_paths": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            "output_path": { "type": "string" },
+        "computed_duration_seconds": { "type": "number", "minimum": 0, "maximum": 15 },
+            "duration_source": { "type": "string", "enum": ["audio_timeline"] },
+          "video_size_source": { "type": "string", "enum": ["anchor_image", "source_image"] },
+          "target_dimensions": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["width", "height"],
+            "properties": {
+              "width": { "type": "integer", "minimum": 1 },
+              "height": { "type": "integer", "minimum": 1 }
+            }
+          },
+          "image_fit_mode": { "type": "string", "enum": ["match_image", "scale_pad"] },
+          "pad_color": { "type": "string" },
+          "source_image_ids": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "source_image_paths": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "anchor_image_path": { "type": "string" },
+          "optimized_prompt": { "type": "string" },
+          "ltx_request": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "mode": { "type": "string", "enum": ["audio_to_video"] },
+              "audio": { "type": "string" },
+              "images": { "type": "array", "items": { "type": "string" } },
+              "save_path": { "type": "string" },
+              "a2v_audio_start_time": { "type": "number" },
+              "a2v_audio_insert_video_time": { "type": "number" },
+                "negative_prompt": { "type": "string" },
+        "duration_seconds": { "type": "number", "minimum": 0, "maximum": 16 }
+              }
+            },
+          "ffmpeg_request": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "mode": { "type": "string", "enum": ["image_audio_ffmpeg"] },
+              "image_paths": { "type": "array", "items": { "type": "string" } },
+              "audio_paths": { "type": "array", "items": { "type": "string" } },
+              "save_path": { "type": "string" },
+              "target_width": { "type": "integer", "minimum": 1 },
+              "target_height": { "type": "integer", "minimum": 1 },
+              "image_fit_mode": { "type": "string", "enum": ["scale_pad"] },
+              "pad_color": { "type": "string" },
+              "motion_style": { "type": "string", "enum": ["static_hold", "slow_zoom_in", "slow_pan", "ken_burns"] },
+              "subtitle_mode": { "type": "string", "enum": ["none", "burn_in", "external_srt"] }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "render_mode": { "const": "ltx" }
+              }
+            },
+            "then": {
+              "required": ["anchor_image_path", "optimized_prompt", "ltx_request", "character_bindings"],
+              "properties": {
+                "anchor_binding": { "enum": ["solo", "duo"] },
+                "character_bindings": { "minItems": 1, "maxItems": 2 }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "render_mode": { "const": "image_audio_ffmpeg" }
+              }
+            },
+            "then": {
+              "required": ["source_image_ids", "source_image_paths", "ffmpeg_request"],
+              "properties": {
+                "anchor_binding": { "const": "document" },
+                "character_bindings": { "maxItems": 0 }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "title": "GPT-5 即将发布，AI 能力再上新台阶",
+  "duration_estimate": "4分15秒",
+  "series_mode": "recurring",
+  "anchors": {
+    "host": "小林",
+    "guest": "老张"
+  },
+  "segments": [
+    {
+      "segment_no": 1,
+      "type": "opening",
+      "segment_goal": "让观众快速知道今天讨论的主题和讨论方式",
+      "takeaway": "今天不只是播报 GPT-5 消息，而是判断它的真正意义。",
+      "host_function": "开场、抛题、降低理解门槛",
+      "guest_function": "给出第一层判断，建立分析气质",
+      "must_keep_evidence": [
+        "OpenAI 预计在 2026 年上半年发布 GPT-5"
+      ],
+      "source_refs": ["src-01"],
+      "visual_hint": "主持人双人开场，不急着上密集信息图",
+      "length_risk": "low"
+    },
+    {
+      "segment_no": 2,
+      "type": "discussion",
+      "segment_goal": "解释 GPT-5 的关注点为什么不只是发布时间",
+      "takeaway": "更关键的是能力结构、稳定性和落地成本。",
+      "host_function": "把抽象概念翻译成观众问题",
+      "guest_function": "解释并给出结构化判断",
+      "must_keep_evidence": [
+        "外界关注点集中在多模态和复杂任务能力",
+        "市场对 GPT-5 的预期并不只在参数规模"
+      ],
+      "source_refs": ["src-01", "src-02"],
+      "visual_hint": "参数与能力对比图可在中段承接",
+      "length_risk": "medium"
+    }
+  ]
+}

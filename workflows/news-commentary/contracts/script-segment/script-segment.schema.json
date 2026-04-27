@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentaryScriptSegment",
+  "description": "Small-file intermediate artifact for Stage 5b. Draft one segment at a time before merge into script.json.",
+  "type": "object",
+  "required": ["segment_no", "type", "segment_goal", "takeaway", "lines"],
+  "properties": {
+    "segment_no": { "type": "integer", "minimum": 1 },
+    "type": {
+      "type": "string",
+      "enum": ["opening", "headline", "discussion", "summary", "closing"]
+    },
+    "duration": { "type": "string" },
+    "segment_goal": { "type": "string" },
+    "takeaway": { "type": "string" },
+    "host_function": { "type": "string" },
+    "guest_function": { "type": "string" },
+    "must_keep_evidence": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "visual_hint": {
+      "type": "string",
+      "description": "Writer-side visual guidance only. It may suggest later source-image usage or visual offloading, but it must not hardcode final clip binding, must not override opening/closing duo-frame policy, and must not instruct the program to start on a source image or solo anchor shot."
+    },
+    "lines": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["line_no", "speaker", "text"],
+        "properties": {
+          "line_id": { "type": "string" },
+          "line_no": { "type": "integer", "minimum": 1 },
+          "speaker": {
+            "type": "string",
+            "enum": ["host", "guest"]
+          },
+          "text": { "type": "string" },
+          "estimated_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 15
+          },
+          "split_group_id": { "type": "string" },
+          "emotion": {
+            "type": "string",
+            "enum": ["neutral", "serious", "friendly", "surprised", "thoughtful", "humorous", "casual"]
+          },
+          "pause_before": { "type": "number", "default": 0 },
+          "pause_after": { "type": "number", "default": 0.5 }
+        }
+      }
+    }
+  }
+}

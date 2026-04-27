@@ -1,0 +1,37 @@
+{
+  "project_title": "Paper Airplane",
+  "style": "soft hand-drawn cinematic illustration, warm nostalgic tone",
+  "scenes": [
+    {
+      "scene_no": 1,
+      "scene_base": {
+        "location": "Hillside",
+        "environment_summary": "A grassy hillside with a distant town, scattered wild grass, and warm late-afternoon sunlight",
+        "lighting": "warm late-afternoon golden light with soft long shadows",
+        "anchor_elements": [
+          "grassy slope",
+          "small wild flowers",
+          "distant town silhouette",
+          "gentle breeze through grass"
+        ],
+        "atmosphere": "quiet, airy, slightly nostalgic"
+      },
+      "reference_images": [
+        {
+          "ref_num": 1,
+          "view_type": "establishing",
+          "purpose": "show the overall hillside layout and emotional atmosphere",
+          "prompt": "soft hand-drawn cinematic illustration, warm nostalgic tone, establishing view, empty scene, no people, grassy hillside, distant town silhouette, small wild flowers, warm late-afternoon golden light, gentle breeze, quiet airy atmosphere",
+          "image_path": "scene-design/scene_01_establishing.png"
+        },
+        {
+          "ref_num": 2,
+          "view_type": "close_detail",
+          "purpose": "show grass texture, flower detail, and warm light behavior for close shots",
+          "prompt": "soft hand-drawn cinematic illustration, warm nostalgic tone, close detail environment view, empty scene, no people, grassy hillside detail, wild flowers, warm late-afternoon golden light, soft long shadows, gentle breeze, quiet nostalgic atmosphere",
+          "image_path": "scene-design/scene_01_close_detail.png"
+        }
+      ]
+    }
+  ]
+}

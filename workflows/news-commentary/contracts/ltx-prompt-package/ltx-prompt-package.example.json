@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "title": "国产算力入局食品安全：沐曦与江南大学的合作意味着什么？",
+  "clip_plan_ref": "video/clip-plan.json",
+  "prompt_guide": "_prompts/ModelGuides/LTX-Video/SKILL.md",
+  "selection_rules": {
+    "default_visual_policy": "Use the active speaker's solo image for most clips.",
+    "duo_frame_policy": "Use duo_frame mainly for opening, closing, and rare same-frame reaction beats; avoid duo for long explanation-heavy lip-sync clips.",
+    "duo_allowed_segment_types": ["opening", "closing", "summary"],
+    "solo_priority_rule": "If one speaker clearly owns the line, use that speaker's solo image even inside a two-anchor segment."
+  },
+  "clips": [
+    {
+      "clip_id": "seg01_clip01",
+      "audio_entry_ids": ["seg01_line01"],
+      "segment_no": 1,
+      "segment_type": "opening",
+      "speaker_focus": "duo",
+      "image_mode": "duo_frame",
+      "image_path": "visuals/anchors/duo_close.png",
+      "audio_path": "audio/host/line_001.mp3",
+      "audio_line_refs": [1],
+      "image_selection_reason": "Opening shot benefits from establishing both anchors in the same frame.",
+      "prompt_draft": "Fixed two-anchor opening shot with duo_close as the single reference image.",
+      "optimized_prompt": "Middle shot, tight two-anchor composition in a clean modern studio with balanced framing, neutral lighting, and clear face visibility. Only the left female speaker speaks. The left female speaker says in Chinese: \"大家好，欢迎收看今天的产业解读，我是小曦。\". The left female speaker shows clearly visible, active speech mouth movement synchronized to the spoken Chinese line, with distinct mouth opening and closing, readable articulation, visible lip shaping, active jaw movement on syllables, a steady eyeline, and subtle blinking with very small head motion. The right male listener listens attentively, remains silent and mostly still, with restrained micro-reactions and no visible speaking motion. Both anchors maintain formal professional posture. Both anchors remain visible in the same frame at all times. The shot stays a fixed two-anchor composition for the entire clip with no cut to a solo shot, no reframing, and no change in shot size. The camera remains fully locked and stable throughout. The overall feeling is calm, steady, and professional.",
+      "ltx_request": {
+        "mode": "audio_to_video",
+        "audio": "audio/host/line_001.mp3",
+        "images": ["visuals/anchors/duo_close.png"],
+        "save_path": "video/segments/seg01_clip01.mp4",
+        "a2v_audio_start_time": 0.0,
+        "a2v_audio_insert_video_time": 0.5,
+        "negative_prompt": "text, subtitles, watermarks, logos, readable signage, overlay, titles, has blurbox, has subtitles, artifacts around text, unreadable text, incorrect lettering, incorrect slogan, camera shake, frame jitter",
+        "duration_seconds": 4.9,
+        "num_inference_steps": 30
+      }
+    },
+    {
+      "clip_id": "seg03_clip02",
+      "audio_entry_ids": ["seg03_line04"],
+      "segment_no": 3,
+      "segment_type": "discussion",
+      "speaker_focus": "guest",
+      "image_mode": "male_solo",
+      "image_path": "visuals/anchors/male_solo.png",
+      "audio_path": "audio/guest/line_004.mp3",
+      "audio_line_refs": [4],
+      "image_selection_reason": "Explanation-heavy guest line should prioritize stable male solo lip-sync.",
+      "prompt_draft": "Middle shot with one anchor in a stable close-up.",
+      "optimized_prompt": "Middle shot, tight close-up on one anchor in a clean modern studio with neutral lighting, stable framing, and clear face visibility. The male anchor is speaking directly to the camera. The male anchor says in Chinese: \"这条新闻的关键不是谁签了协议，而是国产算力企业开始认真思考：除了大模型，还能往哪落？\". The male anchor keeps a steady eyeline and clearly visible, active speech mouth movement synchronized to the spoken Chinese line. Mouth motion stays natural but obvious, with distinct mouth opening and closing, clearly readable articulation, visible lip shaping, and active jaw movement on spoken syllables. Facial motion stays subtle and professional, with restrained blinking, minimal head movement, and calm posture so the speaking motion reads clearly. The camera remains fixed and stable throughout. The overall feeling is controlled, informative, formal, and professional.",
+      "ltx_request": {
+        "mode": "audio_to_video",
+        "audio": "audio/guest/line_004.mp3",
+        "images": ["visuals/anchors/male_solo.png"],
+        "save_path": "video/segments/seg03_clip02.mp4",
+        "a2v_audio_start_time": 0.0,
+        "a2v_audio_insert_video_time": 0.5,
+        "negative_prompt": "text, subtitles, watermarks, logos, readable signage, overlay, titles, has blurbox, has subtitles, artifacts around text, unreadable text, incorrect lettering, incorrect slogan, camera shake, frame jitter",
+        "duration_seconds": 5.0,
+        "num_inference_steps": 30
+      }
+    }
+  ]
+}

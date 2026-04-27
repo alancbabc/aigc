@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentaryScript",
+  "description": "Dual anchor commentary script",
+  "type": "object",
+  "required": ["title", "segments"],
+  "properties": {
+    "title": { "type": "string" },
+    "duration_estimate": { "type": "string" },
+    "series_mode": {
+      "type": "string",
+      "enum": ["one_off", "recurring"]
+    },
+    "anchors": {
+      "type": "object",
+      "properties": {
+        "host": { "type": "string" },
+        "guest": { "type": "string" }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["segment_no", "type", "lines", "segment_goal", "takeaway"],
+        "properties": {
+          "segment_no": { "type": "integer" },
+          "type": {
+            "type": "string",
+            "enum": ["opening", "headline", "discussion", "summary", "closing"]
+          },
+          "duration": { "type": "string" },
+          "segment_goal": {
+            "type": "string",
+            "description": "What this segment is trying to achieve for the audience"
+          },
+          "scripting_rules": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Optional per-segment writing constraints, especially for spoken-length control and line splitting"
+          },
+          "repetition_risk": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Whether the segment risks repeating content already covered in this episode or series"
+          },
+          "takeaway": {
+            "type": "string",
+            "description": "What the viewer should remember after this segment"
+          },
+          "key_point_id": { "type": "integer" },
+          "visual_hint": {
+            "type": "string",
+            "description": "Writer-side visual guidance only. It may identify visuals that should support the segment later, but it must not decide final clip binding, must not override opening/closing duo-frame policy, and must not require the opening clip to start on a source image or solo anchor shot."
+          },
+          "fact_layer": { "type": "string" },
+          "explanation_layer": { "type": "string" },
+          "meaning_layer": { "type": "string" },
+          "source_ref": { "type": "string" },
+          "source_refs": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Multiple source IDs when a segment merges information from several links"
+          },
+          "ltx2_prompt": {
+            "type": "object",
+            "properties": {
+              "visual_prompt": { "type": "string" },
+              "audio_description": { "type": "string" },
+              "camera_movement": { "type": "string" },
+              "image_mode": {
+                "type": "string",
+                "enum": ["female_solo", "male_solo", "duo_frame"]
+              }
+            }
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["line_no", "speaker", "text"],
+              "properties": {
+                "line_id": {
+                  "type": "string",
+                  "description": "Stable line identifier for traceability across script, TTS, audio timeline, and re-synthesis flows."
+                },
+                "line_no": { "type": "integer" },
+                "speaker": {
+                  "type": "string",
+                  "enum": ["host", "guest"]
+                },
+                "text": { "type": "string" },
+                "estimated_duration_seconds": {
+                  "type": "number",
+                  "minimum": 0,
+      "description": "Expected spoken duration for this single line. Keep most single-speaker lines within a practical ~8-15s range for downstream TTS and LTX stability."
+                },
+                "split_group_id": {
+                  "type": "string",
+                  "description": "Optional grouping key when one long thought is intentionally split into multiple consecutive spoken lines."
+                },
+                "emotion": {
+                  "type": "string",
+                  "enum": ["neutral", "serious", "friendly", "surprised", "thoughtful", "humorous", "casual"]
+                },
+                "pause_before": { "type": "number", "default": 0 },
+                "pause_after": { "type": "number", "default": 0.5 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

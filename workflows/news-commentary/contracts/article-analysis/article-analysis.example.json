@@ -1,0 +1,117 @@
+{
+  "source_pack": [
+    {
+      "id": "src-01",
+      "kind": "primary",
+      "title": "GPT-5 即将发布主新闻",
+      "url": "https://example.com/gpt5-news"
+    },
+    {
+      "id": "src-02",
+      "kind": "commentary",
+      "title": "行业评论汇总",
+      "url": "https://example.com/gpt5-commentary"
+    }
+  ],
+  "title": "GPT-5 即将发布：AI 能力再上新台阶",
+  "source": "科技日报",
+  "category": "tech",
+  "content_type": "news",
+  "summary": "OpenAI 计划在2026年上半年发布 GPT-5，预计将带来多模态能力的重大突破。",
+  "core_claim": "GPT-5 将成为 OpenAI 下一阶段能力升级的重要节点，重点不只是参数规模，而是多模态和交互能力的增强。",
+  "source_priority": ["src-01", "src-02"],
+  "cross_source_overlap": [
+    "发布时间相关叙述",
+    "多模态能力增强的行业预期"
+  ],
+  "hard_evidence": [
+    "发布时间被明确指向 2026 年上半年",
+    "多模态能力预计增强，包含视频理解",
+    "市场讨论集中在性能跃迁与行业影响"
+  ],
+  "must_keep_evidence": [
+    "发布时间被明确指向 2026 年上半年",
+    "多模态能力预计增强，包含视频理解"
+  ],
+  "speakable_facts": [
+    "GPT-5 预计在 2026 年上半年发布",
+    "行业关注点集中在多模态能力和复杂任务处理",
+    "用户侧更关心真实体验而不是参数数字本身"
+  ],
+  "visual_only_details": [
+    "如果存在多组技术参数对比，优先做图卡而不是主播口播逐项念完",
+    "复杂性能表格或密集 benchmark 结果更适合视觉呈现"
+  ],
+  "promo_phrases_to_neutralize": [
+    "能力再上新台阶",
+    "通往 AGI 的重要一步"
+  ],
+  "commentary_claim_boundaries": [
+    "可以说行业预期升温，但不要把未证实的能力升级当成既成事实",
+    "可以讨论竞争格局影响，但不要把发布时间预期写成官方最终确认"
+  ],
+  "key_points": [
+    {
+      "id": 1,
+      "type": "fact",
+      "content": "GPT-5 预计 2026 年上半年发布",
+      "importance": "high",
+      "source_ref": "src-01",
+      "confidence": "high"
+    },
+    {
+      "id": 2,
+      "type": "data",
+      "content": "参数规模可能达到 GPT-4 的 10 倍",
+      "importance": "high",
+      "source_ref": "src-01",
+      "confidence": "medium"
+    },
+    {
+      "id": 3,
+      "type": "opinion",
+      "content": "业界认为这将是通往 AGI 的重要一步",
+      "importance": "medium",
+      "source_ref": "src-02",
+      "confidence": "medium"
+    }
+  ],
+  "entities": ["OpenAI", "GPT-5", "Sam Altman", "AGI"],
+  "context": "GPT-4 发布后，AI 进入多模态和 agent 化加速阶段。",
+  "industry_meaning": "这将影响模型竞争格局、企业 API 采购选择，以及多模态产品设计方向。",
+  "public_meaning": "普通用户未来更可能直接让 AI 处理视频、长文档和复杂任务，而不只是聊天。",
+  "controversy": "参数规模是否等于真实能力提升，以及安全边界是否同步增强，仍存在争议。",
+  "uncertainties": [
+    "具体发布时间和正式规格尚未完全公开",
+    "10 倍参数规模是否对应稳定体验提升仍待验证"
+  ],
+  "counterpoints": [
+    "更大的模型不一定自动带来更好的真实使用体验",
+    "推理成本和延迟可能成为商业落地瓶颈"
+  ],
+  "spoken_translation_notes": [
+    "先讲用户真正需要知道的变化，再补模型层面的解释",
+    "避免一条 spoken line 同时塞入多个数字和多个判断",
+    "如果一句话主要承担证据展示，语气应克制，避免宣传化形容词"
+  ],
+  "audience_questions": [
+    "GPT-5 和 GPT-4 的核心差别是什么？",
+    "这对普通用户意味着什么？",
+    "AI 会进一步取代哪些工作？"
+  ],
+  "sources": [
+    {
+      "id": "src-01",
+      "type": "news_report",
+      "name": "科技日报",
+      "url": "https://example.com/gpt5-news"
+    },
+    {
+      "id": "src-02",
+      "type": "industry_commentary",
+      "name": "行业评论汇总",
+      "url": "https://example.com/gpt5-commentary"
+    }
+  ],
+  "series_angle": "本期从模型升级切入，延续栏目对 AI 产品竞争格局的长期跟踪。"
+}

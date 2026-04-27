@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentaryScriptSkeleton",
+  "description": "Small-file intermediate artifact for Stage 5a. Defines segment plan before full script drafting.",
+  "type": "object",
+  "required": ["title", "segments"],
+  "properties": {
+    "title": { "type": "string" },
+    "duration_estimate": { "type": "string" },
+    "series_mode": {
+      "type": "string",
+      "enum": ["one_off", "recurring"]
+    },
+    "anchors": {
+      "type": "object",
+      "properties": {
+        "host": { "type": "string" },
+        "guest": { "type": "string" }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["segment_no", "type", "segment_goal", "takeaway", "host_function", "guest_function", "must_keep_evidence"],
+        "properties": {
+          "segment_no": { "type": "integer", "minimum": 1 },
+          "type": {
+            "type": "string",
+            "enum": ["opening", "headline", "discussion", "summary", "closing"]
+          },
+          "segment_goal": { "type": "string" },
+          "takeaway": { "type": "string" },
+          "host_function": { "type": "string" },
+          "guest_function": { "type": "string" },
+          "must_keep_evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          },
+          "source_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "visual_hint": { "type": "string" },
+          "length_risk": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        }
+      }
+    }
+  }
+}

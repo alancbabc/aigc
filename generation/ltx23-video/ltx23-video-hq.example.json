@@ -1,0 +1,26 @@
+{
+  "skill": "ltx23-video",
+  "request": {
+    "mode": "text_image_to_video_high_quality",
+    "prompt": "A cinematic portrait shot of a person speaking to camera in a modern studio",
+    "save_path": "./output-hq.mp4",
+    "video_seconds": 5,
+    "images": [
+      "/path/to/character.png"
+    ],
+    "image_idxs": [0],
+    "image_strengths": [1.0]
+  },
+  "response_handling": {
+    "transport": "async_job",
+    "poll_interval": 20,
+    "max_retries": 3
+  },
+  "artifacts": [
+    {
+      "path": "./output-hq.mp4",
+      "mime_type": "video/mp4",
+      "role": "primary"
+    }
+  ]
+}

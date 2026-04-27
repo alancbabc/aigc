@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentaryLTXPromptPackage",
+  "description": "Pre-LTX prompt package for news-commentary video generation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "title", "clip_plan_ref", "prompt_guide", "selection_rules", "clips"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "title": { "type": "string" },
+    "clip_plan_ref": { "type": "string" },
+    "prompt_guide": {
+      "type": "string",
+      "description": "Prompt optimization guide used before LTX generation"
+    },
+    "selection_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_visual_policy", "duo_frame_policy"],
+      "properties": {
+        "default_visual_policy": { "type": "string" },
+        "duo_frame_policy": { "type": "string" },
+        "duo_allowed_segment_types": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "solo_priority_rule": { "type": "string" }
+      }
+    },
+    "clips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "clip_id",
+          "segment_no",
+          "speaker_focus",
+          "image_mode",
+          "image_path",
+          "audio_path",
+          "audio_line_refs",
+          "ltx_request",
+          "optimized_prompt"
+        ],
+        "properties": {
+          "clip_id": { "type": "string" },
+          "audio_entry_ids": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "segment_no": { "type": "integer" },
+          "segment_type": { "type": "string" },
+          "speaker_focus": {
+            "type": "string",
+            "enum": ["host", "guest", "duo"]
+          },
+          "image_mode": {
+            "type": "string",
+            "enum": ["female_solo", "male_solo", "duo_frame"]
+          },
+          "image_path": { "type": "string" },
+          "audio_path": { "type": "string" },
+          "audio_line_refs": {
+            "type": "array",
+            "items": { "type": "integer" }
+          },
+          "image_selection_reason": { "type": "string" },
+          "prompt_draft": { "type": "string" },
+          "optimized_prompt": {
+            "type": "string",
+            "description": "Final English prompt optimized for LTX-2"
+          },
+          "ltx_request": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["mode", "audio", "images", "save_path"],
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": ["audio_to_video"]
+              },
+              "audio": { "type": "string" },
+              "images": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+               "save_path": { "type": "string" },
+               "a2v_audio_start_time": { "type": "number" },
+               "a2v_audio_insert_video_time": { "type": "number" },
+               "negative_prompt": { "type": "string" },
+               "height": { "type": "integer" },
+               "width": { "type": "integer" },
+               "video_seconds": { "type": "number" },
+               "frame_rate": { "type": "number" },
+               "num_inference_steps": { "type": "integer" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

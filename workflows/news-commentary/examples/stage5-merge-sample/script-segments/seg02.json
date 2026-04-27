@@ -1,0 +1,36 @@
+{
+  "segment_no": 2,
+  "type": "discussion",
+  "duration": "40秒",
+  "segment_goal": "解释 GPT-5 的关注点为什么不只是发布时间",
+  "takeaway": "真正关键的是能力结构、稳定性和成本是否同时成立。",
+  "host_function": "把观众问题说清楚",
+  "guest_function": "给出结构化解释和判断",
+  "must_keep_evidence": [
+    "行业关注点集中在多模态和复杂任务能力",
+    "参数规模并不自动等于用户体验提升"
+  ],
+  "source_refs": ["src-01", "src-02"],
+  "visual_hint": "参数与能力对比图可承接在这段后半",
+  "lines": [
+    {
+      "line_id": "seg02_line01",
+      "line_no": 1,
+      "speaker": "host",
+      "text": "很多人第一反应是，GPT-5 什么时候发。但更值得问的是，它到底会在哪些能力上拉开差距？",
+      "estimated_duration_seconds": 8.2,
+      "emotion": "neutral",
+      "pause_after": 0.4
+    },
+    {
+      "line_id": "seg02_line02",
+      "line_no": 2,
+      "speaker": "guest",
+      "text": "对，发布时间只是时间点。真正决定行业反应的，是它能不能更稳地处理多模态、复杂任务和更长链路的问题。",
+      "estimated_duration_seconds": 9.6,
+      "split_group_id": "seg02_guest_explainer_01",
+      "emotion": "thoughtful",
+      "pause_after": 0.5
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "style": "professional",
+  "target_duration": "5min",
+  "language": "zh-CN",
+  "anchor_preference": {
+    "host_gender": "female",
+    "guest_gender": "male",
+    "style": "news"
+  },
+  "anchor_asset_mode": "mixed",
+  "builtin_anchor_template_id": "default-news-duo-v1",
+  "missing_anchor_assets_policy": "auto_fill",
+  "anchor_image_inputs": null,
+  "anchor_name_inputs": {
+    "host_name": "晓薇",
+    "guest_name": "陈铭"
+  },
+  "anchor_voice_inputs": null,
+  "series_mode": "one_off",
+  "series_profile": null,
+  "output_goal": "full_video",
+  "model_preference": "LTX-2",
+  "confirmation_mode": "auto"
+}

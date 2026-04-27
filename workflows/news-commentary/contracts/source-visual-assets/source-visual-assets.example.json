@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "source_documents": [
+    {
+      "source_id": "doc-01",
+      "path": "news_test/news1.doc",
+      "kind": "doc",
+      "extraction_status": "success",
+      "note": "Converted to docx before image extraction."
+    },
+    {
+      "source_id": "news1",
+      "path": "news_test/news1.md",
+      "kind": "markdown",
+      "extraction_status": "success",
+      "note": "Parsed markdown image manifest and sibling image files."
+    }
+  ],
+  "images": [
+    {
+      "image_id": "news1_img01",
+      "source_id": "news1",
+      "path": "source-assets/images/news1_img01.png",
+      "asset_type": "figure",
+      "width": 1536,
+      "height": 1024,
+      "is_usable_for_video": true,
+      "video_usage_reason": "Image is large enough and suitable for source-image video clips.",
+      "caption": "模型与算力流程技术图",
+      "context_hint": "适合在解释模型结构、训练流程或集群部署时作为静态说明画面。",
+      "preferred_segment_types": ["headline", "discussion", "summary"]
+    },
+    {
+      "image_id": "doc01_img01",
+      "source_id": "doc-01",
+      "path": "source-assets/images/doc01_img01.png",
+      "asset_type": "figure",
+      "width": 1280,
+      "height": 720,
+      "is_usable_for_video": true,
+      "video_usage_reason": "Landscape figure with readable composition for discussion clips.",
+      "caption": "模型结构示意图",
+      "context_hint": "适合用于解释模型组成或流程时的静态展示",
+      "preferred_segment_types": ["headline", "discussion"]
+    }
+  ]
+}

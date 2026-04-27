@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "title": "国产算力入局食品安全：沐曦与江南大学的合作意味着什么？",
+  "source_visual_assets_ref": "source-assets/source-visual-assets.json",
+  "aggregation_rules": {
+    "default_grouping_policy": "Prefer one spoken line per clip for stable lip-sync; merge only very short adjacent lines when the same visual setup is sufficient.",
+    "duo_frame_policy": "Reserve duo_frame for opening, closing, and short same-frame two-anchor beats; use solo modes for most explanation clips.",
+    "max_lines_per_clip": 2,
+    "split_on_speaker_change": true,
+    "split_on_long_duration_seconds": 15.0,
+    "short_dialogue_duo_max_seconds": 4.5,
+    "long_single_speaker_solo_min_seconds": 6.0,
+    "ltx_max_duration_seconds": 15.0,
+    "source_image_reuse_policy": "Each source image may appear only once in the program, and only as one continuous document-led visual block.",
+    "duration_source": "audio_timeline"
+  },
+  "clips": [
+    {
+      "clip_id": "seg01_clip01",
+      "segment_no": 1,
+      "segment_type": "opening",
+      "render_mode": "ltx",
+      "anchor_binding": "duo",
+      "character_bindings": ["host", "guest"],
+      "visual_asset_paths": [
+        "visuals/anchors/female_solo.png",
+        "visuals/anchors/male_solo.png"
+      ],
+      "composite_visual_asset_path": "visuals/anchors/duo_close.png",
+      "speaker_focus": "duo",
+      "image_mode": "duo_frame",
+      "audio_entry_ids": ["seg01_line01"],
+      "audio_paths": ["audio/host/line_001.mp3"],
+      "line_refs": [1],
+      "computed_duration_seconds": 3.9,
+      "duration_source": "audio_timeline",
+      "grouping_reason": "Opening beat benefits from establishing the two-anchor relationship immediately.",
+      "render_reason": "Opening clip has no document image requirement and should keep the anchors on camera.",
+      "image_selection_reason": "Use a tight duo reference frame briefly at the start for show establishment.",
+      "target_dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "image_fit_mode": "match_image",
+      "transition_in": "cold_open",
+      "transition_out": "cut"
+    },
+    {
+      "clip_id": "seg03_clip02",
+      "segment_no": 3,
+      "segment_type": "discussion",
+      "render_mode": "image_audio_ffmpeg",
+      "anchor_binding": "document",
+      "character_bindings": [],
+      "visual_asset_paths": [],
+      "speaker_focus": "guest",
+      "image_mode": "document_image",
+      "audio_entry_ids": ["seg03_line04", "seg03_line05"],
+      "audio_paths": ["audio/guest/line_004.mp3", "audio/guest/line_005.mp3"],
+      "line_refs": [4, 5],
+      "computed_duration_seconds": 9.1,
+      "duration_source": "audio_timeline",
+      "grouping_reason": "Consecutive spoken units share one source image, so they stay inside one continuous document-led visual block.",
+      "render_reason": "One source image is used once as a continuous visual block across consecutive matching audio units.",
+      "image_selection_reason": "Reused source image 'doc01_img01' only inside one continuous block, then retire it for the rest of the program.",
+      "source_image_ids": ["doc01_img01"],
+      "source_image_paths": ["source-assets/images/doc01_img01.png"],
+      "target_dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "image_fit_mode": "scale_pad",
+      "transition_in": "cut",
+      "transition_out": "cut"
+    }
+  ]
+}

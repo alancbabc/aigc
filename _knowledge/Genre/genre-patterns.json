@@ -1,0 +1,164 @@
+{
+  "genres": [
+    {
+      "id": "wuxia",
+      "tone": [
+        "honor",
+        "restraint",
+        "righteousness",
+        "sacrifice"
+      ],
+      "world_rules": [
+        "jianghu reputation carries real consequences",
+        "martial skill influences social hierarchy"
+      ],
+      "conflict_defaults": [
+        "sect conflict",
+        "revenge vs mercy",
+        "loyalty vs desire"
+      ],
+      "character_archetypes": [
+        "young hero",
+        "wandering swordswoman",
+        "master",
+        "assassin"
+      ],
+      "visual_keywords": [
+        "bamboo forest",
+        "mountain mist",
+        "inn at dusk",
+        "sword glint"
+      ]
+    },
+    {
+      "id": "sci-fi",
+      "tone": [
+        "wonder",
+        "control",
+        "fear",
+        "alienation"
+      ],
+      "world_rules": [
+        "technology changes social order",
+        "system logic can overpower individual desire"
+      ],
+      "conflict_defaults": [
+        "human vs system",
+        "technology risk",
+        "survival under pressure"
+      ],
+      "character_archetypes": [
+        "scientist",
+        "pilot",
+        "outsider",
+        "AI partner"
+      ],
+      "visual_keywords": [
+        "cold light",
+        "interface glow",
+        "industrial corridor",
+        "futuristic skyline"
+      ]
+    },
+    {
+      "id": "urban",
+      "tone": [
+        "realism",
+        "pressure",
+        "intimacy",
+        "ambition"
+      ],
+      "world_rules": [
+        "material pressure shapes personal choices",
+        "relationships are affected by class and work conditions"
+      ],
+      "conflict_defaults": [
+        "family conflict",
+        "work-life tension",
+        "class pressure",
+        "relationship fracture"
+      ],
+      "character_archetypes": [
+        "ordinary worker",
+        "young professional",
+        "parent",
+        "lover"
+      ],
+      "visual_keywords": [
+        "city night",
+        "apartment interior",
+        "office light",
+        "street realism"
+      ]
+    },
+    {
+      "id": "ancient-romance",
+      "tone": [
+        "longing",
+        "fate",
+        "ritual",
+        "separation"
+      ],
+      "world_rules": [
+        "status and family order shape romance",
+        "promises and rituals carry emotional weight"
+      ],
+      "conflict_defaults": [
+        "status barrier",
+        "family pressure",
+        "duty vs love"
+      ],
+      "character_archetypes": [
+        "noble lady",
+        "scholar",
+        "prince",
+        "maid",
+        "guard"
+      ],
+      "visual_keywords": [
+        "courtyard",
+        "flowing sleeves",
+        "lantern light",
+        "seasonal petals"
+      ]
+    },
+    {
+      "id": "fantasy-adventure",
+      "tone": [
+        "wonder",
+        "destiny",
+        "trial",
+        "discovery"
+      ],
+      "world_rules": [
+        "magic or myth changes ordinary limits",
+        "the world contains hidden trials and larger-than-human stakes"
+      ],
+      "conflict_defaults": [
+        "quest",
+        "awakening",
+        "prophecy",
+        "world threat"
+      ],
+      "character_archetypes": [
+        "chosen one",
+        "guide",
+        "rival",
+        "guardian",
+        "magical companion"
+      ],
+      "visual_keywords": [
+        "ancient ruins",
+        "magical forest",
+        "creature silhouette",
+        "mythic landscape"
+      ]
+    }
+  ],
+  "diagnostic_rules": [
+    "If the conflict could happen unchanged in any genre, the genre signal is weak.",
+    "If character behavior ignores the world's social or moral rules, the genre will feel false.",
+    "If visual keywords never repeat, the genre identity will blur.",
+    "If tone shifts randomly, the genre experience will flatten."
+  ]
+}

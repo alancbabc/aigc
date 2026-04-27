@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Anchors",
+  "description": "Dual anchor character profiles",
+  "type": "object",
+  "required": ["anchors", "interaction_style"],
+  "properties": {
+    "anchors": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "name",
+          "gender",
+          "personality",
+          "voice_style",
+          "tts_voice_id",
+          "anchor_function"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": ["host", "guest"]
+          },
+          "name": { "type": "string" },
+          "gender": {
+            "type": "string",
+            "enum": ["male", "female"]
+          },
+          "age_range": { "type": "string" },
+          "personality": { "type": "string" },
+          "anchor_function": {
+            "type": "string",
+            "description": "What this anchor contributes to the dialogue, e.g. translate complexity or judge significance"
+          },
+          "knowledge_bias": {
+            "type": "string",
+            "description": "The perspective this anchor naturally leans toward"
+          },
+          "voice_style": { "type": "string" },
+          "speech_rhythm": { "type": "string" },
+          "tts_voice_id": { "type": "string" },
+          "catchphrases": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "forbidden_patterns": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Patterns this anchor should avoid"
+          }
+        }
+      }
+    },
+    "series_profile_ref": {
+      "type": "string",
+      "description": "Optional reference to a recurring series profile"
+    },
+    "visual_asset_mapping": {
+      "type": "object",
+      "required": ["female_solo", "male_solo", "duo_frame"],
+      "properties": {
+        "female_solo": { "type": "string" },
+        "male_solo": { "type": "string" },
+        "duo_frame": { "type": "string" }
+      },
+      "description": "Paths or filenames for user-provided anchor images"
+    },
+    "interaction_style": {
+      "type": "object",
+      "required": ["format", "turn_pattern"],
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["qa_discussion", "debate", "interview", "casual_chat"]
+        },
+        "turn_pattern": { "type": "string" },
+        "banter_level": {
+          "type": "string",
+          "enum": ["none", "low", "medium", "high"],
+          "default": "medium"
+        }
+      }
+    }
+  }
+}

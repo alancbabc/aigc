@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "title": "国产算力入局食品安全：沐曦与江南大学的合作意味着什么？",
+  "clip_plan_ref": "video/clip-plan.json",
+  "source_visual_assets_ref": "source-assets/source-visual-assets.json",
+  "render_items": [
+    {
+      "clip_id": "seg01_clip01",
+      "render_mode": "ltx",
+      "anchor_binding": "duo",
+      "character_bindings": ["host", "guest"],
+      "audio_paths": ["audio/host/line_001.mp3"],
+      "output_path": "video/segments/seg01_clip01.mp4",
+      "computed_duration_seconds": 3.9,
+      "duration_source": "audio_timeline",
+      "video_size_source": "anchor_image",
+      "target_dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "image_fit_mode": "match_image",
+      "pad_color": "#000000",
+      "anchor_image_path": "visuals/anchors/duo_close.png",
+      "optimized_prompt": "Middle shot, tight two-anchor composition in a clean modern studio with balanced framing, neutral lighting, and clear face visibility. Only the left female speaker speaks. The left female speaker says in Chinese: \"大家好，欢迎收看今天的产业解读，我是小曦。\". The left female speaker shows clearly visible, active speech mouth movement synchronized to the spoken Chinese line, with distinct mouth opening and closing, readable articulation, visible lip shaping, active jaw movement on syllables, a steady eyeline, and subtle blinking with very small head motion. The right male listener listens attentively, remains silent and mostly still, with restrained micro-reactions and no visible speaking motion. Both anchors maintain formal professional posture. Both anchors remain visible in the same frame at all times. The shot stays a fixed two-anchor composition for the entire clip with no cut to a solo shot, no reframing, and no change in shot size. The camera remains fully locked and stable throughout. The overall feeling is calm, steady, and professional.",
+      "ltx_request": {
+        "mode": "audio_to_video",
+        "audio": "audio/host/line_001.mp3",
+        "images": ["visuals/anchors/duo_close.png"],
+        "save_path": "video/segments/seg01_clip01.mp4",
+        "a2v_audio_start_time": 0.0,
+        "a2v_audio_insert_video_time": 0.8,
+        "negative_prompt": "text, subtitles, watermarks, logos, readable signage, overlay, titles, has blurbox, has subtitles, artifacts around text, unreadable text, incorrect lettering, incorrect slogan, camera shake, frame jitter",
+        "duration_seconds": 4.9
+      }
+    },
+    {
+      "clip_id": "seg03_clip03",
+      "render_mode": "image_audio_ffmpeg",
+      "anchor_binding": "document",
+      "character_bindings": [],
+      "audio_paths": ["audio/guest/line_005.mp3"],
+      "output_path": "video/segments/seg03_clip03.mp4",
+      "computed_duration_seconds": 6.2,
+      "duration_source": "audio_timeline",
+      "video_size_source": "source_image",
+      "target_dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "image_fit_mode": "scale_pad",
+      "pad_color": "#000000",
+      "source_image_ids": ["doc01_img01"],
+      "source_image_paths": ["source-assets/images/doc01_img01.png"],
+      "ffmpeg_request": {
+        "mode": "image_audio_ffmpeg",
+        "image_paths": ["source-assets/images/doc01_img01.png"],
+        "audio_paths": ["audio/guest/line_005.mp3"],
+        "save_path": "video/segments/seg03_clip03.mp4",
+        "target_width": 1280,
+        "target_height": 720,
+        "image_fit_mode": "scale_pad",
+        "pad_color": "#000000",
+        "motion_style": "ken_burns",
+        "subtitle_mode": "none"
+      }
+    }
+  ]
+}

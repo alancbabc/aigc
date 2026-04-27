@@ -1,0 +1,28 @@
+{
+  "skill": "qwen-image-2512",
+  "request": {
+    "prompt": "a cute kitten sitting on the grass",
+    "model": "Qwen-Image-2512",
+    "size": "1024x1024",
+    "language_mode": "workflow_english",
+    "num_inference_steps": 4,
+    "cfg_scale": 1,
+    "quality": "standard"
+  },
+  "response_handling": {
+    "transport": "json",
+    "image_data_field": "data[i].b64_json",
+    "decode_required": true,
+    "output_extensions": [
+      "png",
+      "jpg"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "outputs/qwen-image-2512/frame-01.png",
+      "mime_type": "image/png",
+      "role": "primary"
+    }
+  ]
+}

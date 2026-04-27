@@ -1,0 +1,173 @@
+{
+  "role_archetypes": [
+    {
+      "id": "lead-hero",
+      "use_when": [
+        "Audience should follow this character through the story",
+        "The character carries the main decision pressure"
+      ],
+      "signals": [
+        "high recognizability",
+        "stable screen priority",
+        "clear external goal"
+      ],
+      "output_impact": [
+        "character_type",
+        "goal",
+        "states.description"
+      ]
+    },
+    {
+      "id": "support-ally",
+      "use_when": [
+        "Need support, contrast, or emotional echo for the lead"
+      ],
+      "signals": [
+        "proximity to lead",
+        "reactive behavior",
+        "relationship clarity"
+      ],
+      "output_impact": [
+        "relationships",
+        "group composition"
+      ]
+    },
+    {
+      "id": "rival",
+      "use_when": [
+        "Need competitive tension or mirrored growth"
+      ],
+      "signals": [
+        "face-off staging",
+        "mirrored actions",
+        "distance shifts"
+      ],
+      "output_impact": [
+        "relationships",
+        "body_language",
+        "composition"
+      ]
+    },
+    {
+      "id": "antagonist",
+      "use_when": [
+        "Need pressure, threat, or conflict initiation"
+      ],
+      "signals": [
+        "controlling posture",
+        "recognizable threat behavior",
+        "pressure through space"
+      ],
+      "output_impact": [
+        "character_type",
+        "emotion_expression_mode",
+        "staging"
+      ]
+    },
+    {
+      "id": "mentor",
+      "use_when": [
+        "Need guidance, order, or inherited knowledge"
+      ],
+      "signals": [
+        "stable posture",
+        "measured expression",
+        "authority through placement"
+      ],
+      "output_impact": [
+        "body_language",
+        "relationship_signal"
+      ]
+    }
+  ],
+  "relationship_signals": [
+    {
+      "id": "trust",
+      "staging": [
+        "side-by-side placement",
+        "shared direction",
+        "low defensive posture"
+      ]
+    },
+    {
+      "id": "conflict",
+      "staging": [
+        "face-off",
+        "visible distance",
+        "blocked movement"
+      ]
+    },
+    {
+      "id": "protection",
+      "staging": [
+        "one figure slightly forward",
+        "shielding body line",
+        "shared escape direction"
+      ]
+    },
+    {
+      "id": "alienation",
+      "staging": [
+        "physical gap",
+        "avoided eye contact",
+        "offset composition"
+      ]
+    },
+    {
+      "id": "power-imbalance",
+      "staging": [
+        "one centered or elevated",
+        "one offset or lower",
+        "dominant eye line"
+      ]
+    }
+  ],
+  "emotion_expression_modes": [
+    {
+      "id": "restrained",
+      "signals": [
+        "small gestures",
+        "held posture",
+        "minimal facial change"
+      ]
+    },
+    {
+      "id": "direct",
+      "signals": [
+        "open gestures",
+        "direct gaze",
+        "forward body line"
+      ]
+    },
+    {
+      "id": "defensive",
+      "signals": [
+        "folded arms",
+        "turned body",
+        "lowered head"
+      ]
+    },
+    {
+      "id": "aggressive",
+      "signals": [
+        "invasion of space",
+        "forward lean",
+        "sharp eye line"
+      ]
+    },
+    {
+      "id": "dissociated",
+      "signals": [
+        "slow response",
+        "detached gaze",
+        "reduced motion"
+      ]
+    }
+  ],
+  "diagnostic_rules": [
+    "If the character has no stable external signal, they will blur with others.",
+    "If relationships are only stated in text but never staged, they will feel weak.",
+    "If everyone expresses emotion the same way, the cast will flatten.",
+    "If costume and behavior do not reinforce the role, recognizability will drop."
+  ]
+}

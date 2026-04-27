@@ -1,0 +1,28 @@
+{
+  "show_title": "科技解读 5 分钟",
+  "series_mode": "recurring",
+  "tagline": "把复杂新闻讲明白，把行业信号讲透彻",
+  "tone": "professional but accessible",
+  "intro_style": "固定开场 + 当期 headline 快速切入",
+  "repetition_guardrails": [
+    "不要每期都重复同一句行业总论",
+    "不要让 guest 每次都以完全相同的判断句收尾",
+    "同类 AI4S 题材要换不同切入角度"
+  ],
+  "anchor_defaults": {
+    "builtin_anchor_template_id": "default-news-duo-v1",
+    "host_name": "小曦",
+    "guest_name": "沐哥",
+    "host_tts_voice_id": "female-zh-01",
+    "guest_tts_voice_id": "male-zh-02",
+    "host_voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_female.wav",
+    "guest_voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_male.wav",
+    "host_function": "替观众拆问题、翻译术语、控制节奏",
+    "guest_function": "补背景、做判断、给边界",
+    "visual_asset_mapping": {
+      "female_solo": "builtin-anchor-templates/default-news-duo-v1/visuals/anchors/female_solo.png",
+      "male_solo": "builtin-anchor-templates/default-news-duo-v1/visuals/anchors/male_solo.png",
+      "duo_frame": "builtin-anchor-templates/default-news-duo-v1/visuals/anchors/duo_close.png"
+    }
+  }
+}

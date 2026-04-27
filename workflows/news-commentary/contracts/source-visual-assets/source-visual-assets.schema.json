@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentarySourceVisualAssets",
+  "description": "Extracted source images and visual references from doc-like source materials",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_documents", "images"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "source_documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "path", "kind", "extraction_status"],
+        "properties": {
+          "source_id": { "type": "string" },
+          "path": { "type": "string" },
+          "kind": { "type": "string", "enum": ["doc", "docx", "markdown", "pdf", "web_article", "other"] },
+          "extraction_status": { "type": "string", "enum": ["pending", "success", "partial", "failed"] },
+          "error_code": { "type": "string" },
+          "error_message": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["image_id", "source_id", "path", "asset_type"],
+        "properties": {
+          "image_id": { "type": "string" },
+          "source_id": { "type": "string" },
+          "path": { "type": "string" },
+          "asset_type": { "type": "string", "enum": ["embedded_image", "cover_image", "screenshot", "figure", "chart", "other"] },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "is_usable_for_video": { "type": "boolean" },
+          "video_usage_reason": { "type": "string" },
+          "caption": { "type": "string" },
+          "context_hint": { "type": "string" },
+          "preferred_segment_types": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

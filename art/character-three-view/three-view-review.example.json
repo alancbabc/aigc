@@ -1,0 +1,33 @@
+{
+  "character_name": "Boy",
+  "state_num": 1,
+  "review_image": "characters/boy_1_sheet.png",
+  "pass_review": true,
+  "view_coverage": {
+    "front": true,
+    "side": true,
+    "back": true
+  },
+  "background_check": {
+    "front": true,
+    "side": true,
+    "back": true,
+    "all_pure_white": true
+  },
+  "consistency_score": 0.9,
+  "consistency_checks": {
+    "hairstyle": true,
+    "clothing": true,
+    "shoes": true,
+    "accessories": true,
+    "body_proportions": true
+  },
+  "issues": [],
+  "strengths": [
+    "Hairstyle is stable across all three views",
+    "Clothing, shoes, and accessories remain consistent",
+    "Each panel matches the expected viewing direction",
+    "All three panels use a pure white background"
+  ],
+  "fix_suggestions": []
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Outline",
+  "type": "object",
+  "required": ["title", "genre", "duration", "visual_style", "core_theme", "characters", "structure", "scenes"],
+  "properties": {
+    "title": { "type": "string" },
+    "genre": { "type": "string" },
+    "subgenre": { "type": "string" },
+    "duration": { "type": "string" },
+    "visual_style": {
+      "type": "object",
+      "required": ["keywords", "references"],
+      "properties": {
+        "keywords": { "type": "array", "items": { "type": "string" } },
+        "references": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "narrative_focus": { "type": "string" },
+    "core_theme": { "type": "string" },
+    "characters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "role"],
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "gender": { "type": "string" }
+        }
+      }
+    },
+    "structure": { "type": "object" },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scene_no", "name", "location", "function"],
+        "properties": {
+          "scene_no": { "type": "integer" },
+          "name": { "type": "string" },
+          "location": { "type": "string" },
+          "function": { "type": "string" }
+        }
+      }
+    }
+  }
+}

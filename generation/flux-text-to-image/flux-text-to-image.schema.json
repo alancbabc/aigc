@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FLUX Text-to-Image Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skill",
+    "request",
+    "response_handling",
+    "artifacts"
+  ],
+  "properties": {
+    "skill": {
+      "const": "flux-text-to-image"
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt",
+        "model",
+        "size"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "const": "FLUX.2-klein-9B"
+        },
+        "size": {
+          "type": "string",
+          "pattern": "^[0-9]+x[0-9]+$"
+        },
+        "num_inference_steps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "guidance_scale": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "response_handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transport",
+        "image_data_field",
+        "decode_required",
+        "output_extensions"
+      ],
+      "properties": {
+        "transport": {
+          "type": "string",
+          "const": "json"
+        },
+        "image_data_field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decode_required": {
+          "type": "boolean",
+          "const": true
+        },
+        "output_extensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "png",
+              "jpg"
+            ]
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "mime_type",
+          "role"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mime_type": {
+            "type": "string",
+            "enum": [
+              "image/png",
+              "image/jpeg"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "primary"
+            ]
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

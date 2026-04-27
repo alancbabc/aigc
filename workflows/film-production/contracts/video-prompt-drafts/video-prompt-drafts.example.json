@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "project_title": "Paper Airplane",
+  "style": "Ghibli style, hand-drawn 2D, soft colors, delicate light",
+  "keyframe_images_ref": "keyframe-images.json",
+  "keyframe_prompts_ref": "keyframe-prompts.json",
+  "notes": "Raw prompt drafts are preserved before any LTX-specific rewriting.",
+  "entries": [
+    {
+      "prompt_id": "scene01_shot01",
+      "scene_no": 1,
+      "shot_no": 1,
+      "scene_id": "scene_01",
+      "shot_id": "scene_01_shot_01",
+      "clip_type": "shot",
+      "render_mode": "text_image_to_video_high_quality",
+      "source_image_paths": [
+        "keyframes/scene_01_shot_01_first.png",
+        "keyframes/scene_01_shot_01_intermediate.png",
+        "keyframes/scene_01_shot_01_last.png"
+      ],
+      "prompt_basis": "Animate the approved release action from preparation to airplane lift-off while keeping the same environment and boy silhouette.",
+      "prompt_draft": "Wide shot of the young boy on the grassy hillside preparing and then releasing a paper airplane into the warm late-afternoon sky, with gentle upward motion and a hopeful cinematic feeling.",
+      "target_duration_seconds": 5
+    },
+    {
+      "prompt_id": "scene01_transition_to_scene02",
+      "scene_no": 1,
+      "shot_no": 99,
+      "scene_id": "scene_01",
+      "shot_id": "transition_scene_01_to_scene_02",
+      "clip_type": "transition",
+      "render_mode": "text_image_to_video_high_quality",
+      "transition_type": "AERIAL MATCH CUT",
+      "from_shot_id": "scene_01_shot_01",
+      "to_shot_id": "scene_02_shot_01",
+      "from_last_frame": "keyframes/scene_01_shot_01_last.png",
+      "to_first_frame": "keyframes/scene_02_shot_01_first.png",
+      "visual_bridge": "Paper airplane rises into the sky -> sky reveals the next scene",
+      "bridge_logic": "Bridge the outgoing airplane lift-off into a clean sky transition and then reveal the next scene from the sky downward.",
+      "source_image_paths": [
+        "keyframes/scene_01_shot_01_last.png",
+        "keyframes/scene_02_shot_01_first.png"
+      ],
+      "prompt_basis": "Derived from director/transition output for a non-cut scene boundary.",
+      "prompt_draft": "Create a short aerial match cut transition clip using the final airplane release frame and the next scene's opening meadow frame, with the sky acting as the visual bridge.",
+      "target_duration_seconds": 3
+    }
+  ]
+}

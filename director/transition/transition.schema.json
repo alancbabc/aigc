@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Transition Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "transition_type",
+    "transition_goal",
+    "visual_bridge",
+    "reason",
+    "execution_notes",
+    "frame_requirement",
+    "prompt_hint",
+    "transition_clip_needed"
+  ],
+  "properties": {
+    "transition_type": {
+      "type": "string",
+      "enum": [
+        "CUT",
+        "FADE",
+        "DISSOLVE",
+        "MATCH CUT",
+        "SMASH CUT",
+        "WIPE",
+        "AERIAL MATCH CUT",
+        "SKY TRANSITION"
+      ]
+    },
+    "transition_goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "visual_bridge": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "execution_notes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "frame_requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "needs_extra_frames",
+        "recommended_frames"
+      ],
+      "properties": {
+        "needs_extra_frames": {
+          "type": "boolean"
+        },
+        "recommended_frames": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "first",
+              "intermediate",
+              "last"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "prompt_hint": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transition_clip_needed": {
+      "type": "boolean"
+    },
+    "transition_clip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clip_id",
+        "clip_type",
+        "from_last_frame",
+        "to_first_frame",
+        "transition_type",
+        "visual_bridge",
+        "bridge_logic",
+        "raw_prompt",
+        "optimized_prompt",
+        "ltx_request_stub"
+      ],
+      "properties": {
+        "clip_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clip_type": {
+          "type": "string",
+          "const": "transition"
+        },
+        "from_shot_id": {
+          "type": "string"
+        },
+        "to_shot_id": {
+          "type": "string"
+        },
+        "from_last_frame": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to_first_frame": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transition_type": {
+          "type": "string",
+          "enum": [
+            "FADE",
+            "DISSOLVE",
+            "MATCH CUT",
+            "SMASH CUT",
+            "WIPE",
+            "AERIAL MATCH CUT",
+            "SKY TRANSITION"
+          ]
+        },
+        "visual_bridge": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bridge_logic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "raw_prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "optimized_prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_duration_seconds": {
+          "type": "number",
+          "minimum": 1
+        },
+        "ltx_request_stub": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "images"],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["text_image_to_video_high_quality", "audio_to_video"]
+            },
+            "audio": {
+              "type": "string"
+            },
+            "images": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "video_seconds": {
+              "type": "number",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "transition_type": { "const": "CUT" }
+        }
+      },
+      "then": {
+        "properties": {
+          "transition_clip_needed": { "const": false }
+        }
+      },
+      "else": {
+        "required": ["transition_clip"],
+        "properties": {
+          "transition_clip_needed": { "const": true }
+        }
+      }
+    }
+  }
+}

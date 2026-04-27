@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "title": "国产算力入局食品安全：沐曦与江南大学的合作意味着什么？",
+  "source_script_ref": "script.json",
+  "max_target_duration_seconds": 15.0,
+  "estimated_total_duration_seconds": 13.2,
+  "entries": [
+    {
+      "entry_id": "seg01_line01",
+      "script_line_id": "seg01_line01",
+      "segment_no": 1,
+      "segment_type": "opening",
+      "line_no": 1,
+      "speaker": "host",
+      "text": "大家好，欢迎收看今天的产业解读，我是小曦。",
+      "emotion": "friendly",
+      "estimated_duration_seconds": 3.6,
+      "planned_audio_path": "audio/host/seg01_line01.wav",
+      "voice_source": {
+        "mode": "mixed",
+        "tts_voice_id": "female-zh-01",
+        "voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_female.wav",
+        "template_id": "default-news-duo-v1",
+        "local_tts_speaker": "Serena",
+        "local_tts_language": "chinese",
+        "local_tts_instruction": "中文女主持人，活泼自然，语速中等偏快，吐字清楚。"
+      },
+      "pause_before": 0.0,
+      "pause_after": 0.3,
+      "split_part_no": 1,
+      "split_part_total": 1,
+      "source_line_text": "大家好，欢迎收看今天的产业解读，我是小曦。"
+    },
+    {
+      "entry_id": "seg01_line03_part01",
+      "script_line_id": "seg01_line03",
+      "segment_no": 1,
+      "segment_type": "opening",
+      "line_no": 3,
+      "speaker": "guest",
+      "text": "大家好，我是沐哥。",
+      "emotion": "thoughtful",
+      "estimated_duration_seconds": 2.1,
+      "planned_audio_path": "audio/guest/seg01_line03_part01.wav",
+      "voice_source": {
+        "mode": "mixed",
+        "tts_voice_id": "male-zh-02",
+        "voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_male.wav",
+        "template_id": "default-news-duo-v1",
+        "local_tts_speaker": "Ryan",
+        "local_tts_language": "chinese",
+        "local_tts_instruction": "中文男性主播，语速快，发音清晰，声音明亮爽朗，自然有交流感"
+      },
+      "pause_before": 0.0,
+      "pause_after": 0.0,
+      "split_part_no": 1,
+      "split_part_total": 2,
+      "split_group_id": "seg01_line03_split",
+      "source_line_text": "大家好，我是沐哥。这条新闻的关键不是谁签了协议，而是国产算力企业开始认真思考：除了大模型，还能往哪落？"
+    },
+    {
+      "entry_id": "seg01_line03_part02",
+      "script_line_id": "seg01_line03",
+      "segment_no": 1,
+      "segment_type": "opening",
+      "line_no": 3,
+      "speaker": "guest",
+      "text": "这条新闻的关键不是谁签了协议，而是国产算力企业开始认真思考：除了大模型，还能往哪落？",
+      "emotion": "thoughtful",
+      "estimated_duration_seconds": 6.7,
+      "planned_audio_path": "audio/guest/seg01_line03_part02.wav",
+      "voice_source": {
+        "mode": "mixed",
+        "tts_voice_id": "male-zh-02",
+        "voice_reference_audio": "builtin-anchor-templates/default-news-duo-v1/audio/source_male.wav",
+        "template_id": "default-news-duo-v1",
+        "local_tts_speaker": "Ryan",
+        "local_tts_language": "chinese",
+        "local_tts_instruction": "中文男性主播，语速快，发音清晰，声音明亮爽朗，自然有交流感"
+      },
+      "pause_before": 0.0,
+      "pause_after": 0.5,
+      "split_part_no": 2,
+      "split_part_total": 2,
+      "split_group_id": "seg01_line03_split",
+      "source_line_text": "大家好，我是沐哥。这条新闻的关键不是谁签了协议，而是国产算力企业开始认真思考：除了大模型，还能往哪落？"
+    }
+  ]
+}

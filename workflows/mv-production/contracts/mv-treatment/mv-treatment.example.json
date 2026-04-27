@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "song_title": "夜曲",
+  "artist": "周杰伦",
+  "song_structure_ref": "song-structure.json",
+  "lyrics_analysis_ref": "lyrics-analysis.json",
+  "concept_type": "narrative",
+  "concept_summary": "A young pianist walks through a rain-soaked city at night, revisiting locations tied to a lost relationship. Memory and present interweave through dissolves and parallel editing, with a piano motif serving as both diegetic element and emotional anchor. The bridge marks a turning point from grief to acceptance as dawn breaks.",
+  "visual_style": {
+    "style_keywords": ["cinematic", "moody", "neo-noir", "rain-soaked", "warm-cool contrast", "film grain"],
+    "reference_directors": ["Wong Kar-wai", "Xavier Dolan"],
+    "reference_mvs": ["Adele - Someone Like You", "Jay Chou - Secret"],
+    "aspect_ratio": "2.35:1",
+    "grain_texture": "subtle_film"
+  },
+  "color_palette": {
+    "dominant_colors": ["midnight blue", "warm amber", "silver grey"],
+    "accent_colors": ["neon pink", "deep red", "pale gold"],
+    "color_shift_strategy": "Cool blue dominance in verses, warm amber intrusion during choruses, gradual warm takeover through bridge to golden dawn in outro."
+  },
+  "narrative_thread": {
+    "premise": "A pianist returns to the city where a past relationship ended, spending one night walking through shared memories before finding peace at dawn.",
+    "protagonist": "Young male pianist, late 20s, wearing a dark coat, carrying unresolved grief",
+    "conflict": "The inability to let go of a relationship that ended, haunted by vivid memories triggered by familiar places",
+    "resolution": "At dawn, the protagonist sits at a public piano and plays the nocturne one final time, choosing to let the music carry the memory forward rather than holding onto the pain",
+    "timeline_structure": "non_linear"
+  },
+  "performance_plan": null,
+  "cross_cutting_rules": [
+    "Memory sequences use warmer color grading and softer focus than present-time shots",
+    "Never hold a single timeline for more than 20 seconds before cutting to the other",
+    "Chorus sections always include at least one present-memory collision moment",
+    "The bridge is the only section that stays in a single continuous timeline"
+  ],
+  "section_plans": [
+    {
+      "section_ref": "intro",
+      "visual_world": "Rain-soaked city at night, empty streets with neon reflections",
+      "primary_content_type": "concept_imagery",
+      "scene_refs": ["scene_city_night"],
+      "character_refs": [],
+      "key_visual_moments": ["Slow reveal of wet pavement reflecting neon", "First piano note triggers the visual world"],
+      "camera_approach": "Slow dolly forward through empty street, no character visible yet",
+      "transition_strategy": "Dissolve from wide city to close-up of protagonist's hands on piano keys",
+      "energy_match": "Visual stillness matches low musical energy, slow camera movement builds anticipation"
+    },
+    {
+      "section_ref": "verse_1",
+      "visual_world": "Night streets, protagonist walking alone past closed shops and empty cafes",
+      "primary_content_type": "narrative",
+      "scene_refs": ["scene_city_night", "scene_cafe_exterior"],
+      "character_refs": ["protagonist"],
+      "key_visual_moments": ["Protagonist pauses at a cafe window, sees own reflection", "Rain begins to fall"],
+      "camera_approach": "Handheld medium shots following protagonist, occasional close-ups on face and hands",
+      "transition_strategy": "Accelerating cuts build toward pre-chorus, final shot is protagonist looking up at rain",
+      "energy_match": "Measured pacing matches medium-low energy, camera stays close and intimate"
+    },
+    {
+      "section_ref": "chorus_1",
+      "visual_world": "Split between present rain-soaked streets and warm-toned memory apartment",
+      "primary_content_type": "mixed",
+      "scene_refs": ["scene_city_night", "scene_apartment_warm"],
+      "character_refs": ["protagonist", "love_interest"],
+      "key_visual_moments": ["Cross-dissolve from protagonist reaching out to a memory of two hands touching", "Rain transforms into golden light particles"],
+      "camera_approach": "Dynamic: wide establishing shots intercut with tight emotional close-ups, camera movement follows musical crescendo",
+      "transition_strategy": "Energy drops into verse 2 through a long dissolve from memory back to solitary present",
+      "energy_match": "Full visual crescendo matching high musical energy, fastest cutting pace in the MV"
+    },
+    {
+      "section_ref": "verse_2",
+      "visual_world": "Memory world: warm apartment interior, golden hour light",
+      "primary_content_type": "narrative",
+      "scene_refs": ["scene_apartment_warm"],
+      "character_refs": ["protagonist", "love_interest"],
+      "key_visual_moments": ["Intimate domestic scene: cooking together, laughing", "A specific object (a music box) that will return in the bridge"],
+      "camera_approach": "Steady, warm, intimate framing, shallow depth of field",
+      "transition_strategy": "Rhythmic cuts accelerate as chorus approaches, the warmth begins to fracture",
+      "energy_match": "Gentle pacing matches tender mood, visual warmth contrasts with the melancholy undertone"
+    },
+    {
+      "section_ref": "bridge",
+      "visual_world": "Transitional: the boundary between night and dawn, a rooftop or waterfront",
+      "primary_content_type": "narrative",
+      "scene_refs": ["scene_rooftop_dawn"],
+      "character_refs": ["protagonist"],
+      "key_visual_moments": ["Protagonist finds the music box in his coat pocket", "First light of dawn breaks the horizon", "He places the music box on a ledge and walks away"],
+      "camera_approach": "Single long take or minimal cuts, camera slowly pulls back to reveal the full scene",
+      "transition_strategy": "Dawn light builds into the final chorus through a camera push-in on the protagonist's face",
+      "energy_match": "Sustained tension matches reflective energy, visual stillness demands attention"
+    },
+    {
+      "section_ref": "outro",
+      "visual_world": "Morning city, same streets now bathed in warm light",
+      "primary_content_type": "narrative",
+      "scene_refs": ["scene_city_dawn"],
+      "character_refs": ["protagonist"],
+      "key_visual_moments": ["Protagonist walks the same streets from verse 1, now in morning light", "He passes the cafe, this time not stopping", "Final wide shot: small figure walking forward into golden light"],
+      "camera_approach": "Steady wide shots, gradually pulling back to maximum distance",
+      "transition_strategy": "Slow fade to black over final instrumental bars",
+      "energy_match": "Calm resolution matches fading musical energy, spacious framing conveys emotional release"
+    }
+  ],
+  "treatment_notes": "The MV uses a non-linear timeline: verse 1 and chorus 1 establish the present-memory pattern, verse 2 deepens the memory world, the bridge provides the turning point, and the outro mirrors verse 1 with transformed emotional context. The piano motif should appear both diegetically (protagonist playing) and as a visual metaphor (keys, notes, sheet music as recurring motifs)."
+}

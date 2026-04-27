@@ -1,0 +1,39 @@
+{
+  "stage": 2,
+  "project_title": "Paper Airplane",
+  "style": "Ghibli style, hand-drawn 2D, soft colors, delicate light",
+  "scene_no": 1,
+  "shots": [
+    {
+      "shot_no": 1,
+      "reference_images": {
+        "characters": [
+          "characters/boy_1_front.png"
+        ],
+        "scene": "scene-design/scene_01_establishing.png"
+      },
+      "frame_config": {
+        "frames": [
+          {
+            "type": "first",
+            "intent": "show the opening state before the paper airplane is released",
+            "change_focus": "boy preparing the airplane with hands still close to the body",
+            "prompt": "Ghibli style, hand-drawn 2D, soft colors, wide shot, eye-level view, a young boy standing on a grassy hillside, both hands still close to the chest while preparing a paper airplane, distant town below, warm late-afternoon light, quiet hopeful atmosphere"
+          },
+          {
+            "type": "intermediate",
+            "intent": "show the action phase change as the airplane is being released upward",
+            "change_focus": "arm extension and airplane leaving the hand",
+            "prompt": "Ghibli style, hand-drawn 2D, soft colors, wide shot, eye-level view, the same boy extending one arm upward as the paper airplane leaves his hand, grassy hillside, distant town below, warm late-afternoon light, hopeful motion in progress"
+          },
+          {
+            "type": "last",
+            "intent": "show the end state that supports the aerial match cut into the next scene",
+            "change_focus": "airplane already above the boy, composition prepared for sky bridge",
+            "prompt": "Ghibli style, hand-drawn 2D, soft colors, wide shot, eye-level view, the same boy looking upward while the paper airplane is already above him in open sky, grassy hillside at the bottom of frame, warm late-afternoon light, composition prepared for aerial match cut"
+          }
+        ]
+      }
+    }
+  ]
+}

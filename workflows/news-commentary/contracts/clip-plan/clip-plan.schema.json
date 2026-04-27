@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentaryClipPlan",
+  "description": "Line-to-clip aggregation plan for news-commentary workflow",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "title", "aggregation_rules", "clips"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "title": { "type": "string" },
+    "source_visual_assets_ref": { "type": "string" },
+    "aggregation_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_grouping_policy", "duo_frame_policy", "max_lines_per_clip"],
+      "properties": {
+        "default_grouping_policy": { "type": "string" },
+        "duo_frame_policy": { "type": "string" },
+        "max_lines_per_clip": { "type": "integer", "minimum": 1 },
+        "split_on_speaker_change": { "type": "boolean" },
+        "split_on_long_duration_seconds": { "type": "number", "minimum": 0, "maximum": 15 },
+        "short_dialogue_duo_max_seconds": { "type": "number", "minimum": 0 },
+        "long_single_speaker_solo_min_seconds": { "type": "number", "minimum": 0 },
+        "ltx_max_duration_seconds": { "type": "number", "minimum": 0, "maximum": 15 },
+        "source_image_reuse_policy": { "type": "string" },
+        "duration_source": { "type": "string", "enum": ["audio_timeline", "tts_plan"] }
+      }
+    },
+    "clips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "clip_id",
+          "segment_no",
+          "segment_type",
+          "render_mode",
+          "anchor_binding",
+          "character_bindings",
+          "visual_asset_paths",
+          "speaker_focus",
+          "image_mode",
+          "audio_entry_ids",
+          "audio_paths",
+          "line_refs",
+          "computed_duration_seconds"
+        ],
+        "properties": {
+          "clip_id": { "type": "string" },
+          "segment_no": { "type": "integer" },
+          "render_mode": {
+            "type": "string",
+            "enum": ["ltx", "image_audio_ffmpeg"]
+          },
+          "anchor_binding": {
+            "type": "string",
+            "enum": ["solo", "duo", "document"]
+          },
+          "segment_type": {
+            "type": "string",
+            "enum": ["opening", "headline", "discussion", "summary", "closing"]
+          },
+          "speaker_focus": {
+            "type": "string",
+            "enum": ["host", "guest", "duo"]
+          },
+          "image_mode": {
+            "type": "string",
+            "enum": ["female_solo", "male_solo", "duo_frame", "document_image"]
+          },
+          "character_bindings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["host", "guest"]
+            },
+            "uniqueItems": true
+          },
+          "visual_asset_paths": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "composite_visual_asset_path": { "type": "string" },
+          "audio_entry_ids": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          },
+          "audio_paths": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          },
+          "line_refs": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "minItems": 1
+          },
+          "computed_duration_seconds": { "type": "number", "minimum": 0, "maximum": 15 },
+          "duration_source": { "type": "string", "enum": ["audio_timeline", "tts_plan"] },
+          "grouping_reason": { "type": "string" },
+          "render_reason": { "type": "string" },
+          "image_selection_reason": { "type": "string" },
+          "source_image_ids": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "source_image_paths": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "target_dimensions": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["width", "height"],
+            "properties": {
+              "width": { "type": "integer", "minimum": 1 },
+              "height": { "type": "integer", "minimum": 1 }
+            }
+          },
+          "image_fit_mode": {
+            "type": "string",
+            "enum": ["match_image", "scale_pad"]
+          },
+          "transition_in": { "type": "string" },
+          "transition_out": { "type": "string" }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "properties": {
+        "clips": {
+          "items": {
+            "if": {
+              "properties": {
+                "render_mode": { "const": "ltx" }
+              }
+            },
+            "then": {
+              "properties": {
+                "audio_entry_ids": { "maxItems": 1 },
+                "audio_paths": { "maxItems": 1 },
+                "image_mode": {
+                  "enum": ["female_solo", "male_solo", "duo_frame"]
+                },
+                "anchor_binding": {
+                  "enum": ["solo", "duo"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "clips": {
+          "items": {
+            "if": {
+              "properties": {
+                "anchor_binding": { "const": "solo" }
+              }
+            },
+            "then": {
+              "properties": {
+                "speaker_focus": { "enum": ["host", "guest"] },
+                "image_mode": { "enum": ["female_solo", "male_solo"] },
+                "character_bindings": { "minItems": 1, "maxItems": 1 },
+                "visual_asset_paths": { "minItems": 1, "maxItems": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "clips": {
+          "items": {
+            "if": {
+              "properties": {
+                "anchor_binding": { "const": "duo" }
+              }
+            },
+            "then": {
+              "required": ["composite_visual_asset_path"],
+              "properties": {
+                "speaker_focus": { "const": "duo" },
+                "image_mode": { "const": "duo_frame" },
+                "character_bindings": { "minItems": 2, "maxItems": 2 },
+                "visual_asset_paths": { "minItems": 2, "maxItems": 2 }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "clips": {
+          "items": {
+            "if": {
+              "properties": {
+                "anchor_binding": { "const": "document" }
+              }
+            },
+            "then": {
+              "properties": {
+                "render_mode": { "const": "image_audio_ffmpeg" },
+                "image_mode": { "const": "document_image" },
+                "visual_asset_paths": { "maxItems": 0 },
+                "character_bindings": { "maxItems": 0 }
+              },
+              "required": ["source_image_ids", "source_image_paths"]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

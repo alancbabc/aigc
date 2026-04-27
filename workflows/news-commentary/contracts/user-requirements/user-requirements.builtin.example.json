@@ -1,0 +1,17 @@
+{
+  "style": "professional",
+  "target_duration": "3min",
+  "language": "zh-CN",
+  "anchor_preference": null,
+  "anchor_asset_mode": "builtin_template",
+  "builtin_anchor_template_id": "default-news-duo-v1",
+  "missing_anchor_assets_policy": "auto_fill",
+  "anchor_image_inputs": null,
+  "anchor_name_inputs": null,
+  "anchor_voice_inputs": null,
+  "series_mode": "one_off",
+  "series_profile": null,
+  "output_goal": "full_video",
+  "model_preference": "LTX-2",
+  "confirmation_mode": "auto"
+}

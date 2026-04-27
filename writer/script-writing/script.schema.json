@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Script",
+  "type": "object",
+  "required": ["title", "genre", "duration", "scenes"],
+  "properties": {
+    "title": { "type": "string" },
+    "genre": { "type": "string" },
+    "duration": { "type": "string" },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scene_no", "location", "event", "characters"],
+        "properties": {
+          "scene_no": { "type": "integer" },
+          "location": { "type": "string" },
+          "time_of_day": { "type": "string" },
+          "presence": { "type": "array", "items": { "type": "string" } },
+          "enter": { "type": "array", "items": { "type": "string" } },
+          "exit": { "type": "array", "items": { "type": "string" } },
+          "event": { "type": "string" },
+          "duration": { "type": "string" },
+          "characters": { "type": "array" }
+        }
+      }
+    }
+  }
+}

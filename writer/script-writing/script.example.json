@@ -1,0 +1,25 @@
+{
+  "title": "《纸飞机》",
+  "genre": "都市成长",
+  "duration": "5分钟",
+  "scenes": [
+    {
+      "scene_no": 1,
+      "location": "小镇外山坡",
+      "time_of_day": "傍晚",
+      "presence": ["小树"],
+      "enter": ["小树"],
+      "exit": [],
+      "event": "小树放学后在山坡坐下，拿出信纸写给母亲",
+      "duration": "约45秒",
+      "characters": [
+        {
+          "character": "小树",
+          "state_num": 1,
+          "parenthetical": "低头，认真写字",
+          "dialogue": "妈妈，我今天又考了第一名。"
+        }
+      ]
+    }
+  ]
+}

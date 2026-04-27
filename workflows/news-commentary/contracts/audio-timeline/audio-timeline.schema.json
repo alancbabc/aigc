@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewsCommentaryAudioTimeline",
+  "description": "TTS output timeline contract for news-commentary workflow",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "title", "audio_format", "entries"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "title": { "type": "string" },
+    "audio_format": {
+      "type": "string",
+      "enum": ["mp3", "wav"]
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entry_id",
+          "script_line_id",
+          "segment_no",
+          "segment_type",
+          "line_no",
+          "speaker",
+          "text",
+          "audio_path",
+          "duration_seconds",
+          "voice_source"
+        ],
+        "properties": {
+          "entry_id": { "type": "string" },
+          "script_line_id": { "type": "string" },
+          "segment_no": { "type": "integer" },
+          "segment_type": {
+            "type": "string",
+            "enum": ["opening", "headline", "discussion", "summary", "closing"]
+          },
+          "line_no": { "type": "integer" },
+          "speaker": {
+            "type": "string",
+            "enum": ["host", "guest"]
+          },
+          "text": { "type": "string" },
+          "emotion": { "type": "string" },
+          "audio_path": { "type": "string" },
+        "duration_seconds": { "type": "number", "minimum": 0, "maximum": 15 },
+          "pause_before": { "type": "number", "minimum": 0 },
+          "pause_after": { "type": "number", "minimum": 0 },
+          "split_part_no": { "type": "integer", "minimum": 1 },
+          "split_part_total": { "type": "integer", "minimum": 1 },
+          "split_group_id": { "type": "string" },
+          "source_line_text": { "type": "string" },
+          "resynthesis_round": { "type": "integer", "minimum": 0 },
+          "needs_resynthesis": { "type": "boolean" },
+          "resynthesis_reason": { "type": "string" },
+          "voice_source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["mode"],
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": ["tts_voice_id", "voice_reference_audio", "mixed"]
+              },
+              "tts_voice_id": { "type": "string" },
+              "voice_reference_audio": { "type": "string" },
+              "template_id": { "type": "string" },
+              "local_tts_speaker": { "type": "string" },
+              "local_tts_language": { "type": "string" },
+              "local_tts_instruction": { "type": "string" }
+            }
+          },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "properties": {
+        "entries": {
+          "items": {
+            "if": {
+              "properties": {
+                "split_part_total": { "minimum": 2 }
+              }
+            },
+            "then": {
+              "required": ["split_group_id"]
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "entries": {
+          "items": {
+            "if": {
+              "properties": {
+                "needs_resynthesis": { "const": true }
+              }
+            },
+            "then": {
+              "required": ["resynthesis_reason"]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

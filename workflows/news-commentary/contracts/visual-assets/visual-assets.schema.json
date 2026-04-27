@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VisualAssets",
+  "description": "User-provided visual assets for news-commentary anchors",
+  "type": "object",
+  "required": ["female_solo", "male_solo", "duo_frame"],
+  "properties": {
+    "female_solo": {
+      "type": "string",
+      "description": "Path to female single-anchor image"
+    },
+    "male_solo": {
+      "type": "string",
+      "description": "Path to male single-anchor image"
+    },
+    "duo_frame": {
+      "type": "string",
+      "description": "Path to two-anchor same-frame image"
+    }
+  }
+}

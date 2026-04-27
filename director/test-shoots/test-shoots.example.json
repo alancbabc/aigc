@@ -1,0 +1,74 @@
+{
+  "stage": 1,
+  "project_title": "Paper Airplane",
+  "style": "Ghibli style, hand-drawn 2D, soft colors, delicate light",
+  "scene_no": 1,
+  "scene_summary": "A boy writes a note on the hillside before sending a paper airplane into the sky",
+  "location": "Hillside",
+  "time_of_day": "Late afternoon",
+  "shots": [
+    {
+      "shot_no": 1,
+      "shot_type": "wide shot",
+      "camera_angle": "eye-level",
+      "camera_movement": "static",
+      "description": "Establish the hillside and the boy preparing the paper airplane",
+      "duration": 4,
+      "sound_cues": [
+        "soft hillside wind",
+        "paper folding close sound",
+        "light cloth movement"
+      ],
+      "transition_to_next": "AERIAL MATCH CUT",
+      "transition_context": {
+        "visual_bridge": "Paper airplane rises into the sky -> sky reveals the next scene",
+        "prompt_hint": "aerial match cut, camera follows the paper airplane upward into the sky, sky bridge into the next scene",
+        "frame_requirement": {
+          "needs_extra_frames": true,
+          "recommended_frames": [
+            "first",
+            "intermediate",
+            "last"
+          ]
+        }
+      },
+      "frame_plan": {
+        "frame_count": 3,
+        "frames": [
+          {
+            "type": "first",
+            "intent": "show the opening state before the paper airplane is released",
+            "change_focus": "boy preparing the airplane with hands still close to the body"
+          },
+          {
+            "type": "intermediate",
+            "intent": "show the action phase change as the airplane is being released upward",
+            "change_focus": "arm extension and airplane leaving the hand"
+          },
+          {
+            "type": "last",
+            "intent": "show the end state that supports the aerial match cut into the next scene",
+            "change_focus": "airplane already above the boy, composition prepared for sky bridge"
+          }
+        ]
+      },
+      "has_character": true,
+      "characters": [
+        "Boy"
+      ],
+      "reference_images": {
+        "characters": [
+          "characters/boy_1_front.png"
+        ],
+        "scene": "scene-design/scene_01.png"
+      },
+      "shot_prompt": "Ghibli style, hand-drawn 2D, soft colors, wide shot, eye-level view, static, grassy hillside with a distant town and warm late-afternoon light, a young boy preparing a paper airplane, quiet and hopeful atmosphere"
+    }
+  ],
+  "logic_check": {
+    "is_valid": true,
+    "issues": [],
+    "merge_suggestions": [],
+    "split_suggestions": []
+  }
+}

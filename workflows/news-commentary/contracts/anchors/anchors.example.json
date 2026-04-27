@@ -1,0 +1,43 @@
+{
+  "series_profile_ref": "series-profile.json",
+  "visual_asset_mapping": {
+    "female_solo": "visuals/anchors/female_solo.png",
+    "male_solo": "visuals/anchors/male_solo.png",
+    "duo_frame": "visuals/anchors/duo_close.png"
+  },
+  "anchors": [
+    {
+      "role": "host",
+      "name": "小曦",
+      "gender": "female",
+      "age_range": "25-30",
+      "personality": "专业干练，语速适中，善于引导话题",
+      "anchor_function": "把复杂信息翻译成观众能快速理解的问题和结论",
+      "knowledge_bias": "更关心用户听懂没有，而不是技术炫技本身",
+      "voice_style": "清晰标准，略带亲和力",
+      "speech_rhythm": "短句、清晰、提问驱动",
+      "tts_voice_id": "female-zh-01",
+      "catchphrases": ["我们来看看具体情况", "这个你怎么看？", "能详细说说吗？"],
+      "forbidden_patterns": ["长篇独白解释技术原理", "直接替嘉宾下最终判断"]
+    },
+    {
+      "role": "guest",
+      "name": "沐哥",
+      "gender": "male",
+      "age_range": "40-50",
+      "personality": "资深科技评论员，观点犀利但不失幽默",
+      "anchor_function": "补充行业背景、判断价值、指出边界和限制",
+      "knowledge_bias": "更关心产业意义、成本、落地难度和长期影响",
+      "voice_style": "沉稳有力，略带学者气质",
+      "speech_rhythm": "解释 + 判断，句子稍长但不冗余",
+      "tts_voice_id": "male-zh-02",
+      "catchphrases": ["说实话", "这个事情没那么简单", "我的观点是", "你别说"],
+      "forbidden_patterns": ["只重复 headline", "只讲概念不讲影响"]
+    }
+  ],
+  "interaction_style": {
+    "format": "qa_discussion",
+    "turn_pattern": "host-intro → guest-analysis → host-follow-up → guest-conclusion",
+    "banter_level": "medium"
+  }
+}

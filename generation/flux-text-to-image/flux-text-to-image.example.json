@@ -1,0 +1,29 @@
+{
+  "skill": "flux-text-to-image",
+  "request": {
+    "prompt": "Ghibli style, hand-drawn 2D, a young boy, white t-shirt, full body, front view, pure white background",
+    "model": "FLUX.2-klein-9B",
+    "size": "768x1024",
+    "num_inference_steps": 4,
+    "guidance_scale": 1
+  },
+  "response_handling": {
+    "transport": "json",
+    "image_data_field": "data[i].b64_json",
+    "decode_required": true,
+    "output_extensions": [
+      "png",
+      "jpg"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "outputs/flux-text-to-image/shot-01.png",
+      "mime_type": "image/png",
+      "role": "primary"
+    }
+  ],
+  "notes": [
+    "The decoded PNG/JPG file is the final deliverable, not the raw JSON response."
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Keyframe Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scene_no",
+    "shot_reviews"
+  ],
+  "properties": {
+    "scene_no": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "shot_reviews": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "shot_no",
+          "pass_review",
+          "frame_progression_ok",
+          "character_consistency_ok",
+          "scene_consistency_ok",
+          "intent_match_ok",
+          "issues",
+          "strengths",
+          "fix_suggestions"
+        ],
+        "properties": {
+          "shot_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pass_review": {
+            "type": "boolean"
+          },
+          "frame_progression_ok": {
+            "type": "boolean"
+          },
+          "character_consistency_ok": {
+            "type": "boolean"
+          },
+          "scene_consistency_ok": {
+            "type": "boolean"
+          },
+          "intent_match_ok": {
+            "type": "boolean"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "strengths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "fix_suggestions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

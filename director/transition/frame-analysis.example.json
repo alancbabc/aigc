@@ -1,0 +1,16 @@
+{
+  "frame_role": "last_frame",
+  "main_subject": "paper airplane",
+  "subject_position": "upper center",
+  "motion_direction": "upward",
+  "camera_angle": "upward tilt",
+  "composition_focus": "small moving object against open sky",
+  "lighting": "warm late-afternoon light",
+  "mood": "hopeful and light",
+  "bridge_candidates": [
+    "sky",
+    "upward motion",
+    "small flying object"
+  ],
+  "continuity_risks": []
+}

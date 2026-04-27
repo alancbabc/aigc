@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SeriesProfile",
+  "description": "Reusable show identity for recurring news-commentary production",
+  "type": "object",
+  "required": ["show_title", "series_mode", "tone", "anchor_defaults"],
+  "properties": {
+    "show_title": { "type": "string" },
+    "series_mode": {
+      "type": "string",
+      "enum": ["recurring"]
+    },
+    "tagline": { "type": "string" },
+    "tone": { "type": "string" },
+    "intro_style": { "type": "string" },
+    "repetition_guardrails": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "anchor_defaults": {
+      "type": "object",
+      "properties": {
+        "builtin_anchor_template_id": { "type": "string" },
+        "host_name": { "type": "string" },
+        "guest_name": { "type": "string" },
+        "host_tts_voice_id": { "type": "string" },
+        "guest_tts_voice_id": { "type": "string" },
+        "host_voice_reference_audio": { "type": "string" },
+        "guest_voice_reference_audio": { "type": "string" },
+        "host_function": { "type": "string" },
+        "guest_function": { "type": "string" },
+        "visual_asset_mapping": {
+          "type": "object",
+          "properties": {
+            "female_solo": { "type": "string" },
+            "male_solo": { "type": "string" },
+            "duo_frame": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}

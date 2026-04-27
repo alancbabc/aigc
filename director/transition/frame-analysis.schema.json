@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Transition Frame Analysis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "frame_role",
+    "main_subject",
+    "subject_position",
+    "motion_direction",
+    "camera_angle",
+    "composition_focus",
+    "lighting",
+    "mood",
+    "bridge_candidates",
+    "continuity_risks"
+  ],
+  "properties": {
+    "frame_role": {
+      "type": "string",
+      "enum": [
+        "last_frame",
+        "first_frame"
+      ]
+    },
+    "main_subject": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject_position": {
+      "type": "string",
+      "minLength": 1
+    },
+    "motion_direction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "camera_angle": {
+      "type": "string",
+      "minLength": 1
+    },
+    "composition_focus": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lighting": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mood": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bridge_candidates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "continuity_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

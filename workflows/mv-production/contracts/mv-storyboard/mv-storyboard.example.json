@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "song_title": "夜曲",
+  "song_structure_ref": "song-structure.json",
+  "mv_treatment_ref": "mv-treatment.json",
+  "characters_ref": "characters.json",
+  "total_shots": 4,
+  "average_shot_duration_seconds": 6.8,
+  "cutting_rhythm_notes": "Verse shots average 6-8s matching the contemplative pacing. Chorus shots accelerate to 3-5s. Bridge uses a single extended shot of 15s+.",
+  "scenes": [
+    {
+      "scene_id": "scene_intro_city",
+      "section_ref": "intro",
+      "scene_description": "Empty rain-soaked city street at night",
+      "visual_world": "Neo-noir urban nightscape",
+      "shots": [
+        {
+          "shot_id": "intro_shot_01",
+          "shot_type": "establishing",
+          "performance_type": "b_roll",
+          "time_window": {
+            "start_time": 0.0,
+            "end_time": 8.0,
+            "duration_seconds": 8.0
+          },
+          "beat_sync": {
+            "start_beat": 1,
+            "end_beat": 10,
+            "cut_on_beat": false,
+            "beat_emphasis": "none"
+          },
+          "lyrics_line_refs": [],
+          "camera": {
+            "shot_size": "extreme wide",
+            "angle": "eye level",
+            "movement": "slow dolly forward",
+            "lens": "35mm"
+          },
+          "character_refs": [],
+          "action_description": "Camera glides slowly down an empty wet street. Neon signs reflect in puddles. No people visible.",
+          "emotion": "atmospheric anticipation",
+          "lighting": "Low-key, neon accents in deep blue and pink, wet surface reflections",
+          "transition_in": "fade from black",
+          "transition_out": "dissolve",
+          "render_mode_hint": "text_image_to_video_high_quality",
+          "notes": "Set the mood before any character appears. Piano melody carries the emotion."
+        },
+        {
+          "shot_id": "intro_shot_02",
+          "shot_type": "close_up",
+          "performance_type": "concept_imagery",
+          "time_window": {
+            "start_time": 8.0,
+            "end_time": 15.2,
+            "duration_seconds": 7.2
+          },
+          "beat_sync": {
+            "start_beat": 11,
+            "end_beat": 18,
+            "cut_on_beat": true,
+            "beat_emphasis": "downbeat"
+          },
+          "lyrics_line_refs": [],
+          "camera": {
+            "shot_size": "extreme close-up",
+            "angle": "high angle",
+            "movement": "static",
+            "lens": "85mm macro"
+          },
+          "character_refs": ["protagonist"],
+          "action_description": "Close-up of fingers pressing piano keys. Raindrops fall on the keys from an unseen source. Each key press creates a small ripple.",
+          "emotion": "melancholy beauty",
+          "lighting": "Single warm spotlight on hands, surrounding darkness",
+          "transition_in": "dissolve from city",
+          "transition_out": "match cut to protagonist's face",
+          "render_mode_hint": "text_image_to_video_high_quality",
+          "notes": "Establish the piano motif that will recur throughout."
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_verse1_streets",
+      "section_ref": "verse_1",
+      "scene_description": "Protagonist walks through familiar night streets",
+      "visual_world": "Intimate urban solitude",
+      "shots": [
+        {
+          "shot_id": "verse1_shot_01",
+          "shot_type": "medium",
+          "performance_type": "narrative_action",
+          "time_window": {
+            "start_time": 15.2,
+            "end_time": 23.5,
+            "duration_seconds": 8.3
+          },
+          "beat_sync": {
+            "start_beat": 19,
+            "end_beat": 29,
+            "cut_on_beat": true,
+            "beat_emphasis": "downbeat"
+          },
+          "lyrics_line_refs": ["line_01", "line_02"],
+          "camera": {
+            "shot_size": "medium",
+            "angle": "eye level",
+            "movement": "handheld tracking, following from behind",
+            "lens": "50mm"
+          },
+          "character_refs": ["protagonist"],
+          "action_description": "Protagonist walks along a narrow street, coat collar turned up against the rain. He passes a closed bookshop with warm light still glowing inside.",
+          "emotion": "quiet melancholy",
+          "lighting": "Streetlight pools, warm spill from shop windows, rain-diffused",
+          "transition_in": "match cut from piano keys",
+          "transition_out": "cut on beat",
+          "render_mode_hint": "text_image_to_video_high_quality",
+          "notes": "First appearance of protagonist. Establish his solitary presence."
+        },
+        {
+          "shot_id": "verse1_shot_02",
+          "shot_type": "close_up",
+          "performance_type": "lip_sync",
+          "time_window": {
+            "start_time": 23.5,
+            "end_time": 30.0,
+            "duration_seconds": 6.5
+          },
+          "beat_sync": {
+            "start_beat": 30,
+            "end_beat": 38,
+            "cut_on_beat": true,
+            "beat_emphasis": "downbeat"
+          },
+          "lyrics_line_refs": ["line_03"],
+          "camera": {
+            "shot_size": "close-up",
+            "angle": "slightly low",
+            "movement": "slow push in",
+            "lens": "85mm"
+          },
+          "character_refs": ["protagonist"],
+          "action_description": "Close-up of protagonist's face as he mouths the lyrics. Rain runs down his face. His expression carries controlled sadness.",
+          "emotion": "restrained grief",
+          "lighting": "Single streetlight from above, rim lighting on wet hair",
+          "transition_in": "cut on beat",
+          "transition_out": "dissolve to memory",
+          "render_mode_hint": "audio_to_video",
+          "notes": "First lip-sync moment. Use audio_to_video for natural mouth movement."
+        }
+      ]
+    }
+  ]
+}

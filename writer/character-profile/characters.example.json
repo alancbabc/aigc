@@ -1,0 +1,41 @@
+{
+  "project_title": "纸飞机",
+  "genre": "都市成长",
+  "characters": [
+    {
+      "name": "小树",
+      "age": "7岁",
+      "role": "主角",
+      "character_type": "留守儿童",
+      "personality": "安静、认真、敏感",
+      "background": "和外婆生活在小镇边缘，常常想念远方工作的母亲",
+      "goals": "希望把思念传递给母亲",
+      "relationships": [
+        "与外婆相依为命",
+        "与母亲长期分离"
+      ],
+      "states": [
+        {
+          "state_num": 1,
+          "state_name": "日常状态",
+          "description": "瘦小男孩，短发，穿旧白色T恤和卡其短裤",
+          "scene_reference": "山坡、教室、家门口",
+          "views": {
+            "front": {
+              "prompt": "hand-drawn 2D, full body shot, front view, pure white background, a thin Chinese boy with short hair, worn white t-shirt and khaki shorts",
+              "image_path": "memory/2026-03-23/paper-plane/v1/characters/小树_1_front.png"
+            },
+            "side": {
+              "prompt": "hand-drawn 2D, full body shot, side view, pure white background, the same thin Chinese boy with short hair, worn white t-shirt and khaki shorts",
+              "image_path": "memory/2026-03-23/paper-plane/v1/characters/小树_1_side.png"
+            },
+            "back": {
+              "prompt": "hand-drawn 2D, full body shot, back view, pure white background, the same thin Chinese boy with short hair, worn white t-shirt and khaki shorts",
+              "image_path": "memory/2026-03-23/paper-plane/v1/characters/小树_1_back.png"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

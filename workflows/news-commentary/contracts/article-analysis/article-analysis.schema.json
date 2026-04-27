@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArticleAnalysis",
+  "description": "Commentary-ready article analysis",
+  "type": "object",
+  "required": [
+    "title",
+    "summary",
+    "core_claim",
+    "key_points",
+    "industry_meaning",
+    "public_meaning",
+    "audience_questions"
+  ],
+  "properties": {
+    "source_pack": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string", "enum": ["primary", "secondary", "background", "commentary"] },
+          "title": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      },
+      "description": "Multi-source input bundle when more than one article is used"
+    },
+    "title": { "type": "string", "description": "Article title" },
+    "source": { "type": "string", "description": "Article source" },
+    "category": {
+      "type": "string",
+      "enum": ["tech", "finance", "politics", "science", "health", "sports", "entertainment", "social", "other"]
+    },
+    "content_type": {
+      "type": "string",
+      "enum": ["news", "opinion", "explainer", "breaking"]
+    },
+    "summary": { "type": "string", "description": "One-sentence summary" },
+    "core_claim": { "type": "string", "description": "Primary claim the article wants the audience to believe" },
+    "source_priority": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered source IDs showing which source dominates the storyline"
+    },
+    "cross_source_overlap": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Claims repeated across sources that should be merged rather than repeated"
+    },
+    "hard_evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Evidence points that support the main claim"
+    },
+    "must_keep_evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source details that should survive into the script because they are the strongest factual anchors."
+    },
+    "speakable_facts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Facts suitable for direct spoken delivery without overloading the listener."
+    },
+    "visual_only_details": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Details that should usually move to cards, charts, captions, or source-image segments instead of spoken lines."
+    },
+    "promo_phrases_to_neutralize": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source phrases or likely script phrases that should be rewritten into a more evidence-first tone."
+    },
+    "commentary_claim_boundaries": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Boundaries for interpretation so the commentary does not outrun the source evidence."
+    },
+    "key_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "content"],
+        "properties": {
+          "id": { "type": "integer" },
+          "type": {
+            "type": "string",
+            "enum": ["fact", "opinion", "data", "quote", "background"]
+          },
+          "content": { "type": "string" },
+          "importance": {
+            "type": "string",
+            "enum": ["high", "medium", "low"],
+            "default": "medium"
+          },
+          "source_ref": { "type": "string" },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          }
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "context": { "type": "string" },
+    "industry_meaning": {
+      "type": "string",
+      "description": "Why this matters for the industry, market, or research field"
+    },
+    "public_meaning": {
+      "type": "string",
+      "description": "Why this matters for a general audience"
+    },
+    "controversy": { "type": ["string", "null"] },
+    "uncertainties": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Unresolved questions, missing proof, or caveats"
+    },
+    "counterpoints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Counterpoints or balancing views to prevent hollow reporting"
+    },
+    "spoken_translation_notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Guidance for translating dense source prose into natural spoken commentary."
+    },
+    "audience_questions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "name"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "name": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    "series_angle": {
+      "type": "string",
+      "description": "How this episode fits into the broader recurring show angle"
+    }
+  }
+}

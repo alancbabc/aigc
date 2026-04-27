@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Scene Design Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scene_no",
+    "review_image",
+    "review_mode",
+    "reference_count",
+    "pass_review",
+    "setting_match",
+    "lighting_match",
+    "scene_base_consistency",
+    "view_set_quality",
+    "style_consistency_score",
+    "issues",
+    "strengths",
+    "fix_suggestions"
+  ],
+  "properties": {
+    "scene_no": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "review_image": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_mode": {
+      "type": "string",
+      "enum": ["single_view", "multi_view"]
+    },
+    "reference_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "pass_review": {
+      "type": "boolean"
+    },
+    "setting_match": {
+      "type": "boolean"
+    },
+    "lighting_match": {
+      "type": "boolean"
+    },
+    "scene_base_consistency": {
+      "type": "boolean"
+    },
+    "view_set_quality": {
+      "type": "boolean"
+    },
+    "style_consistency_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fix_suggestions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

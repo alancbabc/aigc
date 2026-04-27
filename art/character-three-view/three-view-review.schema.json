@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Three View Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "character_name",
+    "state_num",
+    "review_image",
+    "pass_review",
+    "view_coverage",
+    "background_check",
+    "consistency_score",
+    "consistency_checks",
+    "issues",
+    "strengths",
+    "fix_suggestions"
+  ],
+  "properties": {
+    "character_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state_num": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "review_image": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pass_review": {
+      "type": "boolean"
+    },
+    "view_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "front",
+        "side",
+        "back"
+      ],
+      "properties": {
+        "front": { "type": "boolean" },
+        "side": { "type": "boolean" },
+        "back": { "type": "boolean" }
+      }
+    },
+    "background_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "front",
+        "side",
+        "back",
+        "all_pure_white"
+      ],
+      "properties": {
+        "front": { "type": "boolean" },
+        "side": { "type": "boolean" },
+        "back": { "type": "boolean" },
+        "all_pure_white": { "type": "boolean" }
+      }
+    },
+    "consistency_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "consistency_checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hairstyle",
+        "clothing",
+        "shoes",
+        "accessories",
+        "body_proportions"
+      ],
+      "properties": {
+        "hairstyle": { "type": "boolean" },
+        "clothing": { "type": "boolean" },
+        "shoes": { "type": "boolean" },
+        "accessories": { "type": "boolean" },
+        "body_proportions": { "type": "boolean" }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fix_suggestions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
