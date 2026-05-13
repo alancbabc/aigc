@@ -18,11 +18,14 @@ This directory contains JSON contracts for each stage of the `mv-production` wor
 |--------|-------|-------------|
 | `user-requirements/` | 0 | Intake document ingest: concept MV, visual style, reference images, resolution |
 | `lyrics-timing/` | 1 | Line-level timestamps from `parse_lyrics.py` |
-| `song-sections-llm/` | 2 | Qwen3 section segmentation (reply shape) |
+| `song-sections-llm/` | 2 | Qwen3 section segmentation with enriched per-section analysis (v2.0) |
+| `segment-interpretation/` | 3 | Qwen3.5 segment interpretation: imagery, visual direction, shot planning hints |
+| `shot-plan/` | 4 | Shot-level breakdown: time windows, composition, camera, motion, generation notes |
+| `image-prompts/` | 5 | Image generation prompts: static keyframe prompts, negative prompts, quality checks |
 | `song-structure/` | — | Legacy/reference consolidated structure (not emitted by canonical path) |
-| `mv-global-visual-style/` | 3 | Qwen3 global English style suffix + art-direction axes |
-| `mv-keyframe-director/` | 4 | Qwen3 director plan: grouped keyframes with `keyframe_type` routing |
-| `keyframe-images/` | 5 | Generated keyframe image manifest: paths, timing, generation status |
+| `mv-global-visual-style/` | — | Legacy: global visual style lock (retained for reference) |
+| `mv-keyframe-director/` | — | Legacy: director keyframe plan (retained for reference) |
+| `keyframe-images/` | — | Legacy: keyframe image manifest (retained for reference) |
 
 ### Optional Branch Contracts
 

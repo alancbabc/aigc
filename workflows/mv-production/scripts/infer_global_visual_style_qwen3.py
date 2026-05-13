@@ -245,10 +245,10 @@ def load_lyrics_timing_strict(path: Path) -> dict[str, Any]:
 
 def load_song_sections_llm_strict(path: Path) -> dict[str, Any]:
     data = load_json(path)
-    if data.get("schema_version") != "1.0":
+    if data.get("schema_version") not in ("1.0", "2.0"):
         raise SystemExit(
             "Unsupported song-sections-llm schema_version "
-            f"(expected \"1.0\", got {data.get('schema_version')!r})."
+            f"(expected \"1.0\" or \"2.0\", got {data.get('schema_version')!r})."
         )
     secs = data.get("sections")
     if not isinstance(secs, list) or not secs:
@@ -859,7 +859,7 @@ def main() -> None:
     )
 
     if args.dry_run:
-        print(json.dumps({"model": qwen_cfg.DEFAULT_MODEL, "stream": False, "max_tokens": args.max_tokens, "temperature": args.temperature, "top_p": 0.9, "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user_text}]}, ensure_ascii=False, indent=2))
+        print(json.dumps({"model": qwen_cfg.DEFAULT_MODEL, "stream": False, "enable_thinking": False, "max_tokens": args.max_tokens, "temperature": args.temperature, "top_p": 0.9, "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user_text}]}, ensure_ascii=False, indent=2))
         return
 
     if not qwen_cfg.API_KEY:
@@ -874,6 +874,7 @@ def main() -> None:
         payload = {
             "model": qwen_cfg.DEFAULT_MODEL,
             "stream": False,
+            "enable_thinking": False,
             "max_tokens": args.max_tokens,
             "temperature": args.temperature,
             "top_p": 0.9,

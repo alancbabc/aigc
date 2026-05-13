@@ -250,8 +250,8 @@ def load_timing(path: Path) -> dict[str, Any]:
 
 def load_sections_llm(path: Path) -> dict[str, Any]:
     data = load_json(path)
-    if data.get("schema_version") != "1.0":
-        raise SystemExit('song-sections-llm schema_version must be "1.0".')
+    if data.get("schema_version") not in ("1.0", "2.0"):
+        raise SystemExit('song-sections-llm schema_version must be "1.0" or "2.0".')
     return data
 
 
@@ -599,6 +599,7 @@ def main() -> None:
         payload = {
             "model": qwen_cfg.DEFAULT_MODEL,
             "stream": False,
+            "enable_thinking": False,
             "max_tokens": args.max_tokens,
             "temperature": args.temperature,
             "top_p": 0.85,
@@ -621,6 +622,7 @@ def main() -> None:
         payload = {
             "model": qwen_cfg.DEFAULT_MODEL,
             "stream": False,
+            "enable_thinking": False,
             "max_tokens": args.max_tokens,
             "temperature": args.temperature,
             "top_p": 0.85,

@@ -1,18 +1,27 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.local/contracts/song-sections-llm.schema.json",
-  "title": "Qwen3 (or compatible) lyric structure segmentation",
+  "title": "Qwen3 lyric structure segmentation with enriched per-section analysis",
   "type": "object",
   "required": ["schema_version", "sections"],
   "additionalProperties": false,
   "properties": {
-    "schema_version": { "type": "string", "const": "1.0" },
+    "schema_version": { "type": "string", "const": "2.0" },
     "sections": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["section_id", "section_type", "line_refs"],
+        "required": [
+          "section_id",
+          "section_type",
+          "line_refs",
+          "time_range",
+          "role_in_song_zh",
+          "core_emotion_zh",
+          "visual_segments",
+          "variation"
+        ],
         "additionalProperties": false,
         "properties": {
           "section_id": {
@@ -40,9 +49,67 @@
             "minItems": 1,
             "items": { "type": "string" }
           },
-          "notes": {
+          "time_range": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["start_time", "end_time", "duration_seconds"],
+            "properties": {
+              "start_time": { "type": "number", "minimum": 0 },
+              "end_time": { "type": "number", "minimum": 0 },
+              "duration_seconds": { "type": "number", "minimum": 0 }
+            },
+            "description": "Timestamps are post-injected by script from lyrics-timing.json for accuracy; model may provide estimates."
+          },
+          "role_in_song_zh": {
             "type": "string",
-            "description": "Brief optional rationale (Chinese or English)"
+            "minLength": 8,
+            "description": "What function this section serves in the overall song structure. e.g. '开场主歌，建立梦幻基调，首次引入核心意象'"
+          },
+          "core_emotion_zh": {
+            "type": "string",
+            "minLength": 6,
+            "description": "The core emotion or atmosphere this section conveys. e.g. '沉静、朦胧、孤独的凝视感'"
+          },
+          "visual_segments": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Suggested visual segment splits within this section. The director (Stage 4) uses these as a lower bound for keyframe count.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["segment_id", "start_time", "end_time", "line_refs", "lyrics_text"],
+              "properties": {
+                "segment_id": { "type": "string", "minLength": 1 },
+                "start_time": { "type": "number", "minimum": 0 },
+                "end_time": { "type": "number", "minimum": 0 },
+                "line_refs": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "type": "string" }
+                },
+                "lyrics_text": {
+                  "type": "string",
+                  "minLength": 2,
+                  "description": "The lyrics content covered by this visual segment, joined by '/'."
+                }
+              }
+            }
+          },
+          "variation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["related_section", "relationship_zh"],
+            "properties": {
+              "related_section": {
+                "type": ["string", "null"],
+                "description": "section_id of the related/repeating section, or null if this section is unique"
+              },
+              "relationship_zh": {
+                "type": "string",
+                "minLength": 2,
+                "description": "How this section differs from its counterpart in emotion, perspective, or intensity."
+              }
+            }
           }
         }
       }

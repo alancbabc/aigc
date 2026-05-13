@@ -33,25 +33,54 @@ VALID_SECTION_TYPES = frozenset({
     "bridge", "breakdown", "instrumental", "outro", "interlude",
 })
 
-SYSTEM_PROMPT = """你是一个音乐制作人助理。你只根据用户给出的歌词 timing JSON，
-划分歌曲结构段落。必须输出「仅一个合法 JSON 对象」，不要 Markdown、不要前后说明文字。
-JSON schema:
+SYSTEM_PROMPT = """你是音乐分析专家。你收到一份歌词 timing JSON（逐行 lyrics-timing），需要将整首歌划分为若干段落 section。
+
+对 **每个 section**，你必须回答以下 5 个问题：
+
+1) 时间范围：从哪句开始、到哪句结束（给出 line_refs[]，脚本会自动注入精确 start_time / end_time / duration_seconds）。
+2) 在全曲中起什么作用：这一段对整首歌结构有何贡献（开场、情绪堆叠、高潮释放、过渡、收束……）。
+3) 核心情绪：这一段的核心情绪或表达的是什么（用中文描述氛围、情感温度、心理状态）。
+4) 视觉 segment 划分：这一段应该切成几个视觉 segment？每个 visual segment 的 line_refs、起始时间（秒）、歌词内容文本。注意：visual segment 是对该 section 内部的进一步细分，用于指导后续导演确定 keyframe 数量。每个 section 至少 1 个 visual segment。
+5) 与重复段落之间的变奏关系：如果这首歌有重复的段落（如 verse_1 和 verse_2、chorus_1 和 chorus_2），你这段的 counterpart 是谁？在情绪、思想、视角上有何不同？唯一出现的段落（intro / outro / bridge）填 related_section: null。
+
+硬性规则：
+- 只输出「一个合法 JSON 对象」，不要 Markdown、不要前后说明文字。
+- schema_version 必须为 "2.0"。
+- section_id 使用 snake_case，不得重复。
+- 将所有 section 的 line_refs 串联后，必须与输入歌词的 line_id 顺序完全一致，每条 line_id 恰好出现一次，包括 is_instrumental=true 的空行。
+- 每个 visual_segments 的 start_time / end_time 从该 segment 对应的第一句和最后一句歌词的时间码中提取。可以查看输入中的 start_time 字段。
+
+JSON 输出格式（必须严格遵守；所有 section 必须包含这些字段）：
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "sections": [
     {
-      "section_id": "唯一小写下划线英文名，如 verse_1",
-      "section_type": "必须是 intro|verse|pre_chorus|chorus|post_chorus|bridge|breakdown|instrumental|outro|interlude 之一",
+      "section_id": "verse_1",
+      "section_type": "verse",
       "line_refs": ["line_01", "line_02"],
-      "notes": "可选，一句话说明你为何如此划分（中文亦可）"
+      "time_range": {
+        "start_time": 0.0,
+        "end_time": 25.0,
+        "duration_seconds": 25.0
+      },
+      "role_in_song_zh": "开场主歌，建立…的基调，引入…",
+      "core_emotion_zh": "沉静、朦胧、…",
+      "visual_segments": [
+        {
+          "segment_id": "seg_v1_01",
+          "start_time": 0.0,
+          "end_time": 12.0,
+          "line_refs": ["line_01"],
+          "lyrics_text": "歌词第一句 / 歌词第二句"
+        }
+      ],
+      "variation": {
+        "related_section": "verse_2",
+        "relationship_zh": "verse_1 是初次进入的朦胧感，verse_2 是经历离别后的回望与宿命感"
+      }
     }
   ]
 }
-硬性规则：
-1) 每一段 line_refs 非空。
-2) 将所有 line_refs 串联后，必须与输入 JSON 里的 lines 按顺序一一对应，每条 line_id 恰好出现一次，顺序与歌词先后一致。
-3) section_id 在同一个 JSON 内不得重复。
-4) 不要使用 schema 以外的顶层键或段落键。
 """
 
 
@@ -106,26 +135,36 @@ def parse_model_json(raw_text: str) -> dict[str, Any]:
 
 
 def validate_sections_structure(data: dict[str, Any]) -> list[dict[str, Any]]:
-    if set(data.keys()) != {"schema_version", "sections"}:
-        extras = set(data.keys()) - {"schema_version", "sections"}
-        missing = {"schema_version", "sections"} - set(data.keys())
+    top_keys = set(data.keys())
+    if top_keys != {"schema_version", "sections"}:
+        extras = top_keys - {"schema_version", "sections"}
+        missing = {"schema_version", "sections"} - top_keys
         raise SystemExit(f"Unexpected top-level keys; extra={extras!r} missing={missing!r}")
-    if data.get("schema_version") != "1.0":
-        raise SystemExit("Reply schema_version must be \"1.0\".")
+    if data.get("schema_version") != "2.0":
+        raise SystemExit('Reply schema_version must be "2.0".')
     secs = data.get("sections")
     if not isinstance(secs, list) or not secs:
         raise SystemExit("'sections' must be a non-empty array.")
     ids: list[str] = []
+    allowed_section_keys = {
+        "section_id", "section_type", "line_refs",
+        "time_range", "role_in_song_zh", "core_emotion_zh",
+        "visual_segments", "variation",
+    }
+    req_section_keys = {
+        "section_id", "section_type", "line_refs",
+        "time_range", "role_in_song_zh", "core_emotion_zh",
+        "visual_segments", "variation",
+    }
     for i, sec in enumerate(secs):
         if not isinstance(sec, dict):
             raise SystemExit(f"sections[{i}] is not an object.")
         keys = set(sec.keys())
-        allowed = {"section_id", "section_type", "line_refs", "notes"}
-        if not keys.issubset(allowed):
-            raise SystemExit(f"sections[{i}] has forbidden keys: {keys - allowed!r}")
-        for req in ("section_id", "section_type", "line_refs"):
-            if req not in sec:
-                raise SystemExit(f"sections[{i}] missing {req}.")
+        if not keys.issubset(allowed_section_keys):
+            raise SystemExit(f"sections[{i}] has forbidden keys: {keys - allowed_section_keys!r}")
+        missing = req_section_keys - keys
+        if missing:
+            raise SystemExit(f"sections[{i}] missing required keys: {sorted(missing)!r}")
         sid = sec["section_id"]
         st = sec["section_type"]
         refs = sec["line_refs"]
@@ -135,8 +174,40 @@ def validate_sections_structure(data: dict[str, Any]) -> list[dict[str, Any]]:
             raise SystemExit(f"Invalid section_type at {sid!r}: {st!r}")
         if not isinstance(refs, list) or not all(isinstance(x, str) for x in refs):
             raise SystemExit(f"line_refs must be string array at {sid!r}")
-        if "notes" in sec and sec["notes"] is not None and not isinstance(sec["notes"], str):
-            raise SystemExit(f"notes must be string or absent at {sid!r}")
+        # Validate time_range
+        tr = sec["time_range"]
+        if not isinstance(tr, dict):
+            raise SystemExit(f"time_range must be object at {sid!r}")
+        for fld in ("start_time", "end_time", "duration_seconds"):
+            if not isinstance(tr.get(fld), (int, float)):
+                raise SystemExit(f"time_range.{fld} must be number at {sid!r}")
+        # Validate role_in_song_zh
+        for fld in ("role_in_song_zh", "core_emotion_zh"):
+            val = sec.get(fld)
+            if not isinstance(val, str) or len(val.strip()) < 4:
+                raise SystemExit(f"{fld} too short at {sid!r}")
+        # Validate visual_segments
+        vs = sec["visual_segments"]
+        if not isinstance(vs, list) or len(vs) < 1:
+            raise SystemExit(f"visual_segments must be non-empty array at {sid!r}")
+        for j, seg in enumerate(vs):
+            if not isinstance(seg, dict):
+                raise SystemExit(f"visual_segments[{j}] not an object at {sid!r}")
+            for fld in ("segment_id", "line_refs", "lyrics_text"):
+                if fld not in seg:
+                    raise SystemExit(f"visual_segments[{j}] missing {fld} at {sid!r}")
+            if not isinstance(seg.get("start_time"), (int, float)):
+                raise SystemExit(f"visual_segments[{j}].start_time must be number at {sid!r}")
+            if not isinstance(seg.get("end_time"), (int, float)):
+                raise SystemExit(f"visual_segments[{j}].end_time must be number at {sid!r}")
+        # Validate variation
+        var = sec["variation"]
+        if not isinstance(var, dict):
+            raise SystemExit(f"variation must be object at {sid!r}")
+        if "related_section" not in var or "relationship_zh" not in var:
+            raise SystemExit(f"variation missing related_section or relationship_zh at {sid!r}")
+        if not isinstance(var.get("relationship_zh"), str) or len(str(var["relationship_zh"]).strip()) < 2:
+            raise SystemExit(f"variation.relationship_zh too short (min 2 chars) at {sid!r}")
         ids.append(sid)
     if len(ids) != len(set(ids)):
         raise SystemExit("Duplicate section_id in model reply.")
@@ -179,6 +250,43 @@ def merge_inferred_sections(
     return inferred
 
 
+def inject_timing(
+    lines: list[dict[str, Any]],
+    sections: list[dict[str, Any]],
+) -> None:
+    """Inject accurate time_range from lyrics-timing.json into each section and visual_segment."""
+    by_id = {ln["line_id"]: ln for ln in lines}
+    for sec in sections:
+        refs = sec["line_refs"]
+        first_ln = by_id[refs[0]]
+        last_ln = by_id[refs[-1]]
+        start = first_ln.get("start_time")
+        end = last_ln.get("end_time")
+        if isinstance(start, (int, float)) and isinstance(end, (int, float)):
+            dur = round(float(end) - float(start), 3)
+        else:
+            dur = 0.0
+        sec["time_range"] = {
+            "start_time": float(start) if isinstance(start, (int, float)) else 0.0,
+            "end_time": float(end) if isinstance(end, (int, float)) else 0.0,
+            "duration_seconds": dur,
+        }
+        # Also inject accurate timing into visual_segments
+        for seg in sec.get("visual_segments", []):
+            seg_refs = seg.get("line_refs", [])
+            if not seg_refs:
+                continue
+            seg_first = by_id.get(seg_refs[0])
+            seg_last = by_id.get(seg_refs[-1])
+            if seg_first and seg_last:
+                s_st = seg_first.get("start_time")
+                s_et = seg_last.get("end_time")
+                if isinstance(s_st, (int, float)):
+                    seg["start_time"] = float(s_st)
+                if isinstance(s_et, (int, float)):
+                    seg["end_time"] = float(s_et)
+
+
 def main() -> None:
     load_aigc_dotenv()
     if not os.getenv("AIGC_GITEE_API_KEY") and os.getenv("GITEE_API_TOKEN"):
@@ -206,7 +314,7 @@ def main() -> None:
         help="Sampling temperature (default 0.2 for stable structure)",
     )
     ap.add_argument(
-        "--max-tokens", type=int, default=8192,
+        "--max-tokens", type=int, default=16384,
         help="max_tokens for the chat request",
     )
     ap.add_argument(
@@ -244,6 +352,7 @@ def main() -> None:
         "stream": False,
         "max_tokens": args.max_tokens,
         "temperature": args.temperature,
+        "enable_thinking": False,
         "top_p": 0.9,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -267,6 +376,7 @@ def main() -> None:
     model_obj = parse_model_json(assistant_text)
     secs = validate_sections_structure(model_obj)
     validate_line_coverage(lines, secs)
+    inject_timing(lines, secs)
 
     out_path = args.out.resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)

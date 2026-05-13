@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "song_title": "大鱼",
+  "artist": "周深",
+  "source_sections_llm_ref": "song-sections-llm.json",
+  "segments": [
+    {
+      "segment_id": "seg_v1_01",
+      "parent_section_id": "verse_1",
+      "section_type": "verse",
+      "is_instrumental": false,
+      "time_range": { "start_time": 43.65, "end_time": 68.64, "duration_seconds": 24.99 },
+      "lyrics": {
+        "line_refs": ["line_01", "line_02", "line_03", "line_04"],
+        "lyrics_text": "海浪无声将夜幕深深淹没\n漫过天空尽头的角落\n大鱼在梦境的缝隙里游过\n凝望你沉睡的轮廓"
+      },
+      "interpretation": {
+        "literal_meaning_zh": "夜幕像海水无声淹没世界，巨大透明的鱼穿过梦境缝隙，在远处凝望沉睡中的人。",
+        "deep_meaning_zh": "建立大海、夜空、梦境与凝望之间的关系，暗示一个灵魂在现实与幻想之间靠近另一个沉睡的存在。",
+        "emotional_state_zh": ["静谧", "神秘", "温柔", "朦胧"],
+        "emotional_intensity": 0.45
+      },
+      "imagery": [
+        { "image_zh": "无声海浪", "image_en": "silent ocean waves", "type": "natural", "visual_priority": 0.9, "symbolic_meaning_zh": "温柔吞没、时间流动、命运包围" },
+        { "image_zh": "夜幕", "image_en": "night curtain", "type": "atmosphere", "visual_priority": 0.85, "symbolic_meaning_zh": "梦境入口、未知世界、情绪包裹" },
+        { "image_zh": "大鱼", "image_en": "giant fish", "type": "symbolic_creature", "visual_priority": 1.0, "symbolic_meaning_zh": "自由、灵魂、远方、不可挽留的存在" }
+      ],
+      "visual_direction": {
+        "scene_type": "dream_ocean_night",
+        "setting_zh": "夜空与海洋交融的梦境空间，无边无际",
+        "color_palette": ["深蓝", "银白", "青色微光", "雾黑"],
+        "lighting": "柔和月光从水面渗透，低对比度，水下微光",
+        "composition_zh": "大鱼从画面深处游过，远处有沉睡人影的模糊轮廓，上方为星空倒映海面",
+        "camera_mood": "缓慢、漂浮、梦境感，像在水底仰望天空"
+      },
+      "shot_planning_hint": { "keyframe_count": 2, "motion_intensity": "low", "transition_in": "fade_from_dark_blue", "transition_out": "soft_dissolve" },
+      "generation_constraints": {
+        "must_include": ["大鱼", "夜空与海洋交融", "梦境氛围"],
+        "avoid": ["直白画成普通海边", "现代城市", "强剧情表演", "过度卡通化"]
+      }
+    },
+    {
+      "segment_id": "seg_v1_02",
+      "parent_section_id": "verse_1",
+      "section_type": "verse",
+      "is_instrumental": true,
+      "time_range": { "start_time": 68.64, "end_time": 70.11, "duration_seconds": 1.47 },
+      "lyrics": { "line_refs": ["line_05"], "lyrics_text": "" },
+      "interpretation": {
+        "literal_meaning_zh": "(器乐间奏，无歌词)",
+        "deep_meaning_zh": "短间奏，画面延续前一段的梦境氛围，不做单独画面切换",
+        "emotional_state_zh": ["延续"],
+        "emotional_intensity": 0.0
+      },
+      "imagery": [],
+      "visual_direction": {
+        "scene_type": "instrumental_hold",
+        "setting_zh": "延续前段画面",
+        "color_palette": ["延续"],
+        "lighting": "延续",
+        "composition_zh": "保持前段画面的最后一帧，不做切换",
+        "camera_mood": "静止"
+      },
+      "shot_planning_hint": { "keyframe_count": 0, "motion_intensity": "none", "transition_in": "none", "transition_out": "none" },
+      "generation_constraints": { "must_include": [], "avoid": [] }
+    }
+  ]
+}

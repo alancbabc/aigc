@@ -1,16 +1,61 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "sections": [
     {
       "section_id": "verse_1",
       "section_type": "verse",
       "line_refs": ["line_01", "line_02", "line_03"],
-      "notes": "Opening narrative; no repeated hook yet."
+      "time_range": { "start_time": 10.5, "end_time": 30.2, "duration_seconds": 19.7 },
+      "role_in_song_zh": "开场主歌，建立梦幻基调，首次引入海水与鱼的核心意象",
+      "core_emotion_zh": "沉静、朦胧、孤独的凝视感，像在水底做一个漫长的梦",
+      "visual_segments": [
+        {
+          "segment_id": "seg_v1_01",
+          "start_time": 10.5,
+          "end_time": 20.0,
+          "line_refs": ["line_01", "line_02"],
+          "lyrics_text": "海浪无声将夜幕深深淹没 / 漫过天空尽头的角落"
+        },
+        {
+          "segment_id": "seg_v1_02",
+          "start_time": 20.0,
+          "end_time": 30.2,
+          "line_refs": ["line_03"],
+          "lyrics_text": "大鱼在梦境的缝隙里游过 / (器乐过渡)"
+        }
+      ],
+      "variation": {
+        "related_section": "verse_2",
+        "relationship_zh": "verse_1 是初次坠入梦境的朦胧好奇，verse_2 是经历离别后的回望，多了宿命感和疲惫"
+      }
     },
     {
       "section_id": "chorus_1",
       "section_type": "chorus",
-      "line_refs": ["line_04", "line_05"]
+      "line_refs": ["line_04", "line_05", "line_06"],
+      "time_range": { "start_time": 30.2, "end_time": 55.0, "duration_seconds": 24.8 },
+      "role_in_song_zh": "第一段副歌，情绪首次爆发，大鱼的意象展开为辽阔与自由的象征",
+      "core_emotion_zh": "不舍、追逐、仰望，一种明知留不住却无法放手的矛盾",
+      "visual_segments": [
+        {
+          "segment_id": "seg_c1_01",
+          "start_time": 30.2,
+          "end_time": 43.0,
+          "line_refs": ["line_04", "line_05"],
+          "lyrics_text": "怕你飞远去 怕你离我而去 / 更怕你永远停留在这里"
+        },
+        {
+          "segment_id": "seg_c1_02",
+          "start_time": 43.0,
+          "end_time": 55.0,
+          "line_refs": ["line_06"],
+          "lyrics_text": "每一滴泪水 都向你流淌去 / 倒流进天空的海底"
+        }
+      ],
+      "variation": {
+        "related_section": "chorus_2",
+        "relationship_zh": "chorus_1 是不舍与追逐，chorus_2 是接受与放手，从'怕你离去'到'看你离去'"
+      }
     }
   ]
 }

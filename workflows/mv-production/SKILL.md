@@ -125,10 +125,16 @@ Builtin style templates are retained in `builtin-visual-templates/` as a referen
 |-------|------|-----------------|------------|
 | 0 | intake / preflight | `project_meta.json` + `user_requirements.json` | workflow (`init_project.py`) |
 | 1 | lyrics parsing | `lyrics-timing.json` | workflow |
-| 2 | song section segmentation | `song-sections-llm.json` | workflow |
-| 3 | global visual style lock | `mv-global-visual-style.json` | workflow |
-| 4 | director keyframe plan | `mv-keyframe-director.json` (with `keyframe_type` per keyframe) | workflow |
-| 5 | keyframe image generation | `keyframes/*.png` + `keyframe-images.json` | workflow |
+| 2 | song section segmentation (enriched) | `song-sections-llm.json` (v2.0) | workflow |
+| 3 | segment interpretation | `segment-interpretation.json` | workflow |
+| 4 | shot plan | `shot-plan.json` | workflow |
+| 5 | image prompts | `image-prompts.json` | workflow |
+| 5d | generation queue | `image-generation-queue.json` | workflow (programmatic) |
+| 6 | asset manifest | `asset-manifest.json` | workflow (programmatic) |
+| 6a | image selection review | `image-selection-review.json` | manual / VLM review template |
+| 6b | selected asset manifest | `selected-asset-manifest.json` | workflow (programmatic from review) |
+| 7 | video prompts | `video-prompts.json` | workflow (Qwen3.5) |
+| 8 | timeline | `timeline.json` | workflow (programmatic assembly) |
 
 ## Stage 0: Intake / Preflight
 
@@ -187,17 +193,17 @@ The film-style storyboard chain (`storyboard.json` → `test-shoots.json` → `k
 
 These constraints stay at the orchestration layer and must not be delegated away:
 
-1. The workflow must advance in the direction `lyrics parsing → section segmentation → visual style → director plan → keyframe images`.
+1. The workflow must advance in the direction `lyrics parsing → section segmentation → segment interpretation → shot plan → image prompts`.
 2. The **original song audio** is the single source of truth for all timing decisions. Every downstream artifact must reference the song timeline, not invent independent timing.
-3. Stage 4 keyframes must form a **partition** of all lyric `line_id`s into consecutive blocks. No line may be skipped or duplicated.
-4. `song-sections-llm.json` must cover every lyric `line_id` exactly once in order. Instrumental-only lines (`is_instrumental=true`) must also be covered.
-5. Every `section_ref` in downstream artifacts must match `section_id` from `song-sections-llm.json`.
-6. The `global_style_suffix` from Stage 3 must be present in every downstream image prompt; it must not be silently dropped.
-7. All prompts sent into `generation/*` must be in English.
-8. **Concept MV rule**: Every keyframe in Stage 4 must carry a `keyframe_type` of either `lyric_imagery` or `character_singing`. The director (Qwen3) decides based on lyric content: concrete visual entities → `lyric_imagery`; abstract / emotional / non-visual → `character_singing`.
-9. **Character-singing routing**: Keyframes with `keyframe_type: "character_singing"` must use image-to-image generation with the user's reference images as visual input. Keyframes with `keyframe_type: "lyric_imagery"` use standard text-to-image.
-10. **Non-realistic enforcement**: The `animation_art_style_en` in Stage 3 must reflect the user's `visual_style` setting (anime/cartoon). Photorealistic or cinematic-realistic style is not permitted.
-11. **Resolution propagation**: `resolution` from Stage 0 must flow unchanged through Stage 5 image generation. All keyframe images must share the same resolution.
+3. `song-sections-llm.json` must cover every lyric `line_id` exactly once in order. Instrumental-only lines (`is_instrumental=true`) must also be covered.
+4. Every `section_ref` in downstream artifacts must match `section_id` from `song-sections-llm.json`.
+5. Every `segment_id` in `shot-plan.json` must exist in `segment-interpretation.json`.
+6. Every shot's `time_range` must fall within its `parent_segment_id` time window, and segments must be fully tiled by their shots.
+7. **Imagery-type MV**: no narrative character acting; visual language limited to silhouettes, light threads, reflections, distant views, semi-transparent elements.
+8. **Instrumental segments**: receive `ambient_hold` entries with `generate_new_image: false`, reuse previous shot's image.
+9. All prompts sent into `generation/*` must be in English.
+10. `global_prompt_prefix` is data-driven from S3 segment data, not song-specific hardcoded.
+11. Ambient hold shots reuse previous image, no new generation.
 
 ## Prompt Language Rule
 
@@ -259,144 +265,226 @@ python workflows/mv-production/scripts/infer_sections_qwen3.py \
 
 **Validation**: the script validates line coverage and rejects responses that skip or duplicate lines. If validation fails, the model may be retried.
 
-## Stage 3: Global Visual Style Lock
+## Stage 3: Segment Interpretation
 
-**Goal**: lock global English style suffix, core visual motifs, and per-section-role structural rules so downstream keyframes share one art direction.
+**Goal**: upgrade each visual segment from `song-sections-llm.json` (v2.0) from a "lyric-time block" to a "generation-ready semantic block". Interpret what the lyrics mean, extract visual imagery, set visual direction, plan shot count, and define generation constraints.
 
-**Input**: `lyrics-timing.json` + `song-sections-llm.json`. May also consume a builtin visual template or user style references.
+**Input**: `song-sections-llm.json` (v2.0) + `lyrics-timing.json`
 
-**Output**: `mv-global-visual-style.json` (schema `1.1`)
+**Output**: `segment-interpretation.json` (schema `1.0`)
 
-**Contract**: `contracts/mv-global-visual-style/mv-global-visual-style.schema.json`
+**Contract**: `contracts/segment-interpretation/segment-interpretation.schema.json`
 
-**Key fields**:
-- `global_style_suffix`: English clause appended to every downstream MV image prompt
-- `structural_visual_rules[]`: per `section_roles` (verse / chorus / bridge …) rules for `visual_tension_en`, `camera_framing_en`, `cut_motion_tempo_en`, `contrast_vs_other_sections_en`. Validator ensures verse and chorus are covered when those `section_type`s appear in `song-sections-llm.json`.
-- `core_visual_motifs[]`: recurring `entities / environments / symbols` with `prompt_anchor_en`, `recurrence`, optional `lyrics_line_refs`. Must have 3–10 items.
-- `animation_art_style_en`, `color_palette_en`, `lighting_mood_en`, `texture_material_en`, `motion_camera_en`, `negative_style_hints_en`
+**Key fields per segment**:
+- `interpretation`: `literal_meaning_zh` (direct translation), `deep_meaning_zh` (deeper meaning in song's narrative arc), `emotional_state_zh[]` (keywords), `emotional_intensity` (0.0-1.0 float)
+- `imagery[]`: extracted visual imagery with `image_zh`, `image_en`, `type` (natural/atmosphere/symbolic_creature/character/object/action), `visual_priority` (0.0-1.0), `symbolic_meaning_zh`
+- `visual_direction`: `scene_type`, `setting_zh`, `color_palette[]`, `lighting`, `composition_zh`, `camera_mood`
+- `shot_planning_hint`: `keyframe_count` (≥1, used as lower bound by Stage 5 director), `motion_intensity` (none/low/medium/high), `transition_in`, `transition_out`
+- `generation_constraints`: `must_include[]`, `avoid[]` — both feed into downstream prompt construction
 
-**Builtin template merge rule**: when the user selects a builtin template at Stage 0:
-1. Read `builtin-visual-templates/<template_id>.json`.
-2. Qwen3 receives the template values as context alongside lyrics + sections.
-3. The model may override or extend template fields to create a song-specific style, but the general aesthetic direction should remain aligned with the template.
-4. When the user provides custom style references, the builtin template becomes advisory only.
-
-**Executor (default path)**:
-```
-python workflows/mv-production/scripts/infer_global_visual_style_qwen3.py \
-    --lyrics-timing <project>/lyrics-timing.json \
-    --song-sections-llm <project>/song-sections-llm.json \
-    --out <project>/mv-global-visual-style.json \
-    [--builtin-template-id <template_id>]
-```
-
-**Executor (legacy `song-structure.json` path, still requires `lyrics-timing.json`)**:
-```
-python workflows/mv-production/scripts/infer_global_visual_style_qwen3.py \
-    --lyrics-timing <project>/lyrics-timing.json \
-    --song-structure <project>/song-structure.json \
-    --out <project>/mv-global-visual-style.json
-```
-
-## Stage 4: Director Keyframe + I2V Prompt Plan (Concept MV)
-
-**Goal**: produce non-line-by-line keyframe coverage with concept-MV routing. Consecutive lyric lines are grouped into keyframe beats. Each keyframe carries a `keyframe_type` (`lyric_imagery` or `character_singing`), a still-image prompt (16:9), and an image-to-video prompt, all anchored on canonical timestamps from `lyrics-timing.json`.
-
-**Input**: `lyrics-timing.json` + `song-sections-llm.json` + `mv-global-visual-style.json` + `user_requirements.json` (for `reference_images` and `visual_style`)
-
-**Output**: `mv-keyframe-director.json` (schema `1.0`) with `keyframe_type` on each keyframe
-
-**Contract**: `contracts/mv-keyframe-director/mv-keyframe-director.schema.json`
-
-**Key fields**:
-- `keyframes[]`: `keyframe_id`, `primary_section_ref`, `section_type_focus`, `line_refs[]`, `start_time`, `end_time`, `lines[]`, `keyframe_type`, `keyframe_image_prompt_en`, `video_from_keyframe_prompt_en`
-- `instrumental_bookends[]`: optional segments without lyric `line_refs` (intro before first LRC line, outro tail)
-
-**Concept MV routing logic** (per keyframe):
-| Condition | `keyframe_type` | Generation Path |
-|-----------|----------------|-----------------|
-| Lyrics contain concrete visual entities (sea, fish, sky, etc.) | `lyric_imagery` | Text-to-image from `keyframe_image_prompt_en` |
-| Lyrics are abstract / emotional / lack concrete visual anchors | `character_singing` | Image-to-image using user's reference images of the singer |
-
-The director (Qwen3) analyzes each group of lyrics and decides the `keyframe_type` based on visual concreteness.
-
-**Hard rules**:
-- Keyframes must form a **partition** of all `line_id`s into **consecutive** blocks.
-- One line per keyframe is rejected when keyframe count is excessive (must be fewer than total lines).
-- `start_time` / `end_time` / `lines[]` are filled by the script from timings after model return.
-- `keyframe_image_prompt_en` must incorporate `global_style_suffix` and `core_visual_motifs` prompt anchors.
-- `video_from_keyframe_prompt_en` must describe motion/camera/action starting from the still frame.
-- Every keyframe must have a non-null `keyframe_type`. Instrumental bookends default to `lyric_imagery`.
+**Instrumental segments**: segments where ALL `line_refs` are `is_instrumental=true` get placeholder entries with `is_instrumental: true` and `keyframe_count: 0`. No Qwen3 analysis is performed for these. Their visuals extend the preceding segment's imagery.
 
 **Executor**:
 ```
-python workflows/mv-production/scripts/infer_keyframe_director_qwen3.py \
-    --lyrics-timing <project>/lyrics-timing.json \
+python workflows/mv-production/scripts/infer_segment_interpretation_qwen3.py \
     --song-sections-llm <project>/song-sections-llm.json \
-    --mv-global-visual-style <project>/mv-global-visual-style.json \
-    --out <project>/mv-keyframe-director.json
-```
-
-## Stage 5: Keyframe Image Generation
-
-**Goal**: generate still images for each keyframe in the director plan, routing by `keyframe_type`. Produces raw images and labeled versions with lyric overlays.
-
-**Input**: `mv-keyframe-director.json` + `mv-global-visual-style.json` + `user_requirements.json` (for style prefix, reference images, resolution)
-
-**Output**: `keyframes/<keyframe_id>.png`, `keyframes/<keyframe_id>_labeled.png`, `keyframe-images.json` (manifest with paths, timing, and generation status)
-
-**Contract**: `contracts/keyframe-images/keyframe-images.schema.json`
-
-### Concept MV Routing
-
-Each keyframe's `keyframe_type` determines the generation method:
-
-| `keyframe_type` | Method | Input | Description |
-|----------------|--------|-------|-------------|
-| `lyric_imagery` | Text-to-image | `keyframe_image_prompt_en` | Standard text-to-image generation from the director's English prompt |
-| `character_singing` | Image-to-image | Reference images + prompt | Uses user-provided reference images of the singer as visual input, with the director's prompt as text guidance |
-
-For `character_singing` keyframes:
-- Reference images come from `user_requirements.json` → `reference_images[]`.
-- The first available reference image is used as the visual input.
-- The director's `keyframe_image_prompt_en` becomes the text prompt for image-to-image.
-- If no reference images are available, falls back to `lyric_imagery` method and logs a warning.
-
-**Render backends**:
-| Backend | Service | Resolution Constraints | Fallback |
-|---------|---------|------------------------|----------|
-| `qwen_local` | Local Qwen Image `POST /submit` | Any (default 1280×720) | placeholder PNG |
-| `gitee_kolors` | Gitee `/v1/images/generations` (kolors model) | Only 1024×576, 1024×768, 1024×1024, 512×512 | placeholder PNG |
-| `dry_run` | No API | Any | placeholder PNG |
-
-**Executor** (local Qwen backend):
-```
-python workflows/mv-production/scripts/generate_keyframe_images_from_director.py \
-    --director <project>/mv-keyframe-director.json \
-    --global-style <project>/mv-global-visual-style.json \
-    --user-requirements <project>/user_requirements.json \
-    --project-root <project> \
-    --out-dir <project>/keyframes
-```
-
-**Executor** (Gitee Kolors backend):
-```
-python workflows/mv-production/scripts/generate_keyframe_images_flux.py \
-    --director <project>/mv-keyframe-director.json \
-    --global-style <project>/mv-global-visual-style.json \
-    --user-requirements <project>/user_requirements.json \
-    --project-root <project> \
-    --out-dir <project>/keyframes \
-    --width 1024 --height 576
+    --lyrics-timing <project>/lyrics-timing.json \
+    --out <project>/segment-interpretation.json
 ```
 
 **Hard rules**:
-- Each `keyframe_id` produces one `*.png` and one `*_labeled.png`.
-- `keyframe-images.json` must record per-keyframe `generation_ok` status and `keyframe_type`.
-- Image prompts must incorporate `global_style_suffix` from Stage 3 and the user's `keyframe_style_prefix` from `user_requirements.json`. The director's `keyframe_image_prompt_en` already includes `global_style_suffix`; the script adds `texture_material_en` + `lighting_mood_en` but does NOT re-append `global_style_suffix` to avoid duplication.
-- Resolution is read from `user_requirements.json` → `resolution`. The Kolors backend validates against its supported sizes and falls back to 1024×576 on mismatch.
-- For `character_singing` keyframes: if the image-to-image API is unavailable, fall back to text-to-image with a character description prompt.
-- Placeholder images (solid-color PNGs) replace failed generations only in non-strict mode.
+- Non-instrumental segments are sent to Qwen3.5 for full interpretation. Instrumental segments receive placeholder entries.
+- `time_range` is injected from `lyrics-timing.json` by the script for accuracy.
+- `lyrics_text` is copied from the source `song-sections-llm.json`.
+- `visual_priority = 1.0` marks the segment's core imagery; `emotional_intensity` guides downstream mood.
+
+## Stage 4: Shot Plan
+
+**Goal**: split each segment-interpretation segment into executable shots with precise time windows, composition, camera movement, emotion, and generation notes. This is the bridge from semantic interpretation to actionable prompts.
+
+**Input**: `segment-interpretation.json` (Stage 3)
+
+**Output**: `shot-plan.json` (schema `1.0`)
+
+**Contract**: `contracts/shot-plan/shot-plan.schema.json`
+
+**Key fields per shot**:
+- `shot_id` (`shot_{segment_id}_{NN}`), `parent_segment_id`, `parent_section_id`
+- `time_range` (must fall within parent segment window)
+- `shot_role` (enum: establishing_image, symbolic_detail, emotional_peak, transition_image, motif_development, ambient_hold, memory_echo, climax_image, resolution_image)
+- `visual_concept_zh` / `deep_function_zh`: what this shot shows and why
+- `key_imagery[]` / `secondary_imagery[]`: imagery from Stage 3, assigned per-shot
+- `composition` (enums: shot_size, camera_angle, foreground/midground/background, focal_point, depth)
+- `camera` (enums: camera_motion, movement_speed, lens_feeling, stability)
+- `motion_design` (subject_motion, environment_motion, motion_intensity)
+- `visual_style` (scene_type, color_palette, lighting, texture — inherited from Stage 3)
+- `emotion` (primary, secondary, intensity — inherited from Stage 3)
+- `transition` (transition_in, transition_out, transition_duration)
+- `generation_notes` (image_prompt_focus, video_prompt_focus, avoid — ready for downstream prompt stages)
+
+**Instrumental segments** receive `ambient_hold` entries with `generate_new_image: false` and `reuse_from_shot_id` pointing to the previous segment's last shot.
+
+**Executor**:
+```
+python workflows/mv-production/scripts/infer_shot_plan_qwen3.py \
+    --segment-interpretation <project>/segment-interpretation.json \
+    --out <project>/shot-plan.json
+```
+
+**Hard rules**:
+- Each shot's time window must fall within its parent segment.
+- Each segment's shots must tile its full time window.
+- Each shot has one primary visual motion (one camera move + one subject move).
+- Imagery-type MV constraints apply: silhouettes, light threads, reflections, distant views, no narrative acting.
+- `composition`, `camera`, `motion_design` fields use predefined enums only.
+- `ambient_hold` shots reuse previous shot's image without generating new ones.
+
+## Stage 5: Image Prompts
+
+**Goal**: convert each shot from `shot-plan.json` into a stable, unified English prompt for static keyframe image generation. Ambient hold shots reuse previous images without generating new ones.
+
+**Input**: `shot-plan.json` (Stage 4) + `segment-interpretation.json` (Stage 3)
+
+**Output**: `image-prompts.json` (schema `1.0`)
+
+**Contract**: `contracts/image-prompts/image-prompts.schema.json`
+
+**Method**: Programmatic assembly + Qwen3.5 batch translation.
+- `global_style` is induced from S3 segment data: top-3 colors (CN→EN mapped), top-3 camera moods (CN→EN mapped), dominant lighting, dominant scene type
+- `global_prompt_prefix` is a fixed template filled with data-induced values: `"A poetic symbolic music video keyframe, {color_phrase} atmosphere, cinematic composition, {mood_phrase}, elegant and emotional visual storytelling"`
+- `visual_concept_zh` from each shot is batch-translated to English by Qwen3.5
+- Composition/emotion/lighting are mapped via fixed CN→EN lookup tables
+
+**Key fields per prompt**:
+- `render_strategy.generate_new_image`: `false` for ambient_hold shots with `reuse_from_shot_id`
+- `image_prompt`: full English prompt = `global_prompt_prefix + visual_concept_en + composition_hint + lighting_hint + emotion_hint + 16:9`
+- `negative_prompt`: fixed global template + shot-specific avoid list
+- `prompt_components`: structured breakdown (main_subject, environment, composition, lighting, emotion, style_keywords)
+- `generation_parameters`: aspect_ratio (16:9), resolution, num_candidates
+- `quality_check`: must_include, must_avoid, continuity_tags
+
+**Executor**:
+```
+python workflows/mv-production/scripts/build_image_prompts.py \
+    --shot-plan <project>/shot-plan.json \
+    --segment-interpretation <project>/segment-interpretation.json \
+    --out <project>/image-prompts.json
+```
+
+**Hard rules**:
+- `global_prompt_prefix` is data-driven (not song-specific hardcoded): colors and moods are aggregated from S3 segment data via fixed CN→EN maps.
+- Ambient hold shots do not generate new images; they reuse the previous shot's image.
+- All prompts are in English.
+- `image_prompt` describes only the static keyframe — no camera motion, no video action.
+
+## Stage 5d: Generation Queue
+
+**Goal**: build an executable task queue from image-prompts. Filters `generate_new_image=true` shots and maps each to candidate output paths.
+
+**Input**: `image-prompts.json` (Stage 5)
+
+**Output**: `image-generation-queue.json`
+
+**Executor**:
+```
+python workflows/mv-production/scripts/build_generation_queue.py \
+    --image-prompts <project>/image-prompts.json \
+    --out <project>/image-generation-queue.json
+```
+
+**Hard rules**:
+- Critical shots (`establishing_image`, `emotional_peak`, `climax_image`, `resolution_image`) get 3 candidates; others get 2.
+- Reuse tasks record `reuse_from_shot_id` and `reuse_after_selection` status.
+
+## Stage 6: Asset Manifest (post-generation)
+
+**Goal**: scan generated images on disk and build a manifest recording per-shot candidacy.
+
+**Input**: `image-generation-queue.json` (Stage 5d) + actual generated files on disk
+
+**Output**: `asset-manifest.json`
+
+**Executor**:
+```
+python workflows/mv-production/scripts/build_asset_manifest.py \
+    --generation-queue <project>/image-generation-queue.json \
+    --out <project>/asset-manifest.json
+```
+
+## Stage 6a: Image Selection Review
+
+**Goal**: review candidate images per shot with 5-score rubric. Currently manual; VLM integration planned.
+
+**Input**: `asset-manifest.json` (Stage 6)
+
+**Output**: `image-selection-review.json`
+
+**Executor**:
+```
+python workflows/mv-production/scripts/build_selection_review_template.py \
+    --asset-manifest <project>/asset-manifest.json \
+    --out <project>/image-selection-review.json
+```
+*Scoring is manual — fill in scores, then proceed to S6b.*
+
+**Scoring dimensions**:
+- `prompt_alignment`: does it match the prompt and must_include? (0-1)
+- `style_consistency`: does it match the global visual style? (0-1)
+- `composition_quality`: clear composition with defined depth? (0-1)
+- `symbolic_strength`: powerful and evocative imagery? (0-1)
+- `video_readiness`: suitable for image-to-video generation? (0-1)
+
+## Stage 6b: Selected Asset Manifest
+
+**Goal**: select the highest-scoring candidate per shot and resolve reuse dependencies.
+
+**Input**: `asset-manifest.json` (Stage 6) + `image-selection-review.json` (Stage 6a)
+
+**Output**: `selected-asset-manifest.json`
+
+**Executor**:
+```
+python workflows/mv-production/scripts/build_selected_manifest.py \
+    --asset-manifest <project>/asset-manifest.json \
+    --selection-review <project>/image-selection-review.json \
+    --out <project>/selected-asset-manifest.json
+```
+
+## Stage 7: Video Prompts
+
+**Goal**: convert each selected keyframe image into an image-to-video motion prompt. Uses Qwen3.5 to generate camera-aware video prompts from shot-plan camera/motion data.
+
+**Input**: `shot-plan.json` (Stage 4) + `image-prompts.json` (Stage 5) + `selected-asset-manifest.json` (Stage 6b, optional)
+
+**Output**: `video-prompts.json`
+
+**Executor**:
+```
+python workflows/mv-production/scripts/build_video_prompts.py \
+    --shot-plan <project>/shot-plan.json \
+    --image-prompts <project>/image-prompts.json \
+    [--selected-manifest <project>/selected-asset-manifest.json] \
+    --out <project>/video-prompts.json
+```
+
+## Stage 8: Timeline
+
+**Goal**: assemble a sequential timeline of video segments for final MV production. Aligns with lyrics-timing for subtitle synchronization and builds FFmpeg concat reference.
+
+**Input**: `shot-plan.json` (S4) + `video-prompts.json` (S7) + `selected-asset-manifest.json` (S6b) + `lyrics-timing.json` (S1)
+
+**Output**: `timeline.json`
+
+**Executor**:
+```
+python workflows/mv-production/scripts/build_timeline.py \
+    --shot-plan <project>/shot-plan.json \
+    --video-prompts <project>/video-prompts.json \
+    --selected-manifest <project>/selected-asset-manifest.json \
+    --lyrics-timing <project>/lyrics-timing.json \
+    [--song-audio <original-song>] \
+    --out <project>/timeline.json
+```
 
 ## Appendix: Legacy Storyboard Chain
 
@@ -411,25 +499,17 @@ Contracts and guidance for these stages remain in:
 
 ## Hard Constraints Recap
 
-1. Canonical direction: `lyrics → sections → style → director → keyframes`.
+1. Canonical direction: `lyrics → sections → segment interpretation → shot plan`.
 2. Song audio is the master timeline for all timing decisions.
-3. Stage 4 keyframes form a partition of all `line_id`s into consecutive blocks.
-4. Stage 2 sections cover every `line_id` exactly once, including instrumental lines.
-5. Every `section_ref` downstream matches `section_id` from `song-sections-llm.json`.
-6. `global_style_suffix` must flow into every downstream image prompt.
-7. All `generation/*` prompts in English.
-8. Every keyframe has `keyframe_type`: `lyric_imagery` or `character_singing`.
-9. `character_singing` keyframes route to image-to-image with user reference images.
-10. Non-realistic style enforced; `animation_art_style_en` reflects `visual_style` from intake.
-11. Resolution from Stage 0 propagates unchanged through Stage 5.
+3. Stage 2 sections cover every `line_id` exactly once, including instrumental lines.
+4. Every `segment_id` in shot-plan must exist in segment-interpretation.
+5. Every shot's time window falls within parent segment and all shots tile the segment.
+6. Imagery-type MV constraints: no narrative acting; silhouettes, light threads, reflections.
+7. Instrumental segments use ambient_hold, reuse previous shot's image.
+8. All `generation/*` prompts in English.
+9. `composition`, `camera`, `motion_design` use predefined enums only.
 
 ## Core Dependencies
-
-### Skills
-- `writer/mv-treatment` (optional sidecar)
-- `writer/character-profile` + `art/character-three-view` (optional branch)
-- `art/scene-design` (optional branch)
-- `generation/qwen-image-local` → keyframe stills
 
 ### Contracts
 
@@ -437,13 +517,10 @@ Full index: `contracts/README.md`
 
 Priority directories:
 - `contracts/user-requirements/`
-- `contracts/project-meta/`
 - `contracts/lyrics-timing/`
 - `contracts/song-sections-llm/`
-- `contracts/song-structure/` (legacy reference)
-- `contracts/mv-global-visual-style/`
-- `contracts/mv-keyframe-director/`
-- `contracts/keyframe-images/`
+- `contracts/segment-interpretation/`
+- `contracts/shot-plan/`
 - `contracts/mv-treatment/` (optional sidecar)
 - `contracts/mv-storyboard/` (legacy appendix)
 
@@ -451,17 +528,15 @@ Priority directories:
 
 - **workflow**: owns stage orchestration, artifact dependencies, hard constraints, entry behavior
 - **`writer/mv-treatment`**: owns optional treatment prose and creative concept development
-- **`art/character-three-view` + `art/scene-design`**: owns optional visual world building
 - **`director/storyboard`** (appendix): owns shot-level beat-sync planning
-- **`generation/qwen-image-local`**: owns keyframe image generation rules
 
 ## Early Exit Rules
 
 Valid completion points:
 - after `lyrics-timing.json` + `song-sections-llm.json` (Stage 2)
-- after `mv-global-visual-style.json` (Stage 3)
-- after `mv-keyframe-director.json` (Stage 4)
-- after `keyframes/*.png` + `keyframe-images.json` (Stage 5)
+- after `segment-interpretation.json` (Stage 3)
+- after `shot-plan.json` (Stage 4)
+- after `image-prompts.json` (Stage 5)
 
 ## Intermediate Artifact Recovery
 
@@ -469,10 +544,10 @@ If the user provides an existing artifact, resume from the nearest valid stage:
 
 | Existing Artifact | Resume at |
 |------------------|-----------|
-| `lyrics-timing.json` + `song-sections-llm.json` | Stage 3 (global style) or Stage 4 (director plan) |
-| `mv-global-visual-style.json` | Stage 4 (director plan) |
-| `mv-keyframe-director.json` | Stage 5 (keyframe images) |
-| `keyframe-images.json` | Done — keyframe generation is the terminal stage |
+| `lyrics-timing.json` + `song-sections-llm.json` | Stage 3 (segment interpretation) |
+| `segment-interpretation.json` | Stage 4 (shot plan) |
+| `shot-plan.json` | Stage 5 (image prompts) |
+| `image-prompts.json` | Done — image prompts is the current terminal stage |
 
 Do not rerun earlier stages unless the user asks for revision.
 
@@ -484,14 +559,26 @@ Do not rerun earlier stages unless the user asks for revision.
 ├── user_requirements.json
 ├── lyrics-timing.json
 ├── song-sections-llm.json
-├── mv-global-visual-style.json
-├── mv-keyframe-director.json
-├── keyframes/
-│   ├── kf_01.png
-│   ├── kf_01_labeled.png
-│   └── ...
-├── keyframe-images.json
+├── segment-interpretation.json
+├── shot-plan.json
+├── image-prompts.json
+├── image-generation-queue.json
+├── asset-manifest.json
+├── image-selection-review.json
+├── selected-asset-manifest.json
+├── video-prompts.json
+├── timeline.json
+├── assets/
+│   ├── images/
+│   │   ├── candidates/        (generated, one per gen task)
+│   │   └── selected/           (post-review picks)
+│   └── videos/
+│       ├── candidates/         (generated video clips)
+│       └── selected/           (post-review picks)
 ├── characters.json              (optional)
+├── characters/                  (optional)
+├── scene_design.json            (optional)
+└── scenes/                      (optional)
 ├── characters/                  (optional)
 ├── scene_design.json            (optional)
 └── scenes/                      (optional)

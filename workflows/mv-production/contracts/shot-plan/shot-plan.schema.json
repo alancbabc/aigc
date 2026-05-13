@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MVShotPlan",
+  "description": "Shot-level breakdown plan for imagery-type MV. Splits each segment into executable shots with time, composition, camera, motion, and generation notes. Instrumental segments get ambient_hold entries.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_segment_interpretation_ref", "shot_generation_rules", "shots"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0" },
+    "song_title": { "type": "string", "minLength": 1 },
+    "artist": { "type": "string" },
+    "source_segment_interpretation_ref": { "type": "string", "minLength": 1 },
+    "shot_generation_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min_shot_duration", "target_shot_duration", "max_shot_duration", "instrumental_hold_policy", "long_segment_policy"],
+      "properties": {
+        "min_shot_duration": { "type": "number", "minimum": 1.0 },
+        "target_shot_duration": { "type": "number", "minimum": 1.0 },
+        "max_shot_duration": { "type": "number", "minimum": 1.0 },
+        "instrumental_hold_policy": { "type": "string", "enum": ["reuse_previous_visual_or_create_ambient_hold"] },
+        "long_segment_policy": { "type": "string", "enum": ["split_before_shot_planning_if_over_40_seconds"] }
+      }
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "shot_id", "parent_segment_id", "parent_section_id",
+          "time_range", "lyric_refs", "shot_role", "visual_concept_zh",
+          "key_imagery", "secondary_imagery",
+          "composition", "camera", "motion_design",
+          "transition", "generation_notes"
+        ],
+        "properties": {
+          "shot_id": { "type": "string", "minLength": 1 },
+          "parent_segment_id": { "type": "string", "minLength": 1 },
+          "parent_section_id": { "type": "string", "minLength": 1 },
+          "time_range": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["start_time", "end_time", "duration_seconds"],
+            "properties": {
+              "start_time": { "type": "number", "minimum": 0 },
+              "end_time": { "type": "number", "minimum": 0 },
+              "duration_seconds": { "type": "number", "minimum": 0 }
+            }
+          },
+          "lyric_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "shot_role": {
+            "type": "string",
+            "enum": [
+              "establishing_image", "symbolic_detail", "emotional_peak",
+              "transition_image", "motif_development", "ambient_hold",
+              "memory_echo", "climax_image", "resolution_image"
+            ]
+          },
+          "visual_concept_zh": { "type": "string", "minLength": 1 },
+          "deep_function_zh": { "type": "string", "minLength": 1 },
+          "key_imagery": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          },
+          "secondary_imagery": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "composition": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["shot_size", "camera_angle", "foreground", "midground", "background", "focal_point", "depth"],
+            "properties": {
+              "shot_size": {
+                "type": "string",
+                "enum": ["extreme_wide_shot", "wide_shot", "medium_wide_shot", "medium_shot", "medium_close_up", "close_up", "extreme_close_up"]
+              },
+              "camera_angle": {
+                "type": "string",
+                "enum": ["eye_level", "low_angle", "slightly_low_angle", "high_angle", "slightly_high_angle", "dutch_angle", "overhead"]
+              },
+              "foreground": { "type": "string" },
+              "midground": { "type": "string" },
+              "background": { "type": "string" },
+              "focal_point": { "type": "string" },
+              "depth": {
+                "type": "string",
+                "enum": ["shallow_space", "medium_space", "deep_space", "flat_space"]
+              }
+            }
+          },
+          "camera": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["camera_motion", "movement_speed", "lens_feeling", "stability"],
+            "properties": {
+              "camera_motion": {
+                "type": "string",
+                "enum": ["static", "slow_push_in", "slow_pull_out", "slow_pan_left", "slow_pan_right", "slow_tilt_up", "slow_tilt_down", "slow_dolly", "slow_tracking", "slow_zoom_in", "slow_zoom_out", "floating_drift", "none_or_minimal_drift"]
+              },
+              "movement_speed": {
+                "type": "string",
+                "enum": ["very_slow", "slow", "moderate"]
+              },
+              "lens_feeling": {
+                "type": "string",
+                "enum": ["wide_cinematic", "standard", "telephoto_compressed", "macro_dreamlike"]
+              },
+              "stability": {
+                "type": "string",
+                "enum": ["locked", "floating", "handheld_subtle", "drifting"]
+              }
+            }
+          },
+          "motion_design": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["subject_motion", "environment_motion", "motion_intensity"],
+            "properties": {
+              "subject_motion": { "type": "string" },
+              "environment_motion": { "type": "string" },
+              "motion_intensity": {
+                "type": "string",
+                "enum": ["very_low", "low", "medium", "high"]
+              }
+            }
+          },
+          "visual_style": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "scene_type": { "type": "string" },
+              "color_palette": { "type": "array", "items": { "type": "string" } },
+              "lighting": { "type": "string" },
+              "texture": { "type": "string" }
+            }
+          },
+          "emotion": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "primary": { "type": "string" },
+              "secondary": { "type": "array", "items": { "type": "string" } },
+              "intensity": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+            }
+          },
+          "transition": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["transition_in", "transition_out"],
+            "properties": {
+              "transition_in": { "type": "string" },
+              "transition_out": { "type": "string" },
+              "transition_duration": { "type": "number", "minimum": 0 }
+            }
+          },
+          "generation_notes": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["image_prompt_focus", "video_prompt_focus", "avoid"],
+            "properties": {
+              "generate_new_image": { "type": "boolean" },
+              "reuse_from_shot_id": { "type": "string" },
+              "image_prompt_focus": { "type": "string", "minLength": 1 },
+              "video_prompt_focus": { "type": "string", "minLength": 1 },
+              "avoid": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

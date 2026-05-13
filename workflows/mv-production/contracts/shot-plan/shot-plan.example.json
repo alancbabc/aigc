@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "song_title": "大鱼",
+  "artist": "周深",
+  "source_segment_interpretation_ref": "segment-interpretation.json",
+  "shot_generation_rules": {
+    "min_shot_duration": 4.0,
+    "target_shot_duration": 8.0,
+    "max_shot_duration": 14.0,
+    "instrumental_hold_policy": "reuse_previous_visual_or_create_ambient_hold",
+    "long_segment_policy": "split_before_shot_planning_if_over_40_seconds"
+  },
+  "shots": [
+    {
+      "shot_id": "shot_v1_01_01",
+      "parent_segment_id": "seg_v1_01",
+      "parent_section_id": "verse_1",
+      "time_range": { "start_time": 43.65, "end_time": 56.0, "duration_seconds": 12.35 },
+      "lyric_refs": ["line_01", "line_02"],
+      "shot_role": "establishing_image",
+      "visual_concept_zh": "夜幕像海潮一样从天空深处涌来，海与天的边界逐渐消失。",
+      "deep_function_zh": "建立海、夜、梦境三者交融的主视觉世界。",
+      "key_imagery": ["无声海浪", "夜幕", "海天交界"],
+      "secondary_imagery": ["星光", "雾气", "远方地平线"],
+      "composition": {
+        "shot_size": "extreme_wide_shot",
+        "camera_angle": "slightly_low_angle",
+        "foreground": "暗蓝色海面与微弱水纹",
+        "midground": "逐渐升起的雾气与海浪",
+        "background": "被夜幕吞没的天空尽头",
+        "focal_point": "海天交界处的银蓝色光线",
+        "depth": "deep_space"
+      },
+      "camera": {
+        "camera_motion": "slow_push_in",
+        "movement_speed": "very_slow",
+        "lens_feeling": "wide_cinematic",
+        "stability": "floating"
+      },
+      "motion_design": {
+        "subject_motion": "海浪缓慢上升，夜幕像液体一样蔓延",
+        "environment_motion": "星光轻微闪烁，薄雾缓慢漂移",
+        "motion_intensity": "low"
+      },
+      "visual_style": {
+        "scene_type": "dream_ocean_night",
+        "color_palette": ["深蓝", "银白", "青色微光", "雾黑"],
+        "lighting": "柔和月光，低对比，水面微光",
+        "texture": "柔雾感、梦境感、轻微颗粒"
+      },
+      "emotion": { "primary": "静谧", "secondary": ["神秘", "温柔"], "intensity": 0.45 },
+      "transition": { "transition_in": "fade_from_dark_blue", "transition_out": "soft_dissolve", "transition_duration": 1.0 },
+      "generation_notes": {
+        "image_prompt_focus": "海天交融、夜幕如潮、梦境空间",
+        "video_prompt_focus": "慢速推进、海浪上升、雾气漂移",
+        "avoid": ["普通现实海滩", "人物正脸", "现代建筑", "强烈动作"]
+      }
+    },
+    {
+      "shot_id": "shot_v1_01_02",
+      "parent_segment_id": "seg_v1_01",
+      "parent_section_id": "verse_1",
+      "time_range": { "start_time": 56.0, "end_time": 68.64, "duration_seconds": 12.64 },
+      "lyric_refs": ["line_03", "line_04"],
+      "shot_role": "symbolic_detail",
+      "visual_concept_zh": "一只半透明的巨鱼从画面深处缓缓穿过梦境缝隙，鳞片折射出星河般的微光。",
+      "deep_function_zh": "将大鱼意象从抽象歌词转为具体画面，建立灵魂/自由的象征。",
+      "key_imagery": ["大鱼", "梦境缝隙", "鱼鳞星河"],
+      "secondary_imagery": ["沉睡轮廓剪影", "水底微光"],
+      "composition": {
+        "shot_size": "wide_shot",
+        "camera_angle": "slightly_low_angle",
+        "foreground": "鱼类尾迹的微光粒子",
+        "midground": "大鱼半透明身体穿过空间",
+        "background": "远方沉睡人形的模糊剪影",
+        "focal_point": "大鱼的透明鱼鳞与星河光芒",
+        "depth": "deep_space"
+      },
+      "camera": {
+        "camera_motion": "slow_tracking",
+        "movement_speed": "very_slow",
+        "lens_feeling": "wide_cinematic",
+        "stability": "floating"
+      },
+      "motion_design": {
+        "subject_motion": "大鱼缓慢游过画面，鳞片微光流动",
+        "environment_motion": "水底光点缓慢上升，剪影静止",
+        "motion_intensity": "low"
+      },
+      "visual_style": {
+        "scene_type": "dream_ocean_night",
+        "color_palette": ["深蓝", "银白", "青色微光", "灰蓝"],
+        "lighting": "水下微光，丁达尔光柱，柔和冷色",
+        "texture": "透明质感、星河鳞片、梦境模糊"
+      },
+      "emotion": { "primary": "静谧", "secondary": ["神秘", "凝视"], "intensity": 0.4 },
+      "transition": { "transition_in": "soft_dissolve", "transition_out": "soft_dissolve", "transition_duration": 1.0 },
+      "generation_notes": {
+        "image_prompt_focus": "半透明巨鱼、梦境裂缝、星河鳞片、远方剪影",
+        "video_prompt_focus": "大鱼缓慢游过、鳞片微光流动、水下粒子上升",
+        "avoid": ["写实鱼类", "人物正面", "明亮白天", "快速运动"]
+      }
+    },
+    {
+      "shot_id": "shot_v1_02_hold",
+      "parent_segment_id": "seg_v1_02",
+      "parent_section_id": "verse_1",
+      "time_range": { "start_time": 68.64, "end_time": 70.11, "duration_seconds": 1.47 },
+      "lyric_refs": ["line_05"],
+      "shot_role": "ambient_hold",
+      "visual_concept_zh": "延续上一镜头中大鱼游过后的蓝色尾迹，画面轻微淡出。",
+      "deep_function_zh": "作为段落间的呼吸停顿，不生成新的关键帧。",
+      "key_imagery": ["大鱼尾迹"],
+      "secondary_imagery": [],
+      "composition": {
+        "shot_size": "wide_shot",
+        "camera_angle": "eye_level",
+        "foreground": "残留的光粒子尾迹",
+        "midground": "渐暗的水下空间",
+        "background": "远方模糊剪影",
+        "focal_point": "逐渐消散的光粒子",
+        "depth": "medium_space"
+      },
+      "camera": {
+        "camera_motion": "none_or_minimal_drift",
+        "movement_speed": "very_slow",
+        "lens_feeling": "standard",
+        "stability": "drifting"
+      },
+      "motion_design": {
+        "subject_motion": "光粒子尾迹逐渐消散",
+        "environment_motion": "光点缓慢漂浮",
+        "motion_intensity": "very_low"
+      },
+      "transition": { "transition_in": "none", "transition_out": "none", "transition_duration": 0 },
+      "generation_notes": {
+        "generate_new_image": false,
+        "reuse_from_shot_id": "shot_v1_01_02",
+        "image_prompt_focus": "复用上一shot画面，不做新生成",
+        "video_prompt_focus": "画面静态保持，轻微淡出",
+        "avoid": []
+      }
+    }
+  ]
+}
