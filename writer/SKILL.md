@@ -46,8 +46,8 @@ It is not responsible for:
 
 ### 4. `mv-treatment`
 
-- purpose: generates a creative treatment for a music video based on song structure and lyrics analysis
-- input: `song-structure.json`, `lyrics-analysis.json`, `user_requirements.json`
+- purpose: generates a creative treatment for a music video based on song section timeline + lyrics + visual style lock
+- input: `lyrics-timing.json`, `song-sections-llm.json`, `mv-global-visual-style.json`, `user_requirements.json` (optional: `mv-keyframe-director.json`)
 - output: `mv-treatment.json`
 - downstream: `character-profile`, `art/scene-design`, `director/storyboard`
 - applies to: `workflows/mv-production`

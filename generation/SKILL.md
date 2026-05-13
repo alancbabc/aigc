@@ -70,6 +70,11 @@ It is not responsible for:
 - input: images + questions
 - output: text answers
 
+### `qwen3-chat-gitee`
+- text chat (Gitee Serverless Qwen3, non-streaming)
+- input: `messages` via `--prompt` or `--request` JSON
+- output: assistant text (JSON wrapper with usage or `--plain`)
+
 ### `qwen3-tts`
 - text-to-speech
 - input: text + `speaker` + `language`
@@ -99,6 +104,7 @@ It is not responsible for:
 | `flux-text-to-image` | English prompt + size | images | text-to-image |
 | `flux-image-edit` | references + prompt | images | image editing, three-view generation |
 | `qwen2.5-vl` | images + questions | text | analysis and review |
+| `qwen3-chat-gitee` | messages (prompt or JSON body) | text | LLM chat on Gitee (Qwen3) |
 | `qwen3-tts` | text + speaker + language | audio | TTS and spoken drafts |
 | `qwen-tts-local` | text + optional speaker/instruct/language | audio | local-service TTS |
 | `mineru25-ocr` | documents + OCR settings | Markdown | OCR and document extraction |
@@ -122,6 +128,7 @@ It is not responsible for:
 
 - Video generation: `generation/ltx23-video/SKILL.md`
 - Local image generation: `generation/qwen-image-local/SKILL.md`
+- Qwen3 text chat (Gitee): `generation/qwen3-chat-gitee/SKILL.md`
 - Text to speech: `generation/qwen3-tts/SKILL.md`
 - Local text to speech: `generation/qwen-tts-local/SKILL.md`
 - OCR / parsing: `generation/mineru25-ocr/SKILL.md`

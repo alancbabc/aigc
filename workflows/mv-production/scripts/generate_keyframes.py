@@ -2,16 +2,21 @@
 """Batch keyframe image generation from keyframe-prompts.json.
 
 Supports multiple backends:
-  - flux   : Gitee FLUX.2-klein-9B (requires AIGC_GITEE_API_KEY)
+  - flux   : Gitee image API (requires AIGC_GITEE_API_KEY; kolors defaults to 1024x576 when 16:9)
   - qwen   : Local Qwen Image (requires QWEN_IMAGE_LOCAL_BASE_URL)
   - dry-run: generates solid-color placeholder PNGs (no API needed)
 
+MV defaults: landscape 16:9 when neither --size nor generation_aspect_ratio in JSON contradict
+it. Override style per shot via keyframe_style_prefix / style fields in prompts JSON,
+environment variable MV_KEYFRAME_STYLE_PREFIX, or --style-prefix.
+
 Usage:
-    python generate_keyframes.py \
-        --prompts <project>/keyframe-prompts.json \
-        --output-dir <project>/keyframes \
-        --output <project>/keyframe-images.json \
-        --backend auto
+    python generate_keyframes.py \\
+        --prompts <project>/keyframe-prompts.json \\
+        --output-dir <project>/keyframes \\
+        --output <project>/keyframe-images.json \\
+        --backend flux --aspect-ratio 16:9 \\
+        --style-prefix "Chinese trad. anime, guofeng ink and cel-shading"
 """
 
 from __future__ import annotations
@@ -34,7 +39,27 @@ GITEE_BASE_URL = os.getenv("AIGC_GITEE_BASE_URL", "https://ai.gitee.com/v1")
 QWEN_BASE_URL = os.getenv("QWEN_IMAGE_LOCAL_BASE_URL", "http://10.42.1.1:9000")
 
 DEFAULT_SIZE = "1024x1024"
+DEFAULT_ASPECT_RATIO = "16:9"
 BATCH_DELAY_SECONDS = 3
+ENV_STYLE_PREFIX = "MV_KEYFRAME_STYLE_PREFIX"
+
+
+def _load_aigc_dotenv() -> None:
+    """Load aigc/.env so AIGC_GITEE_API_KEY is set (same search order as generation/qwen3-chat-gitee/client.py)."""
+    root = Path(__file__).resolve().parents[3]
+    candidates = (root / ".env", Path.cwd() / ".env")
+    for env_path in candidates:
+        env_path = env_path.resolve()
+        if not env_path.is_file():
+            continue
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, _, v = line.partition("=")
+            k = k.strip()
+            if k and k not in os.environ:
+                os.environ[k] = v.strip().strip('"').strip("'")
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -63,6 +88,84 @@ def create_placeholder_png(path: Path, width: int = 768, height: int = 512, colo
 
 
 GITEE_IMAGE_MODEL = os.getenv("AIGC_GITEE_IMAGE_MODEL", "kolors")
+
+
+def parse_wxh(size: str) -> tuple[int, int]:
+    parts = size.lower().replace("*", "x").split("x")
+    if len(parts) != 2:
+        return (1024, 576)
+    return int(parts[0]), int(parts[1])
+
+
+def flux_like_model(model_name: str) -> bool:
+    return "flux" in model_name.lower()
+
+
+def size_for_aspect_ratio(aspect_ratio: str, model_name: str) -> str:
+    """Pick a Gitee /images/generations size that matches aspect (validated for kolors / FLUX presets)."""
+    m = model_name or ""
+    if aspect_ratio == "16:9":
+        return "1920x1080" if flux_like_model(m) else "1024x576"
+    if aspect_ratio == "9:16":
+        return "768x1024"
+    if aspect_ratio == "1:1":
+        return "1024x1024"
+    raise ValueError(f"Unknown aspect_ratio: {aspect_ratio!r}")
+
+
+def normalize_generation_aspect(raw: Any) -> str | None:
+    if raw is None:
+        return None
+    s = str(raw).strip().lower()
+    if s in ("16:9", "16x9"):
+        return "16:9"
+    if s in ("1:1", "1x1", "square"):
+        return "1:1"
+    if s in ("9:16", "9x16", "portrait", "vertical"):
+        return "9:16"
+    if s in ("wide", "landscape"):
+        return "16:9"
+    return None
+
+
+def pick_flux_size(
+    explicit_size: str | None,
+    aspect_cli: str | None,
+    json_aspect_raw: Any,
+    model_name: str,
+) -> str:
+    """--size wins. Then --aspect-ratio. JSON generation_aspect_ratio. Else DEFAULT_ASPECT_RATIO."""
+    if explicit_size:
+        return explicit_size
+    json_ar = normalize_generation_aspect(json_aspect_raw)
+    if aspect_cli == "inherit":
+        if json_ar:
+            return size_for_aspect_ratio(json_ar, model_name)
+        return DEFAULT_SIZE
+    if aspect_cli is not None:
+        return size_for_aspect_ratio(aspect_cli, model_name)
+    if json_ar:
+        return size_for_aspect_ratio(json_ar, model_name)
+    return size_for_aspect_ratio(DEFAULT_ASPECT_RATIO, model_name)
+
+
+def frame_prompt_with_style(prompts_data: dict[str, Any], frame_prompt: str, style_prefix_cli: str) -> str:
+    """Build full prompt: optional user-defined look, else project-wide style field, plus shot prompt."""
+    sp_cli = style_prefix_cli.strip()
+    sp_env = (os.getenv(ENV_STYLE_PREFIX) or "").strip()
+    sp_json = (prompts_data.get("keyframe_style_prefix") or "").strip()
+    project_style = (prompts_data.get("style") or "").strip()
+    fp = (frame_prompt or "").strip()
+
+    user_style = sp_cli or sp_env or sp_json
+    parts: list[str] = []
+    if user_style:
+        parts.append(user_style)
+    elif project_style:
+        parts.append(project_style)
+    if fp:
+        parts.append(fp)
+    return ", ".join(parts)
 
 
 def generate_flux(prompt: str, output_path: Path, size: str = DEFAULT_SIZE) -> bool:
@@ -151,12 +254,41 @@ PLACEHOLDER_COLORS = [
 
 
 def main() -> None:
+    _load_aigc_dotenv()
+    global GITEE_API_KEY, QWEN_BASE_URL
+    GITEE_API_KEY = os.getenv("AIGC_GITEE_API_KEY", "")
+    QWEN_BASE_URL = os.getenv("QWEN_IMAGE_LOCAL_BASE_URL", "http://10.42.1.1:9000")
+
     parser = argparse.ArgumentParser(description="Batch keyframe image generation")
     parser.add_argument("--prompts", required=True, help="Path to keyframe-prompts.json")
     parser.add_argument("--output-dir", required=True, help="Directory for generated keyframe images")
     parser.add_argument("--output", required=True, help="Output path for keyframe-images.json")
     parser.add_argument("--backend", default="auto", choices=["auto", "flux", "qwen", "dry_run"])
-    parser.add_argument("--size", default=DEFAULT_SIZE, help="Image size for flux backend (WxH)")
+    parser.add_argument(
+        "--size",
+        default=None,
+        help="Explicit WxH for flux backend (overrides aspect). Example: 1024x576, 1024x1024",
+    )
+    parser.add_argument(
+        "--aspect-ratio",
+        default=None,
+        choices=["16:9", "1:1", "9:16", "inherit"],
+        help="When --size omitted: fixed aspect. Default behavior is 16:9 unless "
+        "keyframe-prompts.json sets generation_aspect_ratio. "
+        "'inherit' = use only JSON (square 1024x1024 if unset).",
+    )
+    parser.add_argument(
+        "--style-prefix",
+        default="",
+        help=f"Highest-priority user style prefix; then {ENV_STYLE_PREFIX}; then JSON keyframe_style_prefix",
+    )
+    parser.add_argument(
+        "--requirements",
+        type=Path,
+        default=None,
+        help="Optional user_requirements.json: merges keyframe_style_prefix, "
+        "generation_aspect_ratio, and legacy keyframe_aspect_ratio into prompts data",
+    )
     args = parser.parse_args()
 
     prompts_path = Path(args.prompts).resolve()
@@ -164,8 +296,26 @@ def main() -> None:
     output_path = Path(args.output).resolve()
 
     prompts_data = load_json(prompts_path)
+
+    req_path = args.requirements
+    if req_path:
+        reqs = load_json(Path(req_path).resolve())
+        if reqs.get("keyframe_style_prefix"):
+            prompts_data.setdefault("keyframe_style_prefix", reqs["keyframe_style_prefix"])
+        merged_ar = reqs.get("generation_aspect_ratio") or reqs.get("keyframe_aspect_ratio")
+        if merged_ar:
+            prompts_data.setdefault("generation_aspect_ratio", merged_ar)
+
+    model_name = os.getenv("AIGC_GITEE_IMAGE_MODEL", "kolors")
+    json_aspect = prompts_data.get("generation_aspect_ratio")
+
+    explicit_size = args.size
+    flux_size = pick_flux_size(explicit_size, args.aspect_ratio, json_aspect, model_name)
+    pw, ph = parse_wxh(flux_size)
+
     backend = args.backend if args.backend != "auto" else detect_backend()
     print(f"Using backend: {backend}")
+    print(f"Image size: {flux_size} (model={model_name})")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     color_idx = 0
@@ -178,13 +328,15 @@ def main() -> None:
 
         for frame in shot.get("frame_config", {}).get("frames", []):
             frame_type = frame["type"]
-            prompt_text = frame["prompt"]
+            prompt_text = frame_prompt_with_style(
+                prompts_data, str(frame.get("prompt", "")), args.style_prefix
+            )
             filename = f"shot{shot_no:02d}_{frame_type}.png"
             img_path = output_dir / filename
 
             success = False
             if backend == "flux":
-                success = generate_flux(prompt_text, img_path, args.size)
+                success = generate_flux(prompt_text, img_path, flux_size)
                 if success:
                     time.sleep(BATCH_DELAY_SECONDS)
             elif backend == "qwen":
@@ -193,7 +345,7 @@ def main() -> None:
             if not success:
                 color = PLACEHOLDER_COLORS[color_idx % len(PLACEHOLDER_COLORS)]
                 color_idx += 1
-                create_placeholder_png(img_path, color=color)
+                create_placeholder_png(img_path, width=pw, height=ph, color=color)
                 print(f"  [placeholder] {filename}")
             else:
                 print(f"  [generated]   {filename}")

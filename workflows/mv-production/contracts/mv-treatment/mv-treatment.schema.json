@@ -4,7 +4,7 @@
   "description": "MV creative treatment for mv-production workflow. Defines the overall concept, visual style, and per-section visual plan.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "song_title", "song_structure_ref", "lyrics_analysis_ref", "concept_type", "visual_style", "section_plans"],
+  "required": ["schema_version", "song_title", "song_structure_ref", "concept_type", "visual_style", "section_plans"],
   "properties": {
     "schema_version": {
       "type": "string"
@@ -17,10 +17,6 @@
       "type": "string"
     },
     "song_structure_ref": {
-      "type": "string",
-      "minLength": 1
-    },
-    "lyrics_analysis_ref": {
       "type": "string",
       "minLength": 1
     },

@@ -1,0 +1,53 @@
+{
+  "template_id": "cinematic",
+  "template_name": "Cinematic Realism",
+  "template_name_zh": "电影写实",
+  "template_description": "General cinematic realism with shallow depth of field, film grain, natural lighting, and anamorphic lens characteristics. Suitable for narrative, ballad, and storytelling MVs.",
+  "global_style_suffix": "cinematic realism with shallow depth of field and anamorphic lens characteristics",
+  "global_style_suffix_zh": "电影写实风格，浅景深与变形镜头质感",
+  "animation_art_style_en": "photorealistic cinematic rendering with film grain",
+  "color_palette_en": [
+    "warm amber",
+    "cool teal shadow",
+    "natural skin tone",
+    "golden hour gold",
+    "deep forest green",
+    "storm grey"
+  ],
+  "lighting_mood_en": "motivated natural lighting with practical sources and soft fill",
+  "texture_material_en": "35mm film grain with subtle chromatic aberration and lens breathing",
+  "motion_camera_en": "smooth Steadicam and dolly moves with rack focus transitions",
+  "negative_style_hints_en": [
+    "avoid cartoonish or stylized rendering",
+    "no oversaturated HDR clipping",
+    "reject artificial studio lighting",
+    "exclude fantasy CGI effects",
+    "no watercolor or painterly textures"
+  ],
+  "structural_visual_rules": [
+    {
+      "section_roles": ["verse"],
+      "visual_tension_en": "observational intimacy with natural available light",
+      "visual_tension_zh": "观察式亲密感，自然光拍摄",
+      "camera_framing_en": "medium and close-up with anamorphic bokeh",
+      "cut_motion_tempo_en": "deliberate pacing with motivated camera moves",
+      "contrast_vs_other_sections_en": "intimate vs chorus grandeur"
+    },
+    {
+      "section_roles": ["chorus"],
+      "visual_tension_en": "epic scope with sweeping camera and golden-hour backlight",
+      "visual_tension_zh": "史诗感，扫摄运镜与黄金时刻逆光",
+      "camera_framing_en": "wide anamorphic with dramatic crane and drone moves",
+      "cut_motion_tempo_en": "confident cutting on beat with motivated whip pans",
+      "contrast_vs_other_sections_en": "epic scale vs verse's observational closeness"
+    },
+    {
+      "section_roles": ["bridge", "instrumental", "outro"],
+      "visual_tension_en": "meditative space with negative space composition",
+      "visual_tension_zh": "冥想留白构图",
+      "camera_framing_en": "static wide compositions with negative space",
+      "cut_motion_tempo_en": "long unbroken takes dissolving into silence",
+      "contrast_vs_other_sections_en": "stillness and absence vs prior momentum"
+    }
+  ]
+}

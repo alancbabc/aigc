@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MVKeyframeImages",
+  "description": "Generated keyframe still image manifest for mv-production Stage 5. Records per-keyframe image paths, timing, prompt used, and generation status.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "song_title", "source_files", "image_size", "keyframes"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.1"
+    },
+    "song_title": { "type": "string", "minLength": 1 },
+    "artist": { "type": "string" },
+    "source_files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mv_keyframe_director", "mv_global_visual_style"],
+      "properties": {
+        "mv_keyframe_director": { "type": "string" },
+        "mv_global_visual_style": { "type": "string" }
+      }
+    },
+    "project_root": { "type": "string" },
+    "service_base_url": { "type": "string" },
+    "image_size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "dry_run": { "type": "boolean" },
+    "strict_mode": { "type": "boolean" },
+    "lyric_keyframes_total": { "type": "integer", "minimum": 0 },
+    "instrumental_bookends_total": { "type": "integer", "minimum": 0 },
+    "keyframes_in_manifest": { "type": "integer", "minimum": 0 },
+    "keyframes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["keyframe_id", "start_time", "end_time", "image_png", "image_labeled_png", "prompt_used", "generation_ok"],
+        "properties": {
+          "keyframe_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "keyframe_type": { "type": "string", "enum": ["lyric_visual", "lyric_emotional", "lyric_philosophical", "character_singing", "instrumental", "lyric_imagery"] },
+          "segment_kind": { "type": "string", "enum": ["lyric", "instrumental"] },
+          "primary_section_ref": { "type": "string", "minLength": 1 },
+          "section_type_focus": { "type": "string" },
+          "start_time": { "type": "number", "minimum": 0 },
+          "end_time": { "type": "number", "minimum": 0 },
+          "lyrics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["line_id", "text", "start_time", "end_time"],
+              "properties": {
+                "line_id": { "type": "string" },
+                "text": { "type": "string" },
+                "start_time": { "type": "number" },
+                "end_time": { "type": "number" }
+              }
+            }
+          },
+          "image_png": { "type": "string", "minLength": 1 },
+          "image_labeled_png": { "type": "string", "minLength": 1 },
+          "prompt_used": { "type": "string", "minLength": 24 },
+          "negative_prompt_used": { "type": "string" },
+          "generation_ok": { "type": "boolean" },
+          "dry_run": { "type": "boolean" },
+          "api_generation_ok": { "type": "boolean" },
+          "placeholder_fallback": { "type": "boolean" },
+          "role": { "type": "string", "enum": ["intro", "outro", "instrumental"] }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "song_title": "Example Song",
+  "artist": "Example Artist",
+  "director_notes_zh": "示例：四句合并为一粒关键帧，主歌调色统一。",
+  "source_refs": {
+    "lyrics_timing_ref": "lyrics-timing.json",
+    "song_sections_llm_ref": "song-sections-llm.json",
+    "mv_global_visual_style_ref": "mv-global-visual-style.json"
+  },
+  "keyframes": [
+    {
+      "keyframe_id": "kf_01",
+      "primary_section_ref": "verse_1",
+      "section_type_focus": "verse",
+      "line_refs": ["line_01", "line_02", "line_03", "line_04"],
+      "start_time": 0.0,
+      "end_time": 17.04,
+      "lines": [
+        {
+          "line_id": "line_01",
+          "text": "Opening line …",
+          "start_time": 0.0,
+          "end_time": 4.5,
+          "duration_seconds": 4.5
+        }
+      ],
+      "narrative_beat_zh": "建立深海梦境与孤独基调。大鱼首次出现：神秘、远古的存在。",
+      "continuity_previous_en": "Fade in from black; first establishing beat.",
+      "continuity_next_en": "Water dissolve into wider oceanic perspective.",
+      "keyframe_type": "lyric_visual",
+      "keyframe_image_prompt_en": "Cinematic 16:9 wide shot … oil-painting textures … anchor motif …",
+      "video_from_keyframe_prompt_en": "Slow lateral dolly … gentle parallax … hold painterly grain … subtle eye-light flicker matching musical swell …"
+    }
+  ],
+  "instrumental_bookends": [
+    {
+      "keyframe_id": "inst_intro",
+      "role": "intro",
+      "primary_section_ref": "verse_1",
+      "section_type_focus": "instrumental",
+      "start_time": 0.0,
+      "end_time": 12.5,
+      "narrative_beat_zh": "前奏器乐：建立画面与情绪，为唱词留出气口。",
+      "continuity_previous_en": "N/A",
+      "continuity_next_en": "Energy lifts into first vocal phrase; keep palette.",
+      "keyframe_type": "lyric_imagery",
+      "keyframe_image_prompt_en": "Cinematic 16:9 wide instrumental establishing shot before vocals, slow atmospheric build, no lip-sync, motifs from global style, soft ambient motion and anticipation.",
+      "video_from_keyframe_prompt_en": "Very slow dolly-in, drifting mist or particles, long breath before vocal entry; gentle parallax; hold for dissolve into first lyric beat."
+    }
+  ]
+}

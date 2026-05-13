@@ -1,0 +1,20 @@
+{
+  "project_name": "梵高艺术动画风格mv",
+  "song_title": "Vincent",
+  "artist": "Don McLean",
+  "song_file_path": "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_music/Don McLean - Vincent.mp3",
+  "lyrics_file_path": "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_music/Don McLean - Vincent.lrc",
+  "lyrics_source": "lrc",
+  "mv_type": "concept",
+  "performance_style": "lip_sync",
+  "visual_style_reference": "",
+  "director_style_reference": "",
+  "style_intensity": "medium",
+  "visual_mood_keywords": "",
+  "target_duration_seconds": null,
+  "output_goal": "final_video",
+  "model_preference": "",
+  "additional_notes": "",
+  "generation_aspect_ratio": "16:9",
+  "keyframe_style_prefix": ""
+}

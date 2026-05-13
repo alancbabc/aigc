@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.1",
+  "song_title": "Vincent",
+  "artist": "Don McLean",
+  "parsed_lyrics_ref": "lyrics-timing.json",
+  "song_structure_ref": "lyrics-timing.json + song-sections-llm.json",
+  "global_style_suffix": "Post-impressionist oil-painting look brought to life, thick visible impasto and swirling brush strokes, cinematic wide compositions, deep cobalt night blues with warm amber accents, soft film grain, painterly edges, museum-grade color harmony, emotionally reverent mood, no modern UI or text overlays.",
+  "global_style_suffix_zh": "后印象派油画质感、厚涂笔触与漩涡云层，电影宽幅构图，钴蓝夜空配琥珀色点缀，胶片微粒与画风边缘，庄重抒情，无现代界面与字幕。",
+  "structural_visual_rules": [
+    {
+      "section_roles": ["verse"],
+      "visual_tension_en": "Contained, observational tension: wider compositions breathe—landscapes, skies, and painterly worlds dominate; emotion sits in stillness and gradual reveals rather than explosive peaks.",
+      "visual_tension_zh": "主歌偏内敛与凝视：画面以远景与环境为主，情绪藏在缓慢的揭示里，而非一下子推到顶点。",
+      "camera_framing_en": "Favor medium-wide and extreme wide shots; slower pushes and gentle tilts; occasional intimate inserts (palette, linen, eyes) as punctuation.",
+      "cut_motion_tempo_en": "Fewer cuts; longer holds; camera moves glide with lyrical phrasing; motion reads like studying a canvas.",
+      "contrast_vs_other_sections_en": "Verses stay cooler in pacing and density compared to choruses—reserve maximal saturation and frontal graphic impact for refrains."
+    },
+    {
+      "section_roles": ["chorus"],
+      "visual_tension_en": "Released, anthemic lift: chromatic intensity climbs—fuller skies, denser brush turbulence, faces and symbolic forms press closer to camera; emotional empathy becomes visually frontal.",
+      "visual_tension_zh": "副歌释放张力：饱和度与笔触动能抬高，符号更贴近镜头，合唱句更像宣言性的画面爆发（仍保持油画媒介而非写实新闻片）。",
+      "camera_framing_en": "More heroic scales and upward angles; tighter clusters alternating with iconic wides; stronger symmetry or radial swirl motifs.",
+      "cut_motion_tempo_en": "Slightly higher cut cadence aligned to refrain repetition; bolder crane or orbit accents on hook lines.",
+      "contrast_vs_other_sections_en": "Choruses must feel visually louder than verses—more starfield motion, thicker pigment chaos, warmer accents—without switching to a different unrelated art style."
+    },
+    {
+      "section_roles": ["bridge"],
+      "visual_tension_en": "Narrowed emotional corridor: sudden intimacy or stark metaphor imagery; brief reduction of scale before final escalation.",
+      "visual_tension_zh": "桥段收窄情绪通道：更私密或更锋利的隐喻镜头，为尾声积蓄落差。",
+      "camera_framing_en": "Close proximity and shallow depth; isolated subjects against simplified backgrounds.",
+      "cut_motion_tempo_en": "Measured but uneasy pacing; fewer panoramic breathers.",
+      "contrast_vs_other_sections_en": "Reads as a hinge between verse contemplation and chorus declamation—distinct but still the same painted universe."
+    }
+  ],
+  "core_visual_motifs": [
+    {
+      "motif_id": "living_starry_night_sky",
+      "name_en": "Living Starry Night sky",
+      "name_zh": "活的星夜天空",
+      "kind": "environment",
+      "recurrence": "through_hook_refrain",
+      "prompt_anchor_en": "swirling cobalt starfield with thick impasto spirals, luminous yellow stars, painterly night clouds",
+      "motif_notes_zh": "贯穿「Starry starry night」 hook，是全片识别度最高的环境母题，必须在副歌反复召回。",
+      "lyrics_line_refs": ["line_01", "line_15", "line_36"]
+    },
+    {
+      "motif_id": "palette_and_paint_world",
+      "name_en": "Palette and painted pigment world",
+      "name_zh": "调色板与颜料世界",
+      "kind": "prop",
+      "recurrence": "verse_emphasis",
+      "prompt_anchor_en": "wooden palette, oil pigments mixing, brush bristles, linen canvas texture dissolving into landscape",
+      "motif_notes_zh": "对应「palette blue and grey」与作画行为，主歌阶段建立「画中之境」的规则。",
+      "lyrics_line_refs": ["line_02"]
+    },
+    {
+      "motif_id": "vincent_figure_presence",
+      "name_en": "Vincent / painter figure presence",
+      "name_zh": "文森特/画家形象",
+      "kind": "figure",
+      "recurrence": "persistent",
+      "prompt_anchor_en": "red-bearded painter in paint-stained coat, candlelit studio, intense concentration at easel",
+      "motif_notes_zh": "承载叙事凝视的对象，可不每张脸清晰，但须在关键句反复暗示同一人物身份与衣着锚点。",
+      "lyrics_line_refs": ["line_18", "line_34"]
+    },
+    {
+      "motif_id": "gallery_portraits",
+      "name_en": "Portraits in empty halls",
+      "name_zh": "空廊里的肖像",
+      "kind": "environment",
+      "recurrence": "bridge_shift",
+      "prompt_anchor_en": "museum-white corridors, gilt frames, painted eyes watching from canvases in dim spotlight",
+      "motif_notes_zh": "歌词后期「empty halls / frameless heads」对应后置段落的核心视觉转向，需与户外星空形成空间对立。",
+      "lyrics_line_refs": ["line_37", "line_38", "line_39"]
+    }
+  ],
+  "animation_art_style_en": "Living canvas: Van Gogh inspired worlds where paint texture stays readable on every surface; transitions feel like dissolves through wet pigment rather than hard CGI plastic.",
+  "color_palette_en": [
+    "cobalt blue",
+    "ultramarine violet shadows",
+    "warm amber candlelight",
+    "sunflower cadmium yellow accents",
+    "ivory paper highlights",
+    "deep umber earth tones"
+  ],
+  "lighting_mood_en": "Self-luminous stars and windows against blue darkness; intimate interiors lit by single warm sources with gentle falloff.",
+  "texture_material_en": "Oil paint impasto, canvas weave subtly visible, light atmospheric haze, restrained analog grain.",
+  "motion_camera_en": "Slow dolly and crane moves, minimal handheld; rhythmic cuts aligned to emotional peaks rather than frantic shake.",
+  "negative_style_hints_en": [
+    "anime",
+    "flat corporate vector",
+    "modern HUD",
+    "oversaturated HDR clip-art",
+    "visible watermark",
+    "low-resolution blur",
+    "extra fingers",
+    "garbled typography"
+  ],
+  "art_direction_summary_zh": "以梵高绘画语言统一全片视觉：星空与麦田等意象以「活起来的油画」呈现；主歌克制凝视、副歌抬升色彩与动能；调色板—星空—肖像廊形成三条反复出现的母题轴；冷暖对比控制情绪；镜头沉稳、尊重民谣叙事节奏。"
+}

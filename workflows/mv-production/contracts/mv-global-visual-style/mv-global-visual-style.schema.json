@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MVGlobalVisualStyle",
+  "description": "Stage 2 art-direction lock from lyrics + song structure (Qwen3). Includes global_style_suffix, structural verse/chorus tension rules, and recurring core visual motifs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "song_title",
+    "parsed_lyrics_ref",
+    "song_structure_ref",
+    "global_style_suffix",
+    "structural_visual_rules",
+    "core_visual_motifs",
+    "animation_art_style_en",
+    "color_palette_en",
+    "lighting_mood_en",
+    "texture_material_en",
+    "motion_camera_en",
+    "negative_style_hints_en",
+    "art_direction_summary_zh"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.1"
+    },
+    "song_title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artist": {
+      "type": "string",
+      "description": "Optional performer name."
+    },
+    "parsed_lyrics_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Filename or relative path to lyrics-timing JSON (parse_lyrics.py output) used as the line-level lyrics source."
+    },
+    "song_structure_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Filename or relative path to song-structure JSON, or composite like \"lyrics-timing.json + song-sections-llm.json\" when sections come from LLM segmentation."
+    },
+    "global_style_suffix": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 900,
+      "description": "English-only compact clause appended to every MV image prompt (style anchor)."
+    },
+    "global_style_suffix_zh": {
+      "type": "string",
+      "description": "Optional Chinese gloss of global_style_suffix for humans."
+    },
+    "structural_visual_rules": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 8,
+      "description": "Per-section-role visual tension vs pacing; must distinguish verse vs chorus when those types exist in song-structure.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "section_roles",
+          "visual_tension_en",
+          "visual_tension_zh",
+          "camera_framing_en",
+          "cut_motion_tempo_en",
+          "contrast_vs_other_sections_en"
+        ],
+        "properties": {
+          "section_roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 6,
+            "items": {
+              "type": "string",
+              "enum": [
+                "intro",
+                "verse",
+                "pre_chorus",
+                "chorus",
+                "post_chorus",
+                "bridge",
+                "breakdown",
+                "instrumental",
+                "outro",
+                "interlude",
+                "other"
+              ]
+            },
+            "description": "Which musical section types this rule applies to (e.g. verse vs chorus)."
+          },
+          "visual_tension_en": {
+            "type": "string",
+            "minLength": 16,
+            "description": "English: how visual tension builds/releases vs other parts."
+          },
+          "visual_tension_zh": {
+            "type": "string",
+            "minLength": 8,
+            "description": "Chinese counterpart."
+          },
+          "camera_framing_en": {
+            "type": "string",
+            "minLength": 12,
+            "description": "English: typical shot scale, composition bias, depth."
+          },
+          "cut_motion_tempo_en": {
+            "type": "string",
+            "minLength": 12,
+            "description": "English: cut rhythm, camera move speed vs beats."
+          },
+          "contrast_vs_other_sections_en": {
+            "type": "string",
+            "minLength": 16,
+            "description": "English: explicit contrast with verses or choruses (painting density, contrast, faces vs landscape)."
+          },
+          "shot_ratio": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Optional: recommended shot-type ratio for this section role.",
+            "properties": {
+              "environment": { "type": "number", "minimum": 0, "maximum": 1 },
+              "mid": { "type": "number", "minimum": 0, "maximum": 1 },
+              "closeup": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          },
+          "lens_emotion_en": {
+            "type": "string",
+            "minLength": 12,
+            "description": "English: what emotion does the lens choice convey for this section. e.g. 'shallow DOF creates dream-like isolation' or 'telephoto compression conveys unreachable distance'."
+          },
+          "color_temperature": {
+            "type": "string",
+            "enum": ["cold", "cool", "neutral", "warm", "hot"],
+            "description": "Color temperature feeling for this section role."
+          }
+        }
+      }
+    },
+    "core_visual_motifs": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 10,
+      "description": "Entities/environments/symbols that must recur for lyric coherence.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "motif_id",
+          "name_en",
+          "name_zh",
+          "kind",
+          "recurrence",
+          "prompt_anchor_en",
+          "motif_notes_zh"
+        ],
+        "properties": {
+          "motif_id": {
+            "type": "string",
+            "minLength": 3,
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "Stable snake_case id."
+          },
+          "name_en": {
+            "type": "string",
+            "minLength": 2
+          },
+          "name_zh": {
+            "type": "string",
+            "minLength": 2
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["entity", "environment", "symbol", "prop", "figure"]
+          },
+          "recurrence": {
+            "type": "string",
+            "enum": [
+              "persistent",
+              "verse_emphasis",
+              "chorus_emphasis",
+              "bridge_shift",
+              "bookend_only",
+              "through_hook_refrain"
+            ],
+            "description": "When this motif should return across the timeline."
+          },
+          "prompt_anchor_en": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 400,
+            "description": "English phrase for prompts / continuity checks."
+          },
+          "motif_notes_zh": {
+            "type": "string",
+            "minLength": 12,
+            "description": "Chinese: why this motif is non-optional for this song."
+          },
+          "lyrics_line_refs": {
+            "type": "array",
+            "maxItems": 24,
+            "items": {
+              "type": "string",
+              "minLength": 4
+            },
+            "description": "Optional lyrics line_id evidence (from lyrics-timing)."
+          },
+          "meaning_evolution": {
+            "type": "array",
+            "maxItems": 12,
+            "description": "Optional: how this motif's meaning changes across song sections.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["section_ref", "meaning_zh"],
+              "properties": {
+                "section_ref": { "type": "string", "minLength": 1 },
+                "meaning_zh": { "type": "string", "minLength": 2 },
+                "meaning_en": { "type": "string", "minLength": 2 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "animation_art_style_en": {
+      "type": "string",
+      "minLength": 12,
+      "description": "English: illustrated / painterly / 3D / mixed-media look suitable for MV frames."
+    },
+    "color_palette_en": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 12,
+      "items": {
+        "type": "string",
+        "minLength": 2
+      },
+      "description": "English color-word anchors for grading (not hex codes required)."
+    },
+    "lighting_mood_en": {
+      "type": "string",
+      "minLength": 8,
+      "description": "English lighting vocabulary (time of day, contrast, key colors)."
+    },
+    "texture_material_en": {
+      "type": "string",
+      "minLength": 8,
+      "description": "English surface texture: film grain, brush strokes, paper, oil paint, etc."
+    },
+    "motion_camera_en": {
+      "type": "string",
+      "minLength": 8,
+      "description": "English typical camera grammar and motion tempo for the MV."
+    },
+    "negative_style_hints_en": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 24,
+      "items": {
+        "type": "string",
+        "minLength": 2
+      },
+      "description": "English negative prompt fragments to avoid style drift."
+    },
+    "art_direction_summary_zh": {
+      "type": "string",
+      "minLength": 20,
+      "description": "Chinese summary for directors / clients."
+    }
+  }
+}

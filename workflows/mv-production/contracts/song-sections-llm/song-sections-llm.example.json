@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "sections": [
+    {
+      "section_id": "verse_1",
+      "section_type": "verse",
+      "line_refs": ["line_01", "line_02", "line_03"],
+      "notes": "Opening narrative; no repeated hook yet."
+    },
+    {
+      "section_id": "chorus_1",
+      "section_type": "chorus",
+      "line_refs": ["line_04", "line_05"]
+    }
+  ]
+}

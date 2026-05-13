@@ -1,0 +1,70 @@
+{
+  "template_id": "ink_wash",
+  "template_name": "Chinese Ink Wash",
+  "template_name_zh": "国风水墨",
+  "template_description": "Traditional Chinese ink-wash painting aesthetic with watercolor textures, soft focus transitions, and ethereal atmosphere. Suitable for ballads, guofeng, and lyrical songs.",
+  "global_style_suffix": "watercolor dreamscapes with soft focus transitions",
+  "global_style_suffix_zh": "水彩梦境与柔焦转场",
+  "animation_art_style_en": "watercolor with digital ink effects",
+  "color_palette_en": [
+    "deep sapphire",
+    "velvet indigo",
+    "pearlescent white",
+    "amber gold",
+    "translucent teal",
+    "muted celadon"
+  ],
+  "lighting_mood_en": "soft ambient glow with subtle bioluminescent accents",
+  "texture_material_en": "watercolor paper grain with liquid surface reflections",
+  "motion_camera_en": "fluid Steadicam movements with occasional slow motion bursts",
+  "negative_style_hints_en": [
+    "avoid hyper-realistic textures",
+    "no sharp geometric shapes",
+    "reject neon color saturation",
+    "exclude mechanical camera movements",
+    "no 3D render artifacts",
+    "avoid cartoonish expressions"
+  ],
+  "structural_visual_rules": [
+    {
+      "section_roles": ["verse"],
+      "visual_tension_en": "restrained intimacy with shallow depth of field",
+      "visual_tension_zh": "克制的亲密感，浅景深凝视",
+      "camera_framing_en": "medium close-up with shallow depth of field",
+      "cut_motion_tempo_en": "slow deliberate dissolves and gentle pans",
+      "contrast_vs_other_sections_en": "grounded intimate perspective vs chorus's sweeping transcendence"
+    },
+    {
+      "section_roles": ["pre_chorus"],
+      "visual_tension_en": "rising anticipation with unfolding landscapes",
+      "visual_tension_zh": "渐强的期待感，景色渐开",
+      "camera_framing_en": "dutch angles with rising camera movements",
+      "cut_motion_tempo_en": "moderate cross-cutting with accelerating rhythm",
+      "contrast_vs_other_sections_en": "bridging verse's stillness to chorus's liberation"
+    },
+    {
+      "section_roles": ["chorus"],
+      "visual_tension_en": "expansive transcendence with celestial scale",
+      "visual_tension_zh": "迸发的超越感，天穹尺度",
+      "camera_framing_en": "wide-angle aerial shots with fluid tracking",
+      "cut_motion_tempo_en": "dynamic whip pans and rapid cuts on beat",
+      "contrast_vs_other_sections_en": "celestial scale vs verse's intimate confinement"
+    },
+    {
+      "section_roles": ["bridge", "instrumental", "interlude"],
+      "visual_tension_en": "ambient immersion with textural focus",
+      "visual_tension_zh": "环境沉浸感，纹理聚焦",
+      "camera_framing_en": "static long takes with slow zooms",
+      "cut_motion_tempo_en": "minimal transitions, dissolve-only",
+      "contrast_vs_other_sections_en": "textural focus vs lyrical narrative drive"
+    },
+    {
+      "section_roles": ["outro"],
+      "visual_tension_en": "gentle dissolution and fading echoes",
+      "visual_tension_zh": "温柔消散与余韵留存",
+      "camera_framing_en": "slow pull-back from subject to vast emptiness",
+      "cut_motion_tempo_en": "extended dissolves into black or white",
+      "contrast_vs_other_sections_en": "resolution and release vs earlier tension"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "template_id": "cyberpunk",
+  "template_name": "Cyberpunk",
+  "template_name_zh": "赛博朋克",
+  "template_description": "Neon-lit cyberpunk aesthetic with rain-slicked streets, holographic displays, and high-contrast urban nightscapes. Suitable for electronic, synthwave, and high-energy songs.",
+  "global_style_suffix": "cyberpunk neon-noir with rain-slicked surfaces and holographic glow",
+  "global_style_suffix_zh": "赛博朋克霓虹夜景，雨湿表面与全息辉光",
+  "animation_art_style_en": "digital painting with cinematic lighting and volumetric fog",
+  "color_palette_en": [
+    "electric cyan",
+    "hot magenta",
+    "neon purple",
+    "deep noir black",
+    "acid yellow",
+    "cool teal"
+  ],
+  "lighting_mood_en": "harsh neon rim lights with deep shadows and volumetric fog",
+  "texture_material_en": "wet asphalt reflections with holographic surface noise",
+  "motion_camera_en": "dynamic handheld tracking with whip transitions and speed ramps",
+  "negative_style_hints_en": [
+    "avoid daylight scenes",
+    "no natural warm lighting",
+    "reject pastoral or rural settings",
+    "exclude soft-focus romance aesthetics",
+    "no cartoonish or cel-shaded rendering"
+  ],
+  "structural_visual_rules": [
+    {
+      "section_roles": ["verse"],
+      "visual_tension_en": "claustrophobic alley perspectives with tight framing",
+      "visual_tension_zh": "幽闭巷道视角，紧凑构图",
+      "camera_framing_en": "tight medium shots with foreground obstruction",
+      "cut_motion_tempo_en": "slow prowling camera with jump cuts",
+      "contrast_vs_other_sections_en": "confinement vs chorus's explosive urban panoramas"
+    },
+    {
+      "section_roles": ["chorus"],
+      "visual_tension_en": "explosive neon panoramas with vertigo-inducing scale",
+      "visual_tension_zh": "爆发式霓虹全景，眩晕尺度",
+      "camera_framing_en": "extreme wide aerial with dramatic crane movements",
+      "cut_motion_tempo_en": "rapid fire cuts syncopated to beat drops",
+      "contrast_vs_other_sections_en": "urban scale vs verse's claustrophobic intimacy"
+    },
+    {
+      "section_roles": ["bridge"],
+      "visual_tension_en": "data-stream abstraction and digital dissolution",
+      "visual_tension_zh": "数据流抽象与数字溶解",
+      "camera_framing_en": "abstract macro shots of light and data",
+      "cut_motion_tempo_en": "glitch transitions and digital artifacts",
+      "contrast_vs_other_sections_en": "abstract digital vs grounded physical environments"
+    }
+  ]
+}

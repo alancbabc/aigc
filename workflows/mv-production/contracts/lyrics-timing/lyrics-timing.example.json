@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.1",
+  "source_file": "大鱼.lrc",
+  "detected_format": "lrc",
+  "total_lines": 4,
+  "has_timestamps": true,
+  "audio_duration_seconds": 240.0,
+  "lines": [
+    {
+      "line_id": "line_01",
+      "start_time": 10.5,
+      "text": "海浪无声将夜幕深深淹没",
+      "is_instrumental": false,
+      "end_time": 16.8,
+      "duration_seconds": 6.3
+    },
+    {
+      "line_id": "line_02",
+      "start_time": 16.8,
+      "text": "漫过天空尽头的角落",
+      "is_instrumental": false,
+      "end_time": 23.2,
+      "duration_seconds": 6.4
+    },
+    {
+      "line_id": "line_03",
+      "start_time": 23.2,
+      "text": "",
+      "is_instrumental": true,
+      "end_time": 26.5,
+      "duration_seconds": 3.3
+    },
+    {
+      "line_id": "line_04",
+      "start_time": 26.5,
+      "text": "看海天一色 听风起雨落",
+      "is_instrumental": false,
+      "end_time": 33.0,
+      "duration_seconds": 6.5
+    }
+  ]
+}

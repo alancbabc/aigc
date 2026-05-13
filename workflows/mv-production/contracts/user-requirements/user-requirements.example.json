@@ -1,0 +1,16 @@
+{
+  "schema_version": "2.0",
+  "song_title": "大鱼",
+  "artist": "周深",
+  "mv_type": "narrative",
+  "visual_style_mode": "builtin_template",
+  "builtin_visual_template_id": "ink_wash",
+  "visual_style_reference": "水墨动画风格, 中国传统美学",
+  "style_intensity": "medium",
+  "keyframe_style_prefix": "国风水墨, cinematic, ethereal atmosphere",
+  "visual_mood_keywords": ["梦境", "大海", "自由", "天空", "思念"],
+  "output_goal": "final_video",
+  "model_preference": "qwen3",
+  "confirmation_mode": "auto",
+  "notes": "周深《大鱼》- 电影《大鱼海棠》印象曲"
+}

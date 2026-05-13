@@ -1,0 +1,53 @@
+{
+  "template_id": "anime",
+  "template_name": "Anime",
+  "template_name_zh": "日系动画",
+  "template_description": "Anime-style cel-shaded aesthetic with vibrant palettes, clean line art, and expressive character design. Suitable for pop, anime OP/ED, and upbeat energetic songs.",
+  "global_style_suffix": "anime cel-shaded aesthetic with vibrant colors and clean line art",
+  "global_style_suffix_zh": "日系动画赛璐璐风格，鲜艳色彩与干净线条",
+  "animation_art_style_en": "cel-shaded 2D animation with hand-painted backgrounds",
+  "color_palette_en": [
+    "cherry blossom pink",
+    "azure sky blue",
+    "sunset orange",
+    "vibrant emerald green",
+    "soft lavender",
+    "bright canary yellow"
+  ],
+  "lighting_mood_en": "bright high-key lighting with soft rim highlights and god rays",
+  "texture_material_en": "flat cel shading with subtle gradient overlays and screen tones",
+  "motion_camera_en": "dynamic anime-style camera moves with speed lines and impact frames",
+  "negative_style_hints_en": [
+    "avoid photorealistic rendering",
+    "no gritty film grain",
+    "reject muted desaturated palettes",
+    "exclude horror or grotesque imagery",
+    "no 3D CGI rendering artifacts"
+  ],
+  "structural_visual_rules": [
+    {
+      "section_roles": ["verse"],
+      "visual_tension_en": "character-focused medium shots with emotional framing",
+      "visual_tension_zh": "角色中景，情感构图",
+      "camera_framing_en": "medium shots with emotional close-up inserts",
+      "cut_motion_tempo_en": "steady pacing with reaction-shot inserts",
+      "contrast_vs_other_sections_en": "character intimacy vs chorus action spectacle"
+    },
+    {
+      "section_roles": ["chorus"],
+      "visual_tension_en": "action spectacle with dramatic angles and particle effects",
+      "visual_tension_zh": "动作奇观，戏剧角度与粒子特效",
+      "camera_framing_en": "dynamic wide shots with dramatic low/high angles",
+      "cut_motion_tempo_en": "fast action cuts with impact frames and speed lines",
+      "contrast_vs_other_sections_en": "action spectacle vs verse emotional grounding"
+    },
+    {
+      "section_roles": ["bridge", "outro"],
+      "visual_tension_en": "reflective stillness with atmospheric wide shots",
+      "visual_tension_zh": "沉思静谧，氛围广角",
+      "camera_framing_en": "wide atmospheric establishing shots with gentle camera drift",
+      "cut_motion_tempo_en": "long takes with slow dissolves and cross-fades",
+      "contrast_vs_other_sections_en": "contemplative stillness vs chorus kinetic energy"
+    }
+  ]
+}

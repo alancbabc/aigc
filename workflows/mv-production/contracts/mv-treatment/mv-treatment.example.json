@@ -2,8 +2,7 @@
   "schema_version": "1.0",
   "song_title": "夜曲",
   "artist": "周杰伦",
-  "song_structure_ref": "song-structure.json",
-  "lyrics_analysis_ref": "lyrics-analysis.json",
+  "song_structure_ref": "lyrics-timing.json + song-sections-llm.json",
   "concept_type": "narrative",
   "concept_summary": "A young pianist walks through a rain-soaked city at night, revisiting locations tied to a lost relationship. Memory and present interweave through dissolves and parallel editing, with a piano motif serving as both diegetic element and emotional anchor. The bridge marks a turning point from grief to acceptance as dawn breaks.",
   "visual_style": {

@@ -3,21 +3,26 @@
 
 Typical usage:
 
-    # Step 1 — parse lyrics
-    python parse_lyrics.py --input song.lrc --output parsed-lyrics.json --infer-sections
+    # Step 1 — parse lyrics (line timings only)
+    python parse_lyrics.py --input song.lrc --output lyrics-timing.json --audio song.mp3
 
-    # Step 2 — build song-structure scaffold
+    # Step 2 — Qwen3 sectioning (optional --merged-parsed for step 3)
+    python infer_sections_qwen3.py \
+        --lyrics-timing lyrics-timing.json \
+        --out song-sections-llm.json \
+        --merged-parsed parsed-with-sections.json
+
+    # Step 3 — scaffold (--total-duration optional if audio or heuristic available)
     python build_song_structure.py \
-        --parsed-lyrics parsed-lyrics.json \
+        --parsed-lyrics parsed-with-sections.json \
         --song-title "夜曲" \
         --artist "周杰伦" \
-        --total-duration 245 \
         --bpm 72 \
         --output song-structure.json
 
-    # Step 3 (optional) — merge LLM-enriched fields
+    # Optional — merge LLM-enriched fields
     python build_song_structure.py \
-        --parsed-lyrics parsed-lyrics.json \
+        --parsed-lyrics parsed-with-sections.json \
         --enrich enrichment.json \
         --output song-structure.json
 
@@ -32,8 +37,30 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
+import statistics
 from pathlib import Path
 from typing import Any
+
+
+def _load_aigc_dotenv() -> None:
+    """Load ``aigc/.env`` into the process environment (only keys not already set)."""
+    aigc_root = Path(__file__).resolve().parents[2]
+    path = aigc_root / ".env"
+    if not path.is_file():
+        return
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        if not key or key in os.environ:
+            continue
+        val = value.strip().strip("'").strip('"')
+        os.environ[key] = val
 
 
 SECTION_TYPE_ORDER = [
@@ -52,6 +79,24 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def round3(value: float) -> float:
     return round(float(value), 3)
+
+
+def estimate_total_duration_from_lines(lines: list[dict[str, Any]]) -> float | None:
+    """Pad after last timed line using median of recent line durations (LRC tail)."""
+    if not lines:
+        return None
+    last = lines[-1]
+    start = last.get("start_time")
+    if not isinstance(start, (int, float)):
+        return None
+    durs = [
+        float(ln["duration_seconds"])
+        for ln in lines
+        if isinstance(ln.get("duration_seconds"), (int, float))
+    ]
+    tail = durs[-10:] if len(durs) >= 3 else durs
+    pad = float(statistics.median(tail)) if tail else 10.0
+    return round3(float(start) + max(pad, 2.0))
 
 
 def time_to_beat(time_seconds: float, bpm: float) -> int:
@@ -219,7 +264,28 @@ def compute_arcs(sections: list[dict[str, Any]]) -> tuple[list[str], list[str]]:
     return mood_arc, energy_arc
 
 
+def resolve_total_duration(
+    parsed: dict[str, Any],
+    cli_total_duration: float | None,
+) -> float | None:
+    """Prefer CLI, then probed audio, legacy estimated key, last-resort line tail heuristic."""
+    if cli_total_duration is not None:
+        return float(cli_total_duration)
+    for key in ("audio_duration_seconds", "estimated_total_duration_seconds"):
+        val = parsed.get(key)
+        if isinstance(val, (int, float)) and val > 0:
+            return float(val)
+    lines = parsed.get("lines")
+    if isinstance(lines, list):
+        est = estimate_total_duration_from_lines(lines)
+        if est is not None and est > 0:
+            return est
+    return None
+
+
 def determine_analysis_method(parsed: dict[str, Any]) -> str:
+    if parsed.get("section_analysis_source") == "qwen3":
+        return "llm_qwen3"
     fmt = parsed.get("detected_format", "")
     if fmt == "lrc":
         return "lrc_parse"
@@ -229,6 +295,7 @@ def determine_analysis_method(parsed: dict[str, Any]) -> str:
 
 
 def main() -> None:
+    _load_aigc_dotenv()
     parser = argparse.ArgumentParser(
         description="Build song-structure.json from parsed lyrics output",
     )
@@ -253,7 +320,8 @@ def main() -> None:
     output_path = Path(args.output).resolve()
     parsed = load_json(parsed_path)
 
-    sections = build_sections(parsed, args.total_duration, args.bpm)
+    total_duration = resolve_total_duration(parsed, args.total_duration)
+    sections = build_sections(parsed, total_duration, args.bpm)
 
     if args.enrich:
         enrichment = load_json(Path(args.enrich).resolve())
@@ -264,7 +332,7 @@ def main() -> None:
     payload: dict[str, Any] = {
         "schema_version": "1.0",
         "song_title": args.song_title or parsed.get("source_file", "Untitled"),
-        "total_duration_seconds": args.total_duration or 0,
+        "total_duration_seconds": total_duration if total_duration is not None else 0,
         "sections": sections,
     }
 
@@ -280,10 +348,17 @@ def main() -> None:
     payload["mood_arc"] = mood_arc
     payload["energy_arc"] = energy_arc
     payload["analysis_method"] = determine_analysis_method(parsed)
+    method = payload["analysis_method"]
+    if method == "llm_qwen3":
+        method_note = "Qwen3 lyric structure (song-sections-llm schema)"
+    elif method == "lyrics_pattern":
+        method_note = "inferred_sections from rules (legacy)"
+    else:
+        method_note = "rule-based scaffold or single full_song block"
     payload["analysis_notes"] = (
-        f"Scaffold generated from {parsed.get('detected_format', 'unknown')} lyrics "
-        f"with {len(sections)} section(s). "
-        "Fields marked null require LLM enrichment."
+        f"Scaffold from {parsed.get('detected_format', 'unknown')} lyrics; "
+        f"{method_note}; {len(sections)} section(s). "
+        "Null mood/energy/visual fields can be filled via --enrich."
     )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)

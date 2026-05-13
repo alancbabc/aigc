@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/song-sections-llm.schema.json",
+  "title": "Qwen3 (or compatible) lyric structure segmentation",
+  "type": "object",
+  "required": ["schema_version", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0" },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["section_id", "section_type", "line_refs"],
+        "additionalProperties": false,
+        "properties": {
+          "section_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "snake_case id, unique in this song"
+          },
+          "section_type": {
+            "type": "string",
+            "enum": [
+              "intro",
+              "verse",
+              "pre_chorus",
+              "chorus",
+              "post_chorus",
+              "bridge",
+              "breakdown",
+              "instrumental",
+              "outro",
+              "interlude"
+            ]
+          },
+          "line_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          },
+          "notes": {
+            "type": "string",
+            "description": "Brief optional rationale (Chinese or English)"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Parse LRC or plain-text lyrics into a structured JSON for MV production."""
+"""Parse LRC or plain-text lyrics into timing JSON only (timestamps per line).
+
+Output is intentionally limited to line-level timestamps and durations; song
+sections (verse/chorus/etc.) belong in a separate Qwen step (infer_sections_qwen3).
+"""
 
 from __future__ import annotations
 
@@ -8,6 +12,8 @@ import json
 import re
 from pathlib import Path
 from typing import Any
+
+from media_duration import probe_audio_duration_seconds
 
 
 LRC_TIMESTAMP_PATTERN = re.compile(r"\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]")
@@ -50,7 +56,56 @@ def round3(value: float) -> float:
     return round(float(value), 3)
 
 
-def parse_lrc(text: str) -> list[dict[str, Any]]:
+def split_lrc_body_and_preamble(text: str) -> tuple[list[dict[str, Any]], str]:
+    """Leading JSON preamble lines (ignored in output); then `[mm:ss.xxx]` body."""
+    raw_lines = text.splitlines()
+    preamble: list[dict[str, Any]] = []
+    i = 0
+    while i < len(raw_lines):
+        stripped = raw_lines[i].strip()
+        if not stripped:
+            i += 1
+            continue
+        entry = _parse_enriched_lrc_json_line(stripped)
+        if entry is None:
+            break
+        preamble.append(entry)
+        i += 1
+    body = "\n".join(raw_lines[i:])
+    return preamble, body
+
+
+def _parse_enriched_lrc_json_line(line: str) -> dict[str, Any] | None:
+    stripped = line.strip()
+    if not stripped.startswith("{"):
+        return None
+    try:
+        data = json.loads(stripped)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    chunks = data.get("c")
+    if not isinstance(chunks, list):
+        return None
+    texts: list[str] = []
+    for item in chunks:
+        if isinstance(item, dict) and "tx" in item:
+            texts.append(str(item["tx"]))
+        elif isinstance(item, str):
+            texts.append(item)
+    if not texts:
+        return None
+    t_raw = data.get("t")
+    offset_ms: int | None
+    if isinstance(t_raw, (int, float)):
+        offset_ms = int(t_raw)
+    else:
+        offset_ms = None
+    return {"offset_ms": offset_ms, "text": "".join(texts)}
+
+
+def _parse_lrc_timed_lines(text: str) -> list[dict[str, Any]]:
     lines: list[dict[str, Any]] = []
     line_counter = 0
 
@@ -108,14 +163,15 @@ def parse_lrc(text: str) -> list[dict[str, Any]]:
     return lines
 
 
-def _merge_bilingual_lines(lines: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Merge consecutive lines that share the same timestamp.
+def parse_lrc(text: str) -> list[dict[str, Any]]:
+    """Parse LRC body; preamble (credits) is skipped and not written to output."""
+    _preamble, body = split_lrc_body_and_preamble(text)
+    return _parse_lrc_timed_lines(body)
 
-    Bilingual LRC files put the original and translation on the same
-    timestamp.  We keep the first line as primary and attach the second
-    as ``translation``, so downstream section inference sees one entry
-    per musical moment instead of two.
-    """
+
+def _merge_bilingual_lines(lines: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Merge same-timestamp bilingual lines into one logical line."""
+
     if not lines:
         return lines
     merged: list[dict[str, Any]] = []
@@ -172,81 +228,9 @@ def detect_format(text: str) -> str:
     return "plain_text"
 
 
-def infer_sections_from_lyrics(lines: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Attempt to detect repeated patterns to infer verse/chorus structure."""
-    if not lines:
-        return []
-
-    text_lines = [line["text"] for line in lines if line["text"]]
-    if len(text_lines) < 4:
-        return [{
-            "section_id": "full_song",
-            "section_type": "verse",
-            "line_refs": [line["line_id"] for line in lines],
-            "start_time": lines[0].get("start_time"),
-            "end_time": lines[-1].get("end_time"),
-        }]
-
-    text_counts: dict[str, int] = {}
-    for t in text_lines:
-        normalized = t.strip().lower()
-        text_counts[normalized] = text_counts.get(normalized, 0) + 1
-
-    repeated_lines = {t for t, count in text_counts.items() if count >= 2}
-
-    sections: list[dict[str, Any]] = []
-    current_lines: list[dict[str, Any]] = []
-    current_type = "verse"
-    section_counter = 0
-    verse_counter = 0
-    chorus_counter = 0
-
-    for line in lines:
-        normalized = line["text"].strip().lower()
-        is_chorus_line = normalized in repeated_lines and len(normalized) > 5
-
-        if current_lines and is_chorus_line != (current_type == "chorus"):
-            section_counter += 1
-            if current_type == "verse":
-                verse_counter += 1
-                label = f"verse_{verse_counter}"
-            else:
-                chorus_counter += 1
-                label = f"chorus_{chorus_counter}"
-
-            sections.append({
-                "section_id": label,
-                "section_type": current_type,
-                "line_refs": [cl["line_id"] for cl in current_lines],
-                "start_time": current_lines[0].get("start_time"),
-                "end_time": current_lines[-1].get("end_time"),
-            })
-            current_lines = []
-
-        current_type = "chorus" if is_chorus_line else "verse"
-        current_lines.append(line)
-
-    if current_lines:
-        if current_type == "verse":
-            verse_counter += 1
-            label = f"verse_{verse_counter}"
-        else:
-            chorus_counter += 1
-            label = f"chorus_{chorus_counter}"
-        sections.append({
-            "section_id": label,
-            "section_type": current_type,
-            "line_refs": [cl["line_id"] for cl in current_lines],
-            "start_time": current_lines[0].get("start_time"),
-            "end_time": current_lines[-1].get("end_time"),
-        })
-
-    return sections
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Parse LRC or plain-text lyrics into structured JSON"
+        description="Parse LRC/plain lyrics to JSON (line timings only)"
     )
     parser.add_argument(
         "--input", required=True,
@@ -254,15 +238,16 @@ def main() -> None:
     )
     parser.add_argument(
         "--output", required=True,
-        help="Output path for parsed lyrics JSON"
+        help="Output path for lyrics-timing JSON"
     )
     parser.add_argument(
         "--format", choices=["lrc", "plain_text", "auto"], default="auto",
         help="Input format (default: auto-detect)"
     )
     parser.add_argument(
-        "--infer-sections", action="store_true",
-        help="Attempt to infer song sections from lyric repetition patterns"
+        "--audio",
+        default=None,
+        help="Optional audio file; duration is stored as audio_duration_seconds for timeline length",
     )
     args = parser.parse_args()
 
@@ -281,7 +266,7 @@ def main() -> None:
         lines = parse_plain_text(text)
 
     payload: dict[str, Any] = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "source_file": str(input_path.name),
         "detected_format": fmt,
         "total_lines": len(lines),
@@ -289,8 +274,10 @@ def main() -> None:
         "lines": lines,
     }
 
-    if args.infer_sections:
-        payload["inferred_sections"] = infer_sections_from_lyrics(lines)
+    if args.audio:
+        probed = probe_audio_duration_seconds(Path(args.audio))
+        if probed is not None:
+            payload["audio_duration_seconds"] = probed
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(

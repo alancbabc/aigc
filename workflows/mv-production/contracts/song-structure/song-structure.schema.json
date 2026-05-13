@@ -48,7 +48,7 @@
     },
     "analysis_method": {
       "type": "string",
-      "enum": ["lrc_parse", "lyrics_pattern", "manual", "audio_analysis"],
+      "enum": ["lrc_parse", "lyrics_pattern", "manual", "audio_analysis", "llm_qwen3"],
       "description": "How the song structure was determined."
     },
     "analysis_notes": {

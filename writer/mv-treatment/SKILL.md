@@ -1,14 +1,14 @@
 ---
 name: mv-treatment
-description: Generates a creative treatment for a music video, mapping song structure and lyrical imagery into a unified visual concept with per-section plans.
-trigger: Use when the user needs an MV concept, treatment, or creative direction document based on a song and its lyrics analysis.
+description: Generates a creative treatment for a music video, mapping song structure and lyrics into a unified visual concept with per-section plans, aligned with mv-global-visual-style.
+trigger: Use when the user needs an MV concept, treatment, or creative direction document based on a song, section timeline, and global visual lock.
 ---
 
 # MV Treatment
 
 ## Overview
 
-This skill turns song structure analysis and lyrics imagery analysis into a creative treatment document that defines the overall MV concept, visual style, color strategy, and per-section visual plans.
+This skill turns song structure (line timings + sections) and global visual style lock into a creative treatment document that defines the overall MV concept, visual style, color strategy, and per-section visual plans. Lyrical imagery is read directly from lyric lines grouped by sections (no standalone `lyrics-analysis.json`).
 
 It is responsible for:
 
@@ -21,16 +21,18 @@ It is responsible for:
 It is not responsible for:
 
 - analyzing the song structure (that belongs to Stage 1 of the workflow)
-- analyzing lyrics imagery (that belongs to Stage 2 of the workflow)
+- authoring a standalone lyrics-imagery JSON artifact (workflow uses lyric lines + `mv-global-visual-style.json` instead)
 - detailed shot-level planning (that belongs to `director/storyboard`)
 - scene reference image generation (that belongs to `art/scene-design`)
 - character visual design (that belongs to `art/character-three-view`)
 
 ## Inputs
 
-- Required: `song-structure.json` from Stage 1
-- Required: `lyrics-analysis.json` from Stage 2
+- Required: **`lyrics-timing.json`** + **`song-sections-llm.json`** from Stage 1 (section timeline; derive windows from **`line_refs`** + line timings)
+- Required: **`mv-global-visual-style.json`** from Stage 2
 - Required: `user_requirements.json` with `mv_type` and style preferences
+- Optional: **`mv-keyframe-director.json`** (director keyframe / I2V prompt plan — align treatment with established beats when present)
+- Optional: legacy consolidated **`song-structure.json`** where the pipeline still emits it (same fields consumed as before where applicable)
 - Optional: user-provided visual references, mood boards, or reference MV links
 - Optional: `project_meta.json` with director style reference
 
@@ -63,7 +65,7 @@ No external API calls. This skill produces a planning document only.
 
 ## Rules
 
-1. The treatment must reference every section in `song-structure.json`. No section may be left without a visual plan.
+1. The treatment must reference every **`section_id`** from **`song-sections-llm.json`**. No section may be left without a visual plan.
 2. The `concept_type` must align with `user_requirements.json`. If the user specified `narrative`, do not produce a pure performance treatment.
 3. All style keywords in `visual_style.style_keywords` must be in English, aligned with `_prompts/PromptTemplates/Style/`.
 4. For narrative MVs, the `narrative_thread` must have a clear premise, protagonist, conflict, and resolution.
@@ -78,8 +80,8 @@ No external API calls. This skill produces a planning document only.
 
 ### For Narrative MV
 
-1. Read `song-structure.json` and `lyrics-analysis.json`.
-2. Extract the narrative potential assessment from lyrics analysis.
+1. Read **`lyrics-timing.json`**, **`song-sections-llm.json`**, and **`mv-global-visual-style.json`**. Optionally read **`mv-keyframe-director.json`** if present.
+2. From lyric lines grouped by **`line_refs`** per section, infer narrative potential / dominant imagery (themes, metaphors).
 3. Read `_knowledge/Narrative/` for story structure patterns.
 4. Read `_knowledge/Genre/` for the musical genre's visual conventions.
 5. Draft the `narrative_thread` (premise, protagonist, conflict, resolution, timeline structure).
@@ -91,7 +93,7 @@ No external API calls. This skill produces a planning document only.
 
 ### For Performance MV
 
-1. Read `song-structure.json` and `lyrics-analysis.json`.
+1. Read **`lyrics-timing.json`**, **`song-sections-llm.json`**, **`mv-global-visual-style.json`**.
 2. Read `_knowledge/Actor/` for performance archetypes and blocking.
 3. Draft `performance_plan` with style, stage description, and camera strategy.
 4. Decide `visual_style` and `color_palette`.
@@ -100,8 +102,8 @@ No external API calls. This skill produces a planning document only.
 
 ### For Concept MV
 
-1. Read `song-structure.json` and `lyrics-analysis.json`.
-2. Focus on `visual_metaphors` from lyrics analysis as the primary creative material.
+1. Read **`lyrics-timing.json`**, **`song-sections-llm.json`**, **`mv-global-visual-style.json`**.
+2. Treat recurring lyric images and **`core_visual_motifs`** from `mv-global-visual-style` as the primary creative material.
 3. Build a visual metaphor sequence that evolves across the song.
 4. Each section plan uses `concept_imagery` as the primary content type.
 5. Produce `mv-treatment.json` with both `narrative_thread` and `performance_plan` set to null.
@@ -122,12 +124,12 @@ No external API calls. This skill produces a planning document only.
 
 ```text
 Input:
-  - song-structure.json: "夜曲" by 周杰伦, 245s, 8 sections, BPM 72
-  - lyrics-analysis.json: themes = lost love + night solitude, narrative_potential = high
+  - lyrics-timing + song-sections-llm: "夜曲" by 周杰伦, 245s, 8 sections (line-level times)
+  - mv-global-visual-style.json: motifs + verse/chorus structural rules
   - user_requirements.json: mv_type = narrative, style = neo-noir cinematic
 
 Processing:
-  1. Extract narrative thread from lyrics themes
+  1. Extract narrative thread from grouped lyric text + motifs
   2. Map visual worlds to song sections (rain city → warm apartment → dawn rooftop)
   3. Define color shift strategy (cool blue → warm amber → golden dawn)
   4. Set cross-cutting rules for memory/present interleaving

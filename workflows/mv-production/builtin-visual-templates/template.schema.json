@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MVProductionBuiltinVisualTemplate",
+  "description": "Builtin visual style template for mv-production. Provides default mv-global-visual-style values. Song-specific fields (song_title, core_visual_motifs, art_direction_summary_zh) are filled by Qwen3 at Stage 3.",
+  "type": "object",
+  "required": ["template_id", "template_name", "template_name_zh", "template_description"],
+  "properties": {
+    "template_id": { "type": "string", "minLength": 1 },
+    "template_name": { "type": "string", "minLength": 1 },
+    "template_name_zh": { "type": "string", "minLength": 1 },
+    "template_description": { "type": "string", "minLength": 1 },
+    "global_style_suffix": { "type": "string", "minLength": 8 },
+    "global_style_suffix_zh": { "type": "string" },
+    "animation_art_style_en": { "type": "string", "minLength": 12 },
+    "color_palette_en": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 12,
+      "items": { "type": "string", "minLength": 2 }
+    },
+    "lighting_mood_en": { "type": "string", "minLength": 8 },
+    "texture_material_en": { "type": "string", "minLength": 8 },
+    "motion_camera_en": { "type": "string", "minLength": 8 },
+    "negative_style_hints_en": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 24,
+      "items": { "type": "string", "minLength": 2 }
+    },
+    "structural_visual_rules": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["section_roles", "visual_tension_en", "visual_tension_zh", "camera_framing_en", "cut_motion_tempo_en", "contrast_vs_other_sections_en"],
+        "properties": {
+          "section_roles": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "visual_tension_en": { "type": "string", "minLength": 16 },
+          "visual_tension_zh": { "type": "string", "minLength": 8 },
+          "camera_framing_en": { "type": "string", "minLength": 12 },
+          "cut_motion_tempo_en": { "type": "string", "minLength": 12 },
+          "contrast_vs_other_sections_en": { "type": "string", "minLength": 16 }
+        }
+      }
+    }
+  }
+}

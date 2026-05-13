@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.1",
+  "song_title": "大鱼",
+  "artist": "周深",
+  "source_files": {
+    "mv_keyframe_director": "mv-keyframe-director.json",
+    "mv_global_visual_style": "mv-global-visual-style.json"
+  },
+  "project_root": ".",
+  "service_base_url": "https://ai.gitee.com/v1",
+  "image_size": { "width": 1024, "height": 576 },
+  "dry_run": false,
+  "strict_mode": false,
+  "lyric_keyframes_total": 8,
+  "instrumental_bookends_total": 0,
+  "keyframes_in_manifest": 8,
+  "keyframes": [
+    {
+      "keyframe_id": "kf_01",
+      "keyframe_type": "lyric_visual",
+      "segment_kind": "lyric",
+      "primary_section_ref": "verse_1",
+      "section_type_focus": "verse",
+      "start_time": 43.65,
+      "end_time": 70.11,
+      "lyrics": [
+        { "line_id": "line_01", "text": "海浪无声将夜幕深深淹没", "start_time": 43.65, "end_time": 50.29 },
+        { "line_id": "line_02", "text": "漫过天空尽头的角落", "start_time": 50.29, "end_time": 56.85 }
+      ],
+      "image_png": "keyframes/kf_01.png",
+      "image_labeled_png": "keyframes/kf_01_labeled.png",
+      "prompt_used": "国风水墨, cinematic, ethereal atmosphere, A translucent fish silhouette gliding through indigo watercolor waves...",
+      "negative_prompt_used": "avoid hyper-realistic textures, no sharp geometric shapes, reject neon color saturation",
+      "generation_ok": true,
+      "dry_run": false,
+      "api_generation_ok": true,
+      "placeholder_fallback": false
+    }
+  ]
+}

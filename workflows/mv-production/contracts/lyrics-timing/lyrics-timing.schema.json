@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/lyrics-timing.schema.json",
+  "title": "Lyrics timing (parse_lyrics output)",
+  "type": "object",
+  "required": ["schema_version", "source_file", "detected_format", "total_lines", "has_timestamps", "lines"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": { "type": "string", "enum": ["1.1"] },
+    "source_file": { "type": "string" },
+    "detected_format": { "type": "string", "enum": ["lrc", "plain_text"] },
+    "total_lines": { "type": "integer", "minimum": 0 },
+    "has_timestamps": { "type": "boolean" },
+    "audio_duration_seconds": { "type": "number", "exclusiveMinimum": 0 },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["line_id", "text", "start_time", "end_time", "duration_seconds", "is_instrumental"],
+        "additionalProperties": true,
+        "properties": {
+          "line_id": { "type": "string" },
+          "text": { "type": "string" },
+          "start_time": { "type": ["number", "null"] },
+          "end_time": { "type": ["number", "null"] },
+          "duration_seconds": { "type": ["number", "null"] },
+          "is_instrumental": { "type": "boolean" },
+          "translation": { "type": "string" }
+        }
+      }
+    }
+  }
+}

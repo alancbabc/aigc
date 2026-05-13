@@ -4,36 +4,72 @@ This directory contains JSON contracts for each stage of the `mv-production` wor
 
 ## Structure
 
-- Each module gets its own subdirectory
-- Each module should have both `*.schema.json` and `*.example.json`
-- Builtin templates and scripts live outside this directory
+- Each module gets its own subdirectory.
+- Each module should have both `*.schema.json` and `*.example.json`.
+- Builtin templates and scripts live outside this directory:
+  - templates: `../builtin-visual-templates/`
+  - scripts: `../scripts/`
 
 ## Module Index
 
-### MV-Specific Contracts
+### Canonical Path Contracts
 
-- `song-structure/` — Song section breakdown with timing, mood, and energy metadata
-- `lyrics-analysis/` — Lyrics imagery, themes, emotion arc, and visual metaphor extraction
-- `mv-treatment/` — MV creative concept, visual style, and per-section visual plan
-- `mv-storyboard/` — Beat-synced storyboard with time windows and lyrics alignment
-- `mv-video-plan/` — Timeline-aware video generation plan with song-synced segments
+| Module | Stage | Description |
+|--------|-------|-------------|
+| `user-requirements/` | 0 | Intake document ingest: concept MV, visual style, reference images, resolution |
+| `lyrics-timing/` | 1 | Line-level timestamps from `parse_lyrics.py` |
+| `song-sections-llm/` | 2 | Qwen3 section segmentation (reply shape) |
+| `song-structure/` | — | Legacy/reference consolidated structure (not emitted by canonical path) |
+| `mv-global-visual-style/` | 3 | Qwen3 global English style suffix + art-direction axes |
+| `mv-keyframe-director/` | 4 | Qwen3 director plan: grouped keyframes with `keyframe_type` routing |
+| `keyframe-images/` | 5 | Generated keyframe image manifest: paths, timing, generation status |
 
-### Reused From film-production
+### Optional Branch Contracts
 
-- Video prompt drafts and LTX prompt optimization reuse the contracts defined in `workflows/film-production/contracts/`
+| Module | Stage | Description |
+|--------|-------|-------------|
+| `characters/` | C1 | Character/performer profiles (reuses `writer/character-profile/`) |
+| `scene-design/` | C2 | Scene environment design (reuses `art/scene-design/`) |
+
+### Legacy / Appendix Contracts
+
+| Module | Stage | Description |
+|--------|-------|-------------|
+| `mv-treatment/` | — | Optional prose treatment (sidecar, not canonical) |
+| `mv-storyboard/` | — | Beat-synced storyboard (appendix film-style chain) |
 
 ## Reading Order
 
 If you are new to this workflow, read in this order:
 
-1. `song-structure/`
-2. `lyrics-analysis/`
-3. `mv-treatment/`
-4. `mv-storyboard/`
-5. `mv-video-plan/`
+1. `user-requirements/` — what the intake document provides
+2. `lyrics-timing/` — the timing foundation for everything downstream
+3. `song-sections-llm/` — section segmentation on the lyric timeline
+4. `song-structure/` — optional reference if you consume a consolidated structure elsewhere
+5. `mv-global-visual-style/` — global style lock after sections
+6. `mv-keyframe-director/` — canonical director keyframe plan (with `keyframe_type`)
+7. `keyframe-images/` — generated still image manifest
+8. *(optional sidecar)* `mv-treatment/` if using prose treatment
+9. *(appendix)* `mv-storyboard/` if using the legacy storyboard chain
+
+## Cross-Contract Validation Rules
+
+- Every `section_ref` in downstream artifacts (`mv-keyframe-director`) must match a `section_id` from `song-sections-llm.json`.
+- Every `line_refs` aggregate across all `mv-keyframe-director` keyframes must form a partition of all `line_id`s from `lyrics-timing.json` — exactly once, in order, consecutive within each keyframe.
+- Every `keyframe_id` in `keyframe-images.json` must exist in `mv-keyframe-director.json`.
+- `keyframe_images.image_size` must match the `resolution` from `user_requirements.json`.
+
+## Duration Field Naming Convention
+
+| Artifact | Duration Field | Source |
+|----------|---------------|--------|
+| `lyrics-timing.json` | `duration_seconds` (line level) | Parsed from LRC |
+| `lyrics-timing.json` | `audio_duration_seconds` (top-level) | From `--audio` media |
+| `mv-keyframe-director.json` | `start_time`, `end_time` (per keyframe) | Injected from lyrics-timing |
 
 ## Interpretation Ownership
 
-- Stages 1-3 contracts are interpreted by the workflow and `writer/mv-treatment`
-- Stage 6 storyboard contract is interpreted by `director/storyboard` with MV extensions
-- Stage 9-11 video contracts follow the same interpretation rules as `workflows/film-production`
+- Stages 1–4 contracts are interpreted by the MV workflow scripts (`parse_lyrics.py`, `infer_sections_qwen3.py`, `infer_global_visual_style_qwen3.py`, `infer_keyframe_director_qwen3.py`).
+- Stage 5 contract is interpreted by `generate_keyframe_images_from_director.py`.
+- The `mv-storyboard` contract is interpreted by `director/storyboard` with MV extensions (appendix only).
+- Optional branch contracts reuse `writer/character-profile/` and `art/scene-design/` rules.
