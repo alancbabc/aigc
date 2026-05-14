@@ -47,18 +47,59 @@ SYSTEM_PROMPT = """你是意象型音乐 MV 分镜规划器。根据 segment-int
 1. 每个 shot 必须属于一个 parent_segment_id
 2. 每个 shot 的 start_time/end_time 必须落在 parent segment 的 time_range 内
 3. 每个 segment 的多个 shot 必须完整覆盖该 segment 的时间窗（无空隙无重叠）
-4. 每个 shot 时长建议 5–14 秒
-5. 每个 shot 只保留一个核心视觉动作（一个主运动）
-6. 画面偏意象化：剪影、轮廓、发光丝线、倒影、远景、半透明元素
-7. 避免剧情化人物表演（无牵手、拥抱、哭泣、对话、面部特写）
-8. 输出严格 JSON，不要解释文字
+4. 不限制 shot 的最短和最长时长
+5. 画面偏意象化：剪影、轮廓、发光丝线、倒影、远景、半透明元素
+6. 避免剧情化人物表演（无牵手、拥抱、哭泣、对话、面部特写）
+7. 输出严格 JSON，不要解释文字
+
+# 视频生成约束
+
+- API 一次生成视频最大长度为 8 秒
+- 大于 8 秒的分镜需用尾帧延长拼接
+- 如果分镜生成的视频长度大于对应的时间戳时长，需要裁剪
 
 # 拆分规则
 
 - 按意象转换拆：当核心视觉主体从 A 变为 B 时，应拆为两个 shot
 - 按情绪推进拆：当情绪从一种状态推向另一种状态时，应拆为不同 shot
-- 按运动方式拆：一个 shot 只保留一个主运动（如"海浪上升"和"大鱼游过"应分开）
+- 按运动方式拆：一个 shot 只保留一个主运动
 - recommended_shot_count 是建议值，实际数量可以 ±1
+
+# 每个 shot 必须包含的信息
+
+1. literal_meaning_zh：该 shot 对应歌词的字面含义（直译）
+2. deep_meaning：歌词对应的深层意味和含义（它在表达什么？不只是功能描述）
+3. static_frame_description：画面里有什么 — 景别、实体、位置、空间关系。必须可被图像模型直接理解执行。简洁具体
+4. key_imagery：只取歌词中明确出现的具象实体名。无实体则为空数组 []
+5. shot_direction：整合了运镜方式、速度、转场方式的完整镜向
+
+# shot_type 路由（必须遵守）
+
+- shot_type = "lyric_imagery"：歌词有明确视觉实体 → 正常生成意象画面
+- shot_type = "singer_performance"：歌词完全抽象、无任何实体 → 歌手演唱场景
+  歌手演唱场景的 static_frame_description：一位歌手在画面中演唱（可以是侧影、正面或背影），背景与全片视觉风格一致的油画质感。不同 shot 可以有不同的角度
+
+# key_imagery 规则（关键）
+
+- 只提取歌词中明确出现的具象实体
+- 有实体："星空" "麦田" "紫罗兰色的云" "画框" "雪地" "眼睛" "调色板"
+- 比喻中的实体也算："他像星星一样闪耀" → "星星" 算
+- 无实体 → key_imagery = []
+- 禁止：抽象概念（"爱" "痛苦" "孤独"）
+- 禁止：自创意象（歌词没说"鱼"就不要加"鱼"）
+
+# static_frame_description 规则
+
+- 必须回答：画面里有什么？在哪里？景别多大？
+- 包含：主体、位置关系（前景中景后景）、空间
+- 必须可被图像模型直接执行
+- 禁止：纯情绪描述、抽象修饰
+
+# shot_direction 规则
+
+- 整合运镜方式（camera_motion, movement_speed, lens_feeling, stability）
+- 画面运动（subject_motion, environment_motion, motion_intensity）
+- 转场（transition_in, transition_out, transition_duration）
 
 # shot_role 枚举
 
@@ -78,34 +119,26 @@ shot_size: extreme_wide_shot | wide_shot | medium_wide_shot | medium_shot | medi
 camera_angle: eye_level | low_angle | slightly_low_angle | high_angle | slightly_high_angle | dutch_angle | overhead
 depth: shallow_space | medium_space | deep_space | flat_space
 
-# camera 字段枚举
+# shot_direction 字段枚举
 
 camera_motion: static | slow_push_in | slow_pull_out | slow_pan_left | slow_pan_right | slow_tilt_up | slow_tilt_down | slow_dolly | slow_tracking | slow_zoom_in | slow_zoom_out | floating_drift | none_or_minimal_drift
 movement_speed: very_slow | slow | moderate
 lens_feeling: wide_cinematic | standard | telephoto_compressed | macro_dreamlike
 stability: locked | floating | handheld_subtle | drifting
-
-# motion_design
-
 motion_intensity: very_low | low | medium | high
 
 # visual_style 和 emotion
 
 visual_style.scene_type: 来自 parent segment 的 scene_type
-visual_style.color_palette: 来自 parent segment 的 color_palette，可以微调但必须与全曲统一色系一致
+visual_style.color_palette: 来自 parent segment 的 color_palette
 visual_style.lighting: 来自 parent segment 的 lighting
-emotion.intensity: 来自 parent segment 的 emotional_intensity，每个 shot 可在此基础上微调 ±0.1
-
-# transition
-
-transition_in / transition_out 使用英文描述
-transition_duration 默认为 1.0 秒
+emotion.intensity: 来自 parent segment 的 emotional_intensity，每个 shot 可微调 ±0.1
 
 # generation_notes
 
-image_prompt_focus: 这个 shot 如果要生成静帧，prompt 应该聚焦什么（英文词或短语）
-video_prompt_focus: 这个 shot 如果要生成视频，prompt 应该聚焦什么（英文词或短语）
-avoid: 必须避免的元素，3-5 个中文短语
+image_prompt_focus: 静帧 prompt 的关键词（英文词或短语）
+video_prompt_focus: 视频 prompt 的关键词（英文词或短语）
+avoid: 必须避免的元素
 
 # JSON 输出格式
 
@@ -115,45 +148,45 @@ avoid: 必须避免的元素，3-5 个中文短语
     {
       "shot_id": "shot_v1_01_01",
       "parent_segment_id": "seg_v1_01",
-      "time_range": {"start_time": 43.65, "end_time": 56.0, "duration_seconds": 12.35},
-      "lyric_refs": ["line_01", "line_02"],
+      "time_range": {"start_time": 0.0, "end_time": 8.0, "duration_seconds": 8.0},
+      "shot_type": "lyric_imagery",
       "shot_role": "establishing_image",
-      "visual_concept_zh": "...",
-      "deep_function_zh": "...",
-      "key_imagery": ["...", "..."],
-      "secondary_imagery": ["...", "..."],
+      "literal_meaning_zh": "星夜、蓝灰色的调色板、夏日的凝视",
+      "deep_meaning": "第一段主歌通过梵高的画作《星月夜》入画，暗示画家眼中世界的美丽与灵魂深处的黑暗并存。",
+      "static_frame_description": "深蓝夜空中旋转的星光漩涡占据画面上半部分，下方沉睡的村庄暗影横跨中景，前景是柏树火焰般的暗色剪影",
+      "key_imagery": ["星空", "蓝灰调色板"],
       "composition": {
         "shot_size": "extreme_wide_shot",
         "camera_angle": "slightly_low_angle",
-        "foreground": "...",
-        "midground": "...",
-        "background": "...",
-        "focal_point": "...",
+        "foreground": "柏树暗影",
+        "midground": "沉睡村庄",
+        "background": "旋转星夜",
+        "focal_point": "最亮的星",
         "depth": "deep_space"
       },
-      "camera": {
+      "shot_direction": {
         "camera_motion": "slow_push_in",
         "movement_speed": "very_slow",
         "lens_feeling": "wide_cinematic",
-        "stability": "floating"
-      },
-      "motion_design": {
-        "subject_motion": "...",
-        "environment_motion": "...",
-        "motion_intensity": "low"
+        "stability": "floating",
+        "subject_motion": "星光缓慢旋转",
+        "environment_motion": "云层轻轻飘移",
+        "motion_intensity": "low",
+        "transition_in": "fade_from_black",
+        "transition_out": "soft_dissolve",
+        "transition_duration": 1.0
       },
       "visual_style": {
-        "scene_type": "dream_ocean_night",
-        "color_palette": ["深蓝", "银白"],
-        "lighting": "...",
-        "texture": "..."
+        "scene_type": "starry_night",
+        "color_palette": ["深蓝", "铬黄", "冷白"],
+        "lighting": "月光与星光交织",
+        "texture": "厚涂油画质感"
       },
-      "emotion": {"primary": "静谧", "secondary": ["神秘"], "intensity": 0.45},
-      "transition": {"transition_in": "fade_from_dark_blue", "transition_out": "soft_dissolve", "transition_duration": 1.0},
+      "emotion": {"primary": "静谧", "secondary": ["神秘"], "intensity": 0.4},
       "generation_notes": {
-        "image_prompt_focus": "...",
-        "video_prompt_focus": "...",
-        "avoid": ["...", "..."]
+        "image_prompt_focus": "swirling starry night, cobalt blue, impasto brushwork",
+        "video_prompt_focus": "rotating stars, cloud drift in violet haze",
+        "avoid": ["写实照片", "现代建筑", "人物正脸", "平滑数字渲染"]
       }
     }
   ]
@@ -210,37 +243,31 @@ def build_qwen_input(seg_data: dict[str, Any]) -> list[dict[str, Any]]:
             core_img.append({
                 "image_zh": img.get("image_zh", ""),
                 "image_en": img.get("image_en", ""),
-                "visual_priority": img.get("visual_priority", 0.5),
             })
-        vd = seg.get("visual_direction", {})
         interp = seg.get("interpretation", {})
+        # Derive recommended_shot_count from segment duration
+        dur = seg["time_range"].get("duration_seconds", 10)
+        rec_shot_count = max(1, int(dur / 8 + 0.5))
         qwen_input.append({
             "segment_id": seg["segment_id"],
             "start_time": seg["time_range"]["start_time"],
             "end_time": seg["time_range"]["end_time"],
             "duration_seconds": seg["time_range"]["duration_seconds"],
             "lyrics_text": seg["lyrics"]["lyrics_text"],
+            "literal_meaning_zh": interp.get("literal_meaning_zh", ""),
             "deep_meaning_zh": interp.get("deep_meaning_zh", ""),
             "emotional_state_zh": interp.get("emotional_state_zh", []),
             "emotional_intensity": interp.get("emotional_intensity", 0.5),
             "core_imagery": core_img,
-            "scene_type": vd.get("scene_type", ""),
-            "color_palette": vd.get("color_palette", []),
-            "lighting": vd.get("lighting", ""),
-            "recommended_shot_count": seg["shot_planning_hint"].get("recommended_shot_count", 2),
-            "variation_from": seg["shot_planning_hint"].get("variation_from"),
-            "variation_strategy": seg["shot_planning_hint"].get("variation_strategy"),
-            "must_include": seg.get("generation_constraints", {}).get("must_include", []),
-            "avoid": seg.get("generation_constraints", {}).get("avoid", []),
+            "recommended_shot_count": rec_shot_count,
         })
     return qwen_input
 
 
 REQUIRED_SHOT = [
-    "shot_id", "parent_segment_id", "time_range", "lyric_refs", "shot_role",
-    "visual_concept_zh", "key_imagery", "secondary_imagery",
-    "composition", "camera", "motion_design",
-    "transition", "generation_notes",
+    "shot_id", "parent_segment_id", "time_range", "lyric_refs", "shot_type", "shot_role",
+    "literal_meaning_zh", "deep_meaning", "static_frame_description", "key_imagery",
+    "composition", "shot_direction", "generation_notes",
 ]
 
 
@@ -276,14 +303,17 @@ def validate_and_fix_shots(
         if s.get("shot_role") not in SHOT_ROLES:
             s["shot_role"] = "symbolic_detail"
 
-        # Inject visual_style / emotion from parent segment if missing
-        vd = pseg.get("visual_direction", {})
+        # Ensure key_imagery is a list (empty is valid)
+        if not isinstance(s.get("key_imagery"), list):
+            s["key_imagery"] = []
+
+        # Inject visual_style / emotion from parent segment if missing (with defaults since S3 no longer has visual_direction)
         if not s.get("visual_style"):
             s["visual_style"] = {
-                "scene_type": vd.get("scene_type", ""),
-                "color_palette": vd.get("color_palette", []),
-                "lighting": vd.get("lighting", ""),
-                "texture": "柔雾感、梦境感",
+                "scene_type": "",
+                "color_palette": [],
+                "lighting": "",
+                "texture": "油画质感",
             }
         interp = pseg.get("interpretation", {})
         if not s.get("emotion"):
@@ -293,10 +323,27 @@ def validate_and_fix_shots(
                 "intensity": interp.get("emotional_intensity", 0.5),
             }
 
+        # Validate shot_type
+        if s.get("shot_type") not in ("lyric_imagery", "singer_performance"):
+            s["shot_type"] = "lyric_imagery"
+
         # Validate missing required fields
         missing = [k for k in REQUIRED_SHOT if k not in s]
         if missing:
             print(f"  [warn] shot[{i}] {s.get('shot_id','?')} missing keys: {missing}")
+
+    # ── Singer performance normalization ──
+    singer_shots = [s for s in shots if s.get("shot_type") == "singer_performance"]
+    if singer_shots and len(singer_shots) > 1:
+        template_frame = singer_shots[0].get("static_frame_description", "")
+        template_imagery: list[str] = list(singer_shots[0].get("key_imagery", []))
+        if template_frame:
+            for s in singer_shots[1:]:
+                if not s.get("static_frame_description"):
+                    s["static_frame_description"] = template_frame
+                if not s.get("key_imagery") or s.get("key_imagery") == template_imagery:
+                    s["key_imagery"] = list(template_imagery)
+        print(f"  Normalized {len(singer_shots)} singer_performance shots to shared template")
 
     return shots
 
@@ -320,11 +367,12 @@ def make_ambient_hold(
             "duration_seconds": tr.get("duration_seconds", 0),
         },
         "lyric_refs": seg.get("lyrics", {}).get("line_refs", []),
+        "shot_type": "lyric_imagery",
         "shot_role": "ambient_hold",
-        "visual_concept_zh": "延续前一段画面的最后一帧，轻微淡出。",
-        "deep_function_zh": "作为段落间的呼吸停顿，不生成新的关键帧。",
+        "literal_meaning_zh": "(器乐间奏，无歌词)",
+        "deep_meaning": "间奏/过渡段落，画面延续前一段氛围，不做单独画面切换。后续阶段可复用前一 shot 的最后一帧作为静态画面。",
+        "static_frame_description": "延续前一段画面的最后一帧，轻微淡出。",
         "key_imagery": [],
-        "secondary_imagery": [],
         "composition": {
             "shot_size": "wide_shot",
             "camera_angle": "eye_level",
@@ -334,32 +382,28 @@ def make_ambient_hold(
             "focal_point": "逐渐消散的光粒子",
             "depth": "medium_space",
         },
-        "camera": {
+        "shot_direction": {
             "camera_motion": "none_or_minimal_drift",
             "movement_speed": "very_slow",
             "lens_feeling": "standard",
             "stability": "drifting",
-        },
-        "motion_design": {
             "subject_motion": "光粒子尾迹逐渐消散",
             "environment_motion": "光点缓慢漂浮",
             "motion_intensity": "very_low",
+            "transition_in": "none",
+            "transition_out": "none",
+            "transition_duration": 0,
         },
         "visual_style": {
             "scene_type": vd.get("scene_type", ""),
             "color_palette": vd.get("color_palette", []),
             "lighting": vd.get("lighting", ""),
-            "texture": "柔雾感",
+            "texture": "油画质感",
         },
         "emotion": {
             "primary": "延续",
             "secondary": [],
             "intensity": interp.get("emotional_intensity", 0.0),
-        },
-        "transition": {
-            "transition_in": "none",
-            "transition_out": "none",
-            "transition_duration": 0,
         },
         "generation_notes": {
             "generate_new_image": False,
@@ -522,11 +566,10 @@ def main() -> None:
         "artist": seg_data.get("artist"),
         "source_segment_interpretation_ref": seg_path.name,
         "shot_generation_rules": {
-            "min_shot_duration": 4.0,
-            "target_shot_duration": 8.0,
-            "max_shot_duration": 14.0,
             "instrumental_hold_policy": "reuse_previous_visual_or_create_ambient_hold",
             "long_segment_policy": "split_before_shot_planning_if_over_40_seconds",
+            "video_max_duration_seconds": 8.0,
+            "over_max_policy": "use_tail_frame_extension_then_trim_to_lyric_duration",
         },
         "shots": all_shots,
     }

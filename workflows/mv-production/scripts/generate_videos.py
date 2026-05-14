@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Execute video generation from video-prompts.json + selected-asset-manifest.json.
+"""Execute video generation from image-video-prompts.json + selected-asset-manifest.json.
 
 Calls Gitee LTX HQ API (POST /v1/async/videos/image-to-video) for each shot.
 Uploads the selected keyframe image, submits an image-to-video task, polls
@@ -115,8 +115,8 @@ def poll_and_download(api_key: str, task_id: str, output_path: Path, timeout: in
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Generate videos from video-prompts + selected images")
-    ap.add_argument("--video-prompts", required=True, type=Path)
+    ap = argparse.ArgumentParser(description="Generate videos from image-video-prompts + selected images")
+    ap.add_argument("--image-video-prompts", required=True, type=Path)
     ap.add_argument("--selected-manifest", required=True, type=Path)
     ap.add_argument("--out", required=True, type=Path, help="Results JSON output path")
     ap.add_argument("--project-root", type=Path, default=None)
@@ -129,28 +129,32 @@ def main() -> None:
     if not API_KEY and not args.dry_run:
         raise SystemExit("Missing AIGC_GITEE_API_KEY / GITEE_API_TOKEN.")
 
-    vid_data = load_json(args.video_prompts.resolve())
-    sel_data = load_json(args.selected_manifest.resolve())
-    project_root = args.project_root.resolve() if args.project_root else args.video_prompts.resolve().parent
+    ivp = load_json(args.image_video_prompts.resolve())
+    sel = load_json(args.selected_manifest.resolve())
+    project_root = args.project_root.resolve() if args.project_root else args.image_video_prompts.resolve().parent
 
-    sel_lookup: dict[str, Any] = {a["shot_id"]: a for a in sel_data.get("assets", [])}
+    sel_lookup: dict[str, Any] = {a["shot_id"]: a for a in sel.get("assets", [])}
 
-    prompts = vid_data.get("video_prompts", [])
+    prompts = ivp.get("prompts", [])
     total = len(prompts)
     completed = 0
     failed = 0
     results: list[dict[str, Any]] = []
 
-    for i, vp in enumerate(prompts):
-        sid = vp["shot_id"]
-        sel = sel_lookup.get(sid, {})
-        image_path_str = sel.get("selected_image", vp.get("input_image", ""))
+    for i, p in enumerate(prompts):
+        sid = p["shot_id"]
+        if not p.get("generate_new_image", True):
+            results.append({"shot_id": sid, "status": "skipped", "video_path": None, "error": "Ambient hold — no video generated."})
+            continue
+
+        sel_item = sel_lookup.get(sid, {})
+        image_path_str = sel_item.get("selected_image", f"assets/images/selected/{sid}.png")
         image_path = project_root / image_path_str
-        duration = vp.get("duration_seconds", 5)
-        video_prompt = vp.get("video_prompt", "")
+        duration = p["time_range"]["duration_seconds"]
+        video_prompt = p.get("video_prompt", "")
         output_path = project_root / "assets" / "videos" / "candidates" / f"{sid}.mp4"
 
-        if not video_prompt or not sel.get("selected_image"):
+        if not video_prompt or not sel_item.get("selected_image"):
             results.append({"shot_id": sid, "status": "skipped", "video_path": None, "error": "Missing prompt or selected image."})
             continue
 
@@ -188,7 +192,7 @@ def main() -> None:
 
     out_obj = {
         "schema_version": "1.0",
-        "source_video_prompts_ref": args.video_prompts.name,
+        "source_image_video_prompts_ref": args.image_video_prompts.name,
         "video_generation_results": results,
     }
     out_path = args.out.resolve()

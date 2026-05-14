@@ -121,7 +121,7 @@ def main() -> None:
         res_str = params.get("resolution", "1024x576")
         width, height = parse_resolution(res_str)
         size = f"{width}x{height}"
-        num_candidates = params.get("num_candidates", 2)
+        num_candidates = params.get("num_candidates", 1)
         candidates = task.get("output_candidates", [])
 
         if not prompt and task.get("generate_new_image"):

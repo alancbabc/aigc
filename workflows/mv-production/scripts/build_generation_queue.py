@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Build image-generation-queue.json from image-prompts.json.
+"""Build image-generation-queue.json from image-video-prompts.json.
 
-Pure programmatic: reads image-prompts.json, creates generation tasks
-for each generate_new_image=true entry, and reuse tasks for ambient_holds.
-Critical shots (based on shot_role) get extra candidates.
+Pure programmatic: reads image-video-prompts.json, creates generation tasks
+for each generate_new_image=true shot. Ambient holds get reuse tasks.
+Defaults to 1 candidate per shot.
 """
 
 from __future__ import annotations
@@ -13,41 +13,47 @@ import json
 from pathlib import Path
 from typing import Any
 
-CRITICAL_ROLES = {"establishing_image", "emotional_peak", "climax_image", "resolution_image"}
-
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build image generation queue from image-prompts.json")
-    ap.add_argument("--image-prompts", required=True, type=Path)
+    ap = argparse.ArgumentParser(description="Build image generation queue from image-video-prompts.json")
+    ap.add_argument("--image-video-prompts", required=True, type=Path)
     ap.add_argument("--out", required=True, type=Path)
     ap.add_argument("--candidates-dir", default="assets/images/candidates")
+    ap.add_argument("--num-candidates", type=int, default=1, help="Candidates per shot (default 1)")
     args = ap.parse_args()
 
-    data = load_json(args.image_prompts.resolve())
+    data = load_json(args.image_video_prompts.resolve())
     generation_queue: list[dict[str, Any]] = []
     reuse_tasks: list[dict[str, Any]] = []
 
-    for p in data["image_prompts"]:
+    fixed_negative = (
+        "text, subtitles, watermark, logo, low quality, blurry, "
+        "plain documentary photography, tourist photo, casual snapshot, "
+        "cartoon, anime, plastic texture, oversaturated colors, "
+        "cluttered composition, harsh daylight"
+    )
+
+    for p in data["prompts"]:
         sid = p["shot_id"]
-        gen = p["render_strategy"]["generate_new_image"]
+        gen = p.get("generate_new_image", True)
 
         if gen:
-            n = 3 if p.get("shot_role") in CRITICAL_ROLES else p["generation_parameters"].get("num_candidates", 2)
+            n = args.num_candidates
             candidates = [f"{args.candidates_dir}/{sid}_c{i+1}.png" for i in range(n)]
             generation_queue.append({
                 "task_id": f"gen_img_{sid}",
                 "shot_id": sid,
-                "prompt_id": p["prompt_id"],
+                "prompt_id": f"img_{sid}",
                 "generate_new_image": True,
-                "image_prompt": p["image_prompt"],
-                "negative_prompt": p["negative_prompt"],
+                "image_prompt": p.get("image_prompt", ""),
+                "negative_prompt": fixed_negative,
                 "generation_parameters": {
-                    "aspect_ratio": p["generation_parameters"]["aspect_ratio"],
-                    "resolution": p["generation_parameters"]["resolution"],
+                    "aspect_ratio": "16:9",
+                    "resolution": "1024x576",
                     "seed": None,
                     "num_candidates": n,
                 },
@@ -57,14 +63,14 @@ def main() -> None:
         else:
             reuse_tasks.append({
                 "shot_id": sid,
-                "reuse_from_shot_id": p["render_strategy"].get("reuse_from_shot_id"),
+                "reuse_from_shot_id": p.get("render_strategy", {}).get("reuse_from_shot_id"),
                 "status": "reuse_after_selection",
             })
 
     out = {
         "schema_version": "1.0",
         "song_title": data.get("song_title", ""),
-        "source_prompt_file": args.image_prompts.name,
+        "source_prompt_file": args.image_video_prompts.name,
         "generation_queue": generation_queue,
         "reuse_tasks": reuse_tasks,
     }

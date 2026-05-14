@@ -13,13 +13,12 @@
     "shot_generation_rules": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["min_shot_duration", "target_shot_duration", "max_shot_duration", "instrumental_hold_policy", "long_segment_policy"],
+      "required": ["instrumental_hold_policy", "long_segment_policy", "video_max_duration_seconds"],
       "properties": {
-        "min_shot_duration": { "type": "number", "minimum": 1.0 },
-        "target_shot_duration": { "type": "number", "minimum": 1.0 },
-        "max_shot_duration": { "type": "number", "minimum": 1.0 },
         "instrumental_hold_policy": { "type": "string", "enum": ["reuse_previous_visual_or_create_ambient_hold"] },
-        "long_segment_policy": { "type": "string", "enum": ["split_before_shot_planning_if_over_40_seconds"] }
+        "long_segment_policy": { "type": "string", "enum": ["split_before_shot_planning_if_over_40_seconds"] },
+        "video_max_duration_seconds": { "type": "number", "minimum": 1.0 },
+        "over_max_policy": { "type": "string" }
       }
     },
     "shots": {
@@ -30,10 +29,9 @@
         "additionalProperties": false,
         "required": [
           "shot_id", "parent_segment_id", "parent_section_id",
-          "time_range", "lyric_refs", "shot_role", "visual_concept_zh",
-          "key_imagery", "secondary_imagery",
-          "composition", "camera", "motion_design",
-          "transition", "generation_notes"
+          "time_range", "shot_type", "shot_role",
+          "literal_meaning_zh", "deep_meaning", "static_frame_description",
+          "key_imagery", "composition", "shot_direction", "generation_notes"
         ],
         "properties": {
           "shot_id": { "type": "string", "minLength": 1 },
@@ -53,6 +51,11 @@
             "type": "array",
             "items": { "type": "string" }
           },
+          "shot_type": {
+            "type": "string",
+            "enum": ["lyric_imagery", "singer_performance"],
+            "description": "lyric_imagery: lyrics have concrete visual entities. singer_performance: no entities, use singer silhouette."
+          },
           "shot_role": {
             "type": "string",
             "enum": [
@@ -61,16 +64,17 @@
               "memory_echo", "climax_image", "resolution_image"
             ]
           },
-          "visual_concept_zh": { "type": "string", "minLength": 1 },
-          "deep_function_zh": { "type": "string", "minLength": 1 },
+          "literal_meaning_zh": { "type": "string", "minLength": 1 },
+          "deep_meaning": { "type": "string", "minLength": 1, "description": "What the lyrics truly express at a deeper level." },
+          "static_frame_description": {
+            "type": "string", "minLength": 1,
+            "description": "Concrete static image description: what is in the frame, shot size, entity positions, spatial relationships. Actionable for an image model."
+          },
           "key_imagery": {
             "type": "array",
-            "minItems": 1,
-            "items": { "type": "string" }
-          },
-          "secondary_imagery": {
-            "type": "array",
-            "items": { "type": "string" }
+            "minItems": 0,
+            "items": { "type": "string" },
+            "description": "Only concrete entities from the lyrics. Empty if no explicit visual entities exist."
           },
           "composition": {
             "type": "object",
@@ -95,40 +99,25 @@
               }
             }
           },
-          "camera": {
+          "shot_direction": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["camera_motion", "movement_speed", "lens_feeling", "stability"],
+            "description": "Combined camera + motion + transition for the coming shot-direction refinement stage.",
+            "required": ["camera_motion", "movement_speed", "lens_feeling", "stability", "subject_motion", "environment_motion", "motion_intensity", "transition_in", "transition_out", "transition_duration"],
             "properties": {
               "camera_motion": {
                 "type": "string",
                 "enum": ["static", "slow_push_in", "slow_pull_out", "slow_pan_left", "slow_pan_right", "slow_tilt_up", "slow_tilt_down", "slow_dolly", "slow_tracking", "slow_zoom_in", "slow_zoom_out", "floating_drift", "none_or_minimal_drift"]
               },
-              "movement_speed": {
-                "type": "string",
-                "enum": ["very_slow", "slow", "moderate"]
-              },
-              "lens_feeling": {
-                "type": "string",
-                "enum": ["wide_cinematic", "standard", "telephoto_compressed", "macro_dreamlike"]
-              },
-              "stability": {
-                "type": "string",
-                "enum": ["locked", "floating", "handheld_subtle", "drifting"]
-              }
-            }
-          },
-          "motion_design": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["subject_motion", "environment_motion", "motion_intensity"],
-            "properties": {
+              "movement_speed": { "type": "string", "enum": ["very_slow", "slow", "moderate"] },
+              "lens_feeling": { "type": "string", "enum": ["wide_cinematic", "standard", "telephoto_compressed", "macro_dreamlike"] },
+              "stability": { "type": "string", "enum": ["locked", "floating", "handheld_subtle", "drifting"] },
               "subject_motion": { "type": "string" },
               "environment_motion": { "type": "string" },
-              "motion_intensity": {
-                "type": "string",
-                "enum": ["very_low", "low", "medium", "high"]
-              }
+              "motion_intensity": { "type": "string", "enum": ["very_low", "low", "medium", "high"] },
+              "transition_in": { "type": "string" },
+              "transition_out": { "type": "string" },
+              "transition_duration": { "type": "number", "minimum": 0 }
             }
           },
           "visual_style": {
@@ -148,16 +137,6 @@
               "primary": { "type": "string" },
               "secondary": { "type": "array", "items": { "type": "string" } },
               "intensity": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
-            }
-          },
-          "transition": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["transition_in", "transition_out"],
-            "properties": {
-              "transition_in": { "type": "string" },
-              "transition_out": { "type": "string" },
-              "transition_duration": { "type": "number", "minimum": 0 }
             }
           },
           "generation_notes": {
