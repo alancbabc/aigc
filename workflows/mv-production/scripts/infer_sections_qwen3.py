@@ -238,8 +238,11 @@ def merge_inferred_sections(
     inferred: list[dict[str, Any]] = []
     for sec in sections:
         refs = sec["line_refs"]
-        first = by_id[refs[0]]
-        last = by_id[refs[-1]]
+        first = by_id.get(refs[0])
+        last = by_id.get(refs[-1])
+        if not first or not last:
+            print(f"  [warn] section {sec.get('section_id','?')}: line_refs {refs} not found in timing, skipping")
+            continue
         inferred.append({
             "section_id": sec["section_id"],
             "section_type": sec["section_type"],
@@ -253,15 +256,22 @@ def merge_inferred_sections(
 def inject_timing(
     lines: list[dict[str, Any]],
     sections: list[dict[str, Any]],
+    timing: dict[str, Any] | None = None,
 ) -> None:
     """Inject accurate time_range from lyrics-timing.json into each section and visual_segment."""
     by_id = {ln["line_id"]: ln for ln in lines}
+    audio_end = timing.get("audio_duration_seconds") if timing else None
     for sec in sections:
         refs = sec["line_refs"]
-        first_ln = by_id[refs[0]]
-        last_ln = by_id[refs[-1]]
+        first_ln = by_id.get(refs[0])
+        last_ln = by_id.get(refs[-1])
+        if not first_ln or not last_ln:
+            print(f"  [warn] inject_timing: section {sec.get('section_id','?')} line_refs not found")
+            continue
         start = first_ln.get("start_time")
         end = last_ln.get("end_time")
+        if end is None and audio_end is not None:
+            end = audio_end
         if isinstance(start, (int, float)) and isinstance(end, (int, float)):
             dur = round(float(end) - float(start), 3)
         else:
@@ -281,6 +291,8 @@ def inject_timing(
             if seg_first and seg_last:
                 s_st = seg_first.get("start_time")
                 s_et = seg_last.get("end_time")
+                if s_et is None and audio_end is not None:
+                    s_et = audio_end
                 if isinstance(s_st, (int, float)):
                     seg["start_time"] = float(s_st)
                 if isinstance(s_et, (int, float)):
@@ -369,14 +381,30 @@ def main() -> None:
             "Missing AIGC_GITEE_API_KEY (or GITEE_API_TOKEN). Set in env or aigc/.env"
         )
 
-    response = post_messages(
-        qwen_cfg.API_URL, qwen_cfg.API_KEY, payload, timeout=args.timeout
-    )
-    assistant_text = extract_assistant_text(response)
-    model_obj = parse_model_json(assistant_text)
+    retry_hint = ""
+    model_obj: dict[str, Any] | None = None
+    for attempt in range(3):
+        full_user = user_text + retry_hint
+        payload["messages"][1]["content"] = full_user
+        try:
+            response = post_messages(
+                qwen_cfg.API_URL, qwen_cfg.API_KEY, payload, timeout=args.timeout
+            )
+            assistant_text = extract_assistant_text(response)
+            model_obj = parse_model_json(assistant_text)
+        except (SystemExit, RuntimeError) as e:
+            msg = e.args[0] if e.args else "unknown"
+            if attempt >= 2:
+                raise SystemExit(msg) from None
+            print(f"  [retry] section inference attempt {attempt+1} failed: {msg[:80]}")
+            retry_hint = f"\n\n[上次失败] {msg}\n请仅输出修正后的完整JSON。"
+            continue
+        break
+
+    assert model_obj is not None
     secs = validate_sections_structure(model_obj)
     validate_line_coverage(lines, secs)
-    inject_timing(lines, secs)
+    inject_timing(lines, secs, timing)
 
     out_path = args.out.resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)

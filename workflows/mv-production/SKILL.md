@@ -52,7 +52,7 @@ The intake document is a JSON file with the following shape:
 | `visual_style` | string | no | Non-realistic style: `anime` (default) / `cartoon` or user-specified |
 | `reference_images` | array[string] | no | Paths to user-provided singer/artist reference images (3-5, jpg/png). Used as fallback when a shot image is unsatisfactory — replace the selected shot image with a singer reference. |
 | `shot_overrides` | object | no | Map of shot_id → relative image path. Formal way to declare which shots use singer images instead of generated ones. Applied by Stage 6b. |
-| `resolution` | object | no | Output resolution `{"width": 1280, "height": 720}` (default: API capability) |
+| `resolution` | object | no | Output resolution `{"width": 1280, "height": 720}` (default: 1280x720) |
 | `notes` | string | no | Free-form notes |
 
 # Singer Reference Image Substitution
@@ -142,6 +142,7 @@ Builtin style templates are retained in `builtin-visual-templates/` as a referen
 | 6 | image generation | `assets/images/candidates/*.png` | workflow (Kolors API) |
 | 6a | asset manifest | `asset-manifest.json` | workflow (scan disk) |
 | 6b | apply shot overrides | `selected/*.png` (overwritten) | workflow (programmatic) |
+| 6c | selected manifest | `selected-asset-manifest.json` + copies to `selected/` | workflow (programmatic) |
 | 7 | video generation | `assets/videos/candidates/*.mp4` | workflow (LTX HQ API) |
 | 8 | final assembly | `assets/videos/final/output.mp4` | workflow (FFmpeg) |
 
@@ -180,7 +181,7 @@ python workflows/mv-production/scripts/init_project.py \
 - The intake document must contain at least `song_audio_path` and `lyrics_lrc_path`.
 - The audio file and LRC file must exist at the specified paths.
 - `mv_type` is always `"concept"`; this field is set automatically and cannot be overridden.
-- `resolution` defaults to 1280x720 (the project's available API capability) when not specified.
+- `resolution` defaults to 1280x720 when not specified.
 - `visual_style` defaults to `"anime"` when not specified.
 
 ### Optional Branch: Character + Scene Design
@@ -327,15 +328,38 @@ python workflows/mv-production/scripts/infer_segment_interpretation_qwen3.py \
 - `visual_style` (scene_type, color_palette, lighting, texture)
 - `emotion` (primary, secondary, intensity)
 - `generation_notes` (image_prompt_focus, video_prompt_focus, avoid)
+- `extension_strategy` (`"none"` | `"tail_frame_loop"`) — strategy for extending video beyond API max duration
+- `reuse_from_shot_id` (string | null) — if set, reuses the referenced shot's generated image
+- `generate_new_image` (bool) — `false` for ambient_hold and reuse shots
+- `extension_strategy` — one of `"none"` (default), `"tail_frame_loop"` (long intro/outro), or `"ambient_hold"` (instrumental). Set by post-processing merge.
+- `reuse_from_shot_id` — when set, this shot reuses the generated image from the referenced shot (no new image generation).
+- `generate_new_image` — `false` for ambient_hold and reuse shots; `true` otherwise.
 
 **Instrumental segments** receive `ambient_hold` entries with `generate_new_image: false` and `reuse_from_shot_id` pointing to the previous segment's last shot.
+
+### Post-Processing: Continuous Shot Merging
+
+After Qwen3.5 generates shots, a programmatic merge step collapses multiple near-identical consecutive shots in **intro / outro / instrumental / interlude** sections into a single shot with `extension_strategy: "tail_frame_loop"`. Merge trigger: `static_frame_description` similarity ≥ 80% (via `difflib.SequenceMatcher`).
+
+**Merge rules**:
+- Only applies to sections with `section_type` in `{intro, outro, instrumental, interlude}`, **plus the first and last non-instrumental sections** of the song (regardless of their formal section_type — covers cases where Qwen3 classifies intro/outro as verse/chorus).
+- Does NOT apply to `ambient_hold` shots (instrumental holds are already single-shot).
+- Merged shot inherits the time range of the full group and the last shot's `shot_role`.
+- Intro shots get `reuse_from_shot_id` pointing to the **first non-intro shot** after them.
+- Outro/interlude shots get `reuse_from_shot_id` pointing to the **last non-outro shot** before them.
+- `generate_new_image` is set to `false` for shots with `reuse_from_shot_id`.
+
+**Example**: a 28.8s outro segment with 4 identical ~7.2s shots → 1 shot of 28.8s with `extension_strategy: "tail_frame_loop"` and `reuse_from_shot_id` pointing to the preceding chorus shot's image.
 
 **Executor**:
 ```
 python workflows/mv-production/scripts/infer_shot_plan_qwen3.py \
     --segment-interpretation <project>/segment-interpretation.json \
-    --out <project>/shot-plan.json
+    --out <project>/shot-plan.json \
+    [--max-shot-duration <seconds>]
 ```
+
+- `--max-shot-duration` (default 15s): controls the `recommended_shot_count` divisor — **independent of the actual API video max duration**. Lower values (e.g., 8-10) produce finer shot granularity; higher values produce fewer, longer shots.
 
 **Hard rules**:
 - Each shot's time window must fall within its parent segment.
@@ -344,6 +368,7 @@ python workflows/mv-production/scripts/infer_shot_plan_qwen3.py \
 - Imagery-type MV constraints apply: silhouettes, light threads, reflections, distant views, no narrative acting.
 - `composition`, `camera`, `motion_design` fields use predefined enums only.
 - `ambient_hold` shots reuse previous shot's image without generating new ones.
+- Consecutive near-identical shots (≥80% `static_frame_description` similarity) in intro/outro/instrumental/interlude sections are merged into a single shot with `extension_strategy: "tail_frame_loop"`. Intro shots reuse the first non-intro shot's image; outro shots reuse the last non-outro shot's image.
 
 ## Stage 5: Image + Video Prompts
 
@@ -441,13 +466,58 @@ python workflows/mv-production/scripts/apply_shot_overrides.py \
 }
 ```
 
+## Stage 6c: Selected Manifest
+
+**Goal**: select one image per shot (first candidate by default) and copy to `selected/` directory. Produces the `selected-asset-manifest.json` consumed by Stage 7 video generation.
+
+**Input**: `asset-manifest.json` (Stage 6a)
+
+**Output**: `assets/images/selected/{shot_id}.png` + `selected-asset-manifest.json`
+
+**Auto-select executor** (picks first candidate per shot):
+```
+python workflows/mv-production/scripts/build_selected_manifest.py \
+    --asset-manifest <project>/asset-manifest.json \
+    --auto-select \
+    --project-root <project> \
+    --out <project>/selected-asset-manifest.json
+```
+
+**Manual-review executor** (requires scored selection-review.json):
+```
+python workflows/mv-production/scripts/build_selected_manifest.py \
+    --asset-manifest <project>/asset-manifest.json \
+    --selection-review <project>/image-selection-review.json \
+    --out <project>/selected-asset-manifest.json
+```
+
+**Reuse handling**: ambient_hold shots reuse the selected image from their `reuse_from_shot_id` reference shot.
+
+**Hard rule**: this stage must run after Stage 6b (shot overrides) so that singer reference overrides are reflected before video generation.
+
 ## Stage 7: Video Generation (Execution)
 
-**Goal**: for each shot with a selected image, call LTX HQ image-to-video API producing MP4 files. Supports resume: skips already-generated videos.
+**Goal**: for each shot with a selected image, call image-to-video API producing MP4 files. Supports resume: skips already-generated videos.
 
 **Input**: `image-video-prompts.json` (Stage 5) + `selected-asset-manifest.json`
 
 **Output**: `assets/videos/candidates/{shot_id}.mp4` + `video-generation-results.json`
+
+### Generation Modes
+
+**Normal mode** (shots ≤ 15s or `extension_strategy=none`):
+- Single API call with `duration_seconds` capped at 15s
+- Post-generation: `extend_video_duration()` closes small gaps via FFmpeg `tpad` tail-frame freeze
+
+**Tail-frame loop mode** (`extension_strategy=tail_frame_loop` AND `duration_seconds > 15s`):
+- Multi-segment generation:
+  1. Segment 0: API call with initial keyframe (≤ 14.5s)
+  2. `extract_last_frame()` extracts the last frame of segment N-1 as PNG
+  3. Segment N: API call using the extracted tail frame as new keyframe
+  4. Repeat until total duration covered
+  5. `concat_video_segments()` concatenates all segments via FFmpeg concat demuxer
+- Each segment is individually gap-closed via `extend_video_duration()` before concatenation
+- The concatenated output is trimmed to exact `duration_seconds` by Stage 8 assembly
 
 **Executor**:
 ```
@@ -521,6 +591,7 @@ Priority directories:
 - `contracts/song-sections-llm/`
 - `contracts/segment-interpretation/`
 - `contracts/shot-plan/`
+- `contracts/image-prompts/`
 - `contracts/mv-treatment/` (optional sidecar)
 - `contracts/mv-storyboard/` (legacy appendix)
 
@@ -536,7 +607,7 @@ Valid completion points:
 - after `lyrics-timing.json` + `song-sections-llm.json` (Stage 2)
 - after `segment-interpretation.json` (Stage 3)
 - after `shot-plan.json` (Stage 4)
-- after `image-prompts.json` (Stage 5)
+- after `image-video-prompts.json` (Stage 5)
 
 ## Intermediate Artifact Recovery
 
@@ -546,8 +617,8 @@ If the user provides an existing artifact, resume from the nearest valid stage:
 |------------------|-----------|
 | `lyrics-timing.json` + `song-sections-llm.json` | Stage 3 (segment interpretation) |
 | `segment-interpretation.json` | Stage 4 (shot plan) |
-| `shot-plan.json` | Stage 5 (image prompts) |
-| `image-prompts.json` | Done — image prompts is the current terminal stage |
+| `shot-plan.json` | Stage 5 (image + video prompts) |
+| `image-video-prompts.json` | Done — image + video prompts is the current terminal stage |
 
 Do not rerun earlier stages unless the user asks for revision.
 
@@ -561,13 +632,14 @@ Do not rerun earlier stages unless the user asks for revision.
 ├── song-sections-llm.json
 ├── segment-interpretation.json
 ├── shot-plan.json
-├── image-prompts.json
+├── image-video-prompts.json
 ├── image-generation-queue.json
+├── image-generation-results.json
 ├── asset-manifest.json
 ├── image-selection-review.json
 ├── selected-asset-manifest.json
-├── video-prompts.json
 ├── timeline.json
+├── video-generation-results.json
 ├── assets/
 │   ├── images/
 │   │   ├── candidates/        (generated, one per gen task)
@@ -576,9 +648,6 @@ Do not rerun earlier stages unless the user asks for revision.
 │       ├── candidates/         (generated video clips)
 │       └── selected/           (post-review picks)
 ├── characters.json              (optional)
-├── characters/                  (optional)
-├── scene_design.json            (optional)
-└── scenes/                      (optional)
 ├── characters/                  (optional)
 ├── scene_design.json            (optional)
 └── scenes/                      (optional)

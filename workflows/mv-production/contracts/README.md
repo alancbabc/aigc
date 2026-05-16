@@ -21,7 +21,7 @@ This directory contains JSON contracts for each stage of the `mv-production` wor
 | `song-sections-llm/` | 2 | Qwen3 section segmentation with enriched per-section analysis (v2.0) |
 | `segment-interpretation/` | 3 | Qwen3.5 segment interpretation: imagery, visual direction, shot planning hints |
 | `shot-plan/` | 4 | Shot-level breakdown: time windows, composition, camera, motion, generation notes |
-| `image-prompts/` | 5 | Image generation prompts: static keyframe prompts, negative prompts, quality checks |
+| `image-prompts/` | 5 | Image + video generation prompts: static keyframe prompts, video motion prompts |
 | `song-structure/` | — | Legacy/reference consolidated structure (not emitted by canonical path) |
 | `mv-global-visual-style/` | — | Legacy: global visual style lock (retained for reference) |
 | `mv-keyframe-director/` | — | Legacy: director keyframe plan (retained for reference) |

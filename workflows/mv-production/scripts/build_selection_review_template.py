@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Build image-selection-review.json template from asset-manifest.json.
+"""DEPRECATED: Multi-candidate image selection review template.
 
-Creates a review template with five scoring dimensions per candidate
-image. Scores default to null — filled in during manual/VLM review.
+This script is no longer used in the standard pipeline. Each shot now
+generates exactly 1 candidate image, so no review/selection is needed.
+Kept for reference only.
 """
 
 from __future__ import annotations

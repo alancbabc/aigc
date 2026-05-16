@@ -90,9 +90,14 @@ def post_messages(
             raw = resp.read().decode("utf-8")
     except HTTPError as e:
         err_body = e.read().decode("utf-8", errors="replace")
-        raise SystemExit(f"HTTP {e.code} {e.reason}\n{err_body[:2000]}") from e
+        code = e.code
+        if code >= 500:
+            raise RuntimeError(f"HTTP {code} server error (retryable)\n{err_body[:2000]}") from e
+        if code == 429:
+            raise RuntimeError(f"HTTP {code} rate limited (retryable)\n{err_body[:2000]}") from e
+        raise SystemExit(f"HTTP {code} {e.reason} (not retryable)\n{err_body[:2000]}") from e
     except URLError as e:
-        raise SystemExit(f"Network error: {e}") from e
+        raise RuntimeError(f"Network error (retryable): {e}") from e
 
     try:
         return json.loads(raw)

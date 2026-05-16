@@ -10,6 +10,7 @@ Output matches contracts/shot-plan/shot-plan.schema.json.
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import os
 import sys
@@ -40,7 +41,7 @@ SHOT_ROLES = [
     "resolution_image",
 ]
 
-SYSTEM_PROMPT = """你是意象型音乐 MV 分镜规划器。根据 segment-interpretation.json 生成 shot_plan。
+SYSTEM_PROMPT = """你是意象型音乐 MV（concept MV）分镜规划器。根据 segment-interpretation.json 生成 shot_plan。
 
 # 核心约束
 
@@ -48,19 +49,75 @@ SYSTEM_PROMPT = """你是意象型音乐 MV 分镜规划器。根据 segment-int
 2. 每个 shot 的 start_time/end_time 必须落在 parent segment 的 time_range 内
 3. 每个 segment 的多个 shot 必须完整覆盖该 segment 的时间窗（无空隙无重叠）
 4. 不限制 shot 的最短和最长时长
-5. 画面偏意象化：剪影、轮廓、发光丝线、倒影、远景、半透明元素
-6. 避免剧情化人物表演（无牵手、拥抱、哭泣、对话、面部特写）
+5. 画面偏意象化：风景/场景为主体，剪影/轮廓/倒影/远景/光效为主要表现手法
+6. 避免剧情化人物表演（无牵手、拥抱、哭泣、对话）
 7. 输出严格 JSON，不要解释文字
+
+# 意象型 MV 设计总则（最重要的规则）
+
+意象型 MV 的画面不是歌词的插图，而是与歌词情感共鸣的独立画作。
+
+三条黄金法则：
+1. 画面 ≠ 歌词字面翻译 —— 歌词中出现"眼睛"时，画面不是眼睛特写；歌词出现"倾听"时，画面不是耳朵
+2. 画面必须是一幅可独立欣赏的画 —— 任何画面都应该有完整的场景上下文（前景+中景+背景），而不是单个物体悬浮在虚空
+3. 歌词→画面的映射是情感的映射，不是语义的映射 —— 歌词"they would not listen"的情感是"孤独/被忽视"，对应的画面应该是空荡的空间/远去的背影，而不是耳朵
+
+# 画面内容设计规则（通用，适用于任何风格）
+
+## 可用视觉元素设计原则
+
+画面内容应来源于对应画家/艺术风格的真实作品世界。对于每一首歌，遵循以下原则选取元素：
+
+- 优先使用：该风格所属艺术家的标志性场景（如梵高: 星夜/麦田/向日葵/柏树/咖啡馆/卧室/鸢尾花/杏花/自画像/椅子/橄榄树）
+- 其次使用：该风格所属艺术家常用构图方式（强烈笔触/厚涂/漩涡状纹理/鲜明对比色）
+- 再次使用：自然环境元素（天空/云/风/光/雾/远山/田野/水面）
+- 最后使用：人造环境元素（窗户/门/走廊/桌椅/画架/灯/建筑远景）
+
+## 禁止：孤立器官作为画面主体（硬性）
+
+- ❌ 禁止：将孤立的身体器官（眼睛、耳朵、手、嘴、心脏等）作为画面主要视觉主体
+- ❌ 禁止：人体器官占据画面超过 20% 的视觉面积
+- ❌ 禁止：画面元素悬浮在纯色虚空中（每一帧都需要有场景上下文）
+
+## 如何正确处理歌词中的器官词汇：
+
+| 歌词 | 错误做法 | 正确做法 |
+|------|---------|---------|
+| "with eyes that know darkness" | 巨大眼睛特写 | 暗色夜空中星光倒影在水面，或画架上的肖像远景 |
+| "reflect in his eyes" | 眼睛瞳孔特写 | 湖面倒影中的星夜漩涡，或人物剪影远眺远方 |
+| "they would not listen" | 耳朵器官 | 空无一人的教堂/走廊/麦田，或转开的背影 |
+| "artist's loving hand" | 手的特写 | 画笔在画布上涂抹的色彩轨迹，颜料管挤出的颜色 |
+| "suffered for your sanity" | 锁链/破碎人形 | 暴风中扭曲的柏树/干枯的向日葵/阴云翻滚 |
+
+## 抽象概念→画面转化规则
+
+抽象概念（爱、痛苦、孤独、理智、自由、倾听、希望、绝望）必须用环境/场景隐喻传达：
+
+| 抽象概念 | 推荐视觉转化 |
+|---------|------------|
+| 孤独/被忽视 | 空旷空间中的单一人影（远景）；空椅子；延伸向远方的路 |
+| 痛苦/挣扎 | 扭曲的树/缠绕的藤蔓/暴风雨的天空/破碎的笔触 |
+| 希望/温暖 | 穿透云层的阳光/窗内的灯光/燃烧的暖色调 |
+| 自由/释放 | 飞鸟/飘散的颜料/展开的画布/流动的水 |
+| 倾听/理解 | 敞开的门/光透入的窗/两个人影靠近 |
+| 绝望/消逝 | 熄灭的光/枯萎的花/渐暗的天空 |
+
+## 画面构图规则
+
+- 所有画面必须有完整的三层空间：前景、中景、背景
+- 任何单一元素不得占据超过 50% 的视觉焦点面积
+- 避免单一物体悬浮在纯色背景中（必须有场景上下文）
+- "特写"仅允许用于自然对象（花/画笔/颜料/麦穗/水波），不用于人体器官
 
 # 视频生成约束
 
-- API 一次生成视频最大长度为 8 秒
-- 大于 8 秒的分镜需用尾帧延长拼接
+- API 一次生成视频最大长度为 15 秒
+- 大于 15 秒的分镜需用尾帧延长拼接
 - 如果分镜生成的视频长度大于对应的时间戳时长，需要裁剪
 
 # 拆分规则
 
-- 按意象转换拆：当核心视觉主体从 A 变为 B 时，应拆为两个 shot
+- 按视觉场景转换拆：当核心视觉主体从 A 变为 B 时，应拆为两个 shot
 - 按情绪推进拆：当情绪从一种状态推向另一种状态时，应拆为不同 shot
 - 按运动方式拆：一个 shot 只保留一个主运动
 - recommended_shot_count 是建议值，实际数量可以 ±1
@@ -68,32 +125,33 @@ SYSTEM_PROMPT = """你是意象型音乐 MV 分镜规划器。根据 segment-int
 # 每个 shot 必须包含的信息
 
 1. literal_meaning_zh：该 shot 对应歌词的字面含义（直译）
-2. deep_meaning：歌词对应的深层意味和含义（它在表达什么？不只是功能描述）
-3. static_frame_description：画面里有什么 — 景别、实体、位置、空间关系。必须可被图像模型直接理解执行。简洁具体
+2. deep_meaning：歌词对应的深层意味和含义
+3. static_frame_description：画面里有什么 — 场景、实体、位置、空间关系。必须可被图像模型直接理解执行。简洁具体
 4. key_imagery：只取歌词中明确出现的具象实体名。无实体则为空数组 []
 5. shot_direction：整合了运镜方式、速度、转场方式的完整镜向
 
 # shot_type 路由（必须遵守）
 
 - shot_type = "lyric_imagery"：歌词有明确视觉实体 → 正常生成意象画面
-- shot_type = "singer_performance"：歌词完全抽象、无任何实体 → 歌手演唱场景
-  歌手演唱场景的 static_frame_description：一位歌手在画面中演唱（可以是侧影、正面或背影），背景与全片视觉风格一致的油画质感。不同 shot 可以有不同的角度
+- shot_type = "singer_performance"：歌词完全抽象、无任何实体 → 歌手演唱场景（远景或中景，融入风格化背景中）
 
-# key_imagery 规则（关键）
+# key_imagery 规则
 
-- 只提取歌词中明确出现的具象实体
-- 有实体："星空" "麦田" "紫罗兰色的云" "画框" "雪地" "眼睛" "调色板"
+- 只提取歌词中明确出现的具象实体名
+- 有实体："星空" "麦田" "向日葵" "柏树" "云" "调色板" "画架" "椅子"
 - 比喻中的实体也算："他像星星一样闪耀" → "星星" 算
 - 无实体 → key_imagery = []
-- 禁止：抽象概念（"爱" "痛苦" "孤独"）
-- 禁止：自创意象（歌词没说"鱼"就不要加"鱼"）
+- 禁止：抽象概念（"爱" "痛苦" "孤独" "倾听"）
+- 禁止：人体器官（"眼睛" "耳朵" "手" "心"）
+- 禁止：自创意象（歌词没说"漩涡"就不要加"漩涡"）
 
 # static_frame_description 规则
 
 - 必须回答：画面里有什么？在哪里？景别多大？
-- 包含：主体、位置关系（前景中景后景）、空间
-- 必须可被图像模型直接执行
+- 必须包含完整场景上下文（前景+中景+背景）
+- 禁止：单个物体悬浮在虚空中
 - 禁止：纯情绪描述、抽象修饰
+- 必须可被图像模型直接执行
 
 # shot_direction 规则
 
@@ -103,15 +161,15 @@ SYSTEM_PROMPT = """你是意象型音乐 MV 分镜规划器。根据 segment-int
 
 # shot_role 枚举
 
-establishing_image: 建立画面世界
-symbolic_detail: 象征物特写或细节
-emotional_peak: 情绪顶点
-transition_image: 过渡画面
-motif_development: 意象演化
+establishing_image: 建立画面世界。通常是远景/极远景，展示风格化场景全貌
+symbolic_detail: 象征物细节。特写自然对象（花/笔触/笔/颜料），不特写器官
+emotional_peak: 情绪顶点。场景情感最强烈的时刻，通过色彩/光影/天气传达
+transition_image: 过渡画面。场景转换的桥梁
+motif_development: 意象演化。同一主题元素的变化（如从白天→黄昏→夜晚的同一麦田）
 ambient_hold: 空段延续（不生成新图，复用前一个 shot）
-memory_echo: 回忆回响
-climax_image: 高潮画面
-resolution_image: 收束画面
+memory_echo: 回忆回响。类似但不同视角的重复场景
+climax_image: 高潮画面。全曲情绪最高点，视觉上最强烈的构图
+resolution_image: 收束画面。情感回落，渐远/渐暗/渐空
 
 # composition 字段枚举
 
@@ -149,12 +207,13 @@ avoid: 必须避免的元素
       "shot_id": "shot_v1_01_01",
       "parent_segment_id": "seg_v1_01",
       "time_range": {"start_time": 0.0, "end_time": 8.0, "duration_seconds": 8.0},
+      "lyric_refs": ["line_01", "line_02"],
       "shot_type": "lyric_imagery",
       "shot_role": "establishing_image",
       "literal_meaning_zh": "星夜、蓝灰色的调色板、夏日的凝视",
       "deep_meaning": "第一段主歌通过梵高的画作《星月夜》入画，暗示画家眼中世界的美丽与灵魂深处的黑暗并存。",
       "static_frame_description": "深蓝夜空中旋转的星光漩涡占据画面上半部分，下方沉睡的村庄暗影横跨中景，前景是柏树火焰般的暗色剪影",
-      "key_imagery": ["星空", "蓝灰调色板"],
+      "key_imagery": ["星空"],
       "composition": {
         "shot_size": "extreme_wide_shot",
         "camera_angle": "slightly_low_angle",
@@ -229,8 +288,13 @@ def load_segment_interpretation(path: Path) -> dict[str, Any]:
     return data
 
 
-def build_qwen_input(seg_data: dict[str, Any]) -> list[dict[str, Any]]:
-    """Extract non-instrumental segments to send to Qwen3.5."""
+def build_qwen_input(seg_data: dict[str, Any], max_shot_duration: float = 15.0) -> list[dict[str, Any]]:
+    """Extract non-instrumental segments to send to Qwen3.5.
+    
+    max_shot_duration controls the recommended_shot_count divisor
+    (independent of the actual API video max duration).
+    Lower values → more shots, finer granularity.
+    """
     qwen_input: list[dict[str, Any]] = []
     for seg in seg_data["segments"]:
         if seg.get("is_instrumental"):
@@ -247,7 +311,7 @@ def build_qwen_input(seg_data: dict[str, Any]) -> list[dict[str, Any]]:
         interp = seg.get("interpretation", {})
         # Derive recommended_shot_count from segment duration
         dur = seg["time_range"].get("duration_seconds", 10)
-        rec_shot_count = max(1, int(dur / 8 + 0.5))
+        rec_shot_count = max(1, int(dur / max_shot_duration + 0.5))
         qwen_input.append({
             "segment_id": seg["segment_id"],
             "start_time": seg["time_range"]["start_time"],
@@ -275,7 +339,7 @@ def validate_and_fix_shots(
     shots: list[dict[str, Any]],
     seg_data: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """Post-process shots: inject parent_section_id, validate timing, validate enums."""
+    """Post-process shots: inject parent_section_id, validate timing, validate enums, inject lyrics_text."""
     seg_lookup: dict[str, dict[str, Any]] = {}
     for seg in seg_data["segments"]:
         seg_lookup[seg["segment_id"]] = seg
@@ -295,9 +359,13 @@ def validate_and_fix_shots(
             print(f"  [warn] shot[{i}] {s.get('shot_id','?')} time {st}-{et} outside segment [{seg_start}-{seg_end}], clamping")
             st = max(st, seg_start)
             et = min(et, seg_end)
-        s["time_range"]["start_time"] = round(st, 2)
-        s["time_range"]["end_time"] = round(et, 2)
-        s["time_range"]["duration_seconds"] = round(et - st, 2)
+        s["time_range"]["start_time"] = round(st, 3)
+        s["time_range"]["end_time"] = round(et, 3)
+        dur = round(et - st, 3)
+        if dur <= 0:
+            dur = 0.5  # minimum 0.5s to avoid zero-duration shots
+            print(f"  [warn] shot[{i}] {s.get('shot_id','?')} has zero/negative duration, set to {dur}s")
+        s["time_range"]["duration_seconds"] = dur
 
         # Validate shot_role
         if s.get("shot_role") not in SHOT_ROLES:
@@ -327,10 +395,23 @@ def validate_and_fix_shots(
         if s.get("shot_type") not in ("lyric_imagery", "singer_performance"):
             s["shot_type"] = "lyric_imagery"
 
+        # Auto-populate lyric_refs from parent segment when missing
+        if not s.get("lyric_refs"):
+            parent_lyric_refs = pseg.get("lyrics", {}).get("line_refs", [])
+            if parent_lyric_refs:
+                s["lyric_refs"] = list(parent_lyric_refs)
+
+        # Inject lyrics_text from parent segment's resolved lyrics text
+        s["lyrics_text"] = pseg.get("lyrics", {}).get("lyrics_text", "")
+
         # Validate missing required fields
         missing = [k for k in REQUIRED_SHOT if k not in s]
         if missing:
-            print(f"  [warn] shot[{i}] {s.get('shot_id','?')} missing keys: {missing}")
+            print(f"  [error] shot[{i}] {s.get('shot_id','?')} missing keys: {missing}")
+            s["time_range"] = s.get("time_range", {"start_time": 0, "end_time": 0.5, "duration_seconds": 0.5})
+            s["composition"] = s.get("composition", {})
+            s["shot_direction"] = s.get("shot_direction", {})
+            s["generation_notes"] = s.get("generation_notes", {})
 
     # ── Singer performance normalization ──
     singer_shots = [s for s in shots if s.get("shot_type") == "singer_performance"]
@@ -355,7 +436,6 @@ def make_ambient_hold(
 ) -> dict[str, Any]:
     """Create ambient_hold placeholder for instrumental segments."""
     tr = seg.get("time_range", {})
-    vd = seg.get("visual_direction", {})
     interp = seg.get("interpretation", {})
     return {
         "shot_id": f"shot_{seg['segment_id']}_hold",
@@ -367,6 +447,7 @@ def make_ambient_hold(
             "duration_seconds": tr.get("duration_seconds", 0),
         },
         "lyric_refs": seg.get("lyrics", {}).get("line_refs", []),
+        "lyrics_text": seg.get("lyrics", {}).get("lyrics_text", ""),
         "shot_type": "lyric_imagery",
         "shot_role": "ambient_hold",
         "literal_meaning_zh": "(器乐间奏，无歌词)",
@@ -395,9 +476,9 @@ def make_ambient_hold(
             "transition_duration": 0,
         },
         "visual_style": {
-            "scene_type": vd.get("scene_type", ""),
-            "color_palette": vd.get("color_palette", []),
-            "lighting": vd.get("lighting", ""),
+            "scene_type": "",
+            "color_palette": [],
+            "lighting": "",
             "texture": "油画质感",
         },
         "emotion": {
@@ -439,12 +520,9 @@ def merge_and_sort(
             shots_for_seg = model_by_seg.get(seg_id, [])
             for s in shots_for_seg:
                 result.append(s)
-                previous_shot_id = s.get("shot_id")
-        # Update previous_shot_id to the last non-instrumental shot
-        if not seg.get("is_instrumental"):
-            seg_shots = model_by_seg.get(seg_id, [])
-            if seg_shots:
-                previous_shot_id = seg_shots[-1].get("shot_id")
+            # Update previous_shot_id to the last generated shot in this segment
+            if shots_for_seg:
+                previous_shot_id = shots_for_seg[-1].get("shot_id")
 
     result.sort(key=lambda s: s["time_range"]["start_time"])
     return result
@@ -470,6 +548,170 @@ def verify_coverage(shots: list[dict[str, Any]], seg_data: dict[str, Any]) -> No
             print(f"  [warn] segment {seg_id}: coverage gap ({seg_start}-{seg_end}) vs shots ({shot_start}-{shot_end})")
 
 
+def similarity(a: str, b: str) -> float:
+    """Character-level similarity ratio (0.0-1.0)."""
+    if not a and not b:
+        return 1.0
+    if not a or not b:
+        return 0.0
+    return difflib.SequenceMatcher(None, a, b).ratio()
+
+
+MERGE_SECTION_TYPES = frozenset({"intro", "outro", "instrumental", "interlude"})
+SIMILARITY_THRESHOLD = 0.8
+
+
+def merge_continuous_shots(
+    shots: list[dict[str, Any]],
+    seg_data: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Merge similar consecutive shots in intro/outro/instrumental sections.
+
+    When shots in the same section type have >80% similar static_frame_description,
+    they are merged into a single shot with extension_strategy: "tail_frame_loop".
+    Intro shots get reuse_from_shot_id pointing to the first non-intro shot;
+    outro shots point to the last non-outro shot.
+    
+    Also merges the FIRST and LAST non-instrumental sections regardless of their
+    formal section_type (covers cases where Qwen3 classifies intro/outro as verse/chorus).
+    """
+    seg_lookup: dict[str, dict[str, Any]] = {}
+    for seg in seg_data["segments"]:
+        seg_lookup[seg["segment_id"]] = seg
+
+    # ── Build section_type lookup ──
+    seg_section_type: dict[str, str] = {}
+    for seg in seg_data["segments"]:
+        seg_section_type[seg["segment_id"]] = seg.get("section_type", "")
+        seg_section_type[seg.get("parent_section_id", "")] = seg.get("section_type", "")
+
+    # ── Determine first and last non-instrumental sections ──
+    non_inst_segs = [s for s in seg_data["segments"] if not s.get("is_instrumental")]
+    first_section_type: str | None = None
+    last_section_type: str | None = None
+    if non_inst_segs:
+        first_section_type = non_inst_segs[0].get("section_type", "")
+        last_section_type = non_inst_segs[-1].get("section_type", "")
+
+    # Extend MERGE_SECTION_TYPES to include first/last sections (pseudo-intro/outro)
+    effective_merge_types = set(MERGE_SECTION_TYPES)
+    if first_section_type:
+        effective_merge_types.add(first_section_type)
+    if last_section_type:
+        effective_merge_types.add(last_section_type)
+
+    def _get_section_type(shot: dict[str, Any]) -> str:
+        psid = shot.get("parent_segment_id", "")
+        return seg_section_type.get(psid, shot.get("parent_section_id", ""))
+
+    # ── Pass 1: merge consecutive similar shots in MERGE_SECTION_TYPES ──
+    merged: list[dict[str, Any]] = []
+    i = 0
+    merge_count = 0
+    while i < len(shots):
+        shot = shots[i]
+        st = _get_section_type(shot)
+        j = i + 1
+
+        if st in effective_merge_types and not shot.get("shot_role") == "ambient_hold":
+            # Collect consecutive shots in same section_type with similar description
+            base_desc = shot.get("static_frame_description", "")
+            group = [shot]
+            while j < len(shots):
+                next_shot = shots[j]
+                next_st = _get_section_type(next_shot)
+                if next_st != st:
+                    break
+                if next_shot.get("shot_role") == "ambient_hold":
+                    break
+                next_desc = next_shot.get("static_frame_description", "")
+                if similarity(base_desc, next_desc) < SIMILARITY_THRESHOLD:
+                    break
+                group.append(next_shot)
+                j += 1
+
+            if len(group) >= 2:
+                # Merge group into single shot
+                first = dict(group[0])
+                last = group[-1]
+                first["time_range"] = {
+                    "start_time": first["time_range"]["start_time"],
+                    "end_time": last["time_range"]["end_time"],
+                    "duration_seconds": round(
+                        last["time_range"]["end_time"] - first["time_range"]["start_time"], 2
+                    ),
+                }
+                # Combine lyric_refs from all group members
+                all_refs: list[str] = []
+                for g in group:
+                    for r in g.get("lyric_refs", []):
+                        if r not in all_refs:
+                            all_refs.append(r)
+                first["lyric_refs"] = all_refs
+                # Use last shot's role (most climactic / terminal)
+                first["shot_role"] = last.get("shot_role", first.get("shot_role", ""))
+                # Keep first shot's description (they're similar anyway)
+                first["extension_strategy"] = "tail_frame_loop"
+                first["reuse_from_shot_id"] = None  # resolved in pass 2
+
+                merged.append(first)
+                merge_count += len(group) - 1
+                i = j
+                continue
+
+        merged.append(shot)
+        i += 1
+
+    if merge_count > 0:
+        print(f"  Merged {merge_count} similar shot(s) in intro/outro sections "
+              f"({len(shots)} → {len(merged)} shots)")
+
+    # ── Pass 2: resolve reuse_from_shot_id for intro/outro ──
+    for shot in merged:
+        if shot.get("extension_strategy") != "tail_frame_loop":
+            continue
+        st = _get_section_type(shot)
+        ref_shot_id: str | None = None
+
+        if st == "intro" or st == first_section_type:
+            # Reuse image from first non-intro/non-first-section shot after this one
+            shot_start = shot["time_range"]["start_time"]
+            for s in merged:
+                if s["time_range"]["start_time"] <= shot_start:
+                    continue
+                s_st = _get_section_type(s)
+                if s_st != "intro" and s_st != first_section_type and s.get("shot_role") != "ambient_hold":
+                    ref_shot_id = s["shot_id"]
+                    break
+        elif st in ("outro", "interlude", "instrumental") or st == last_section_type:
+            # Reuse image from last non-outro/non-last-section shot before this one
+            shot_start = shot["time_range"]["start_time"]
+            merge_st = {"outro", "interlude", "instrumental"}
+            if last_section_type:
+                merge_st.add(last_section_type)
+            for s in reversed(merged):
+                if s["time_range"]["start_time"] >= shot_start:
+                    continue
+                if _get_section_type(s) not in merge_st and s.get("shot_role") != "ambient_hold":
+                    ref_shot_id = s["shot_id"]
+                    break
+
+        if ref_shot_id:
+            shot["reuse_from_shot_id"] = ref_shot_id
+            shot["generate_new_image"] = False
+        else:
+            # No suitable neighbor found — generate new image for this merged shot
+            shot["generate_new_image"] = True
+            shot["reuse_from_shot_id"] = None
+
+    # Report reuse assignments
+    reused = [s for s in merged if s.get("reuse_from_shot_id")]
+    for s in reused:
+        print(f"  [reuse] {s['shot_id']} ({_get_section_type(s)}) → reuses image from {s['reuse_from_shot_id']}")
+
+    return merged
+
+
 def main() -> None:
     load_aigc_dotenv()
     if not os.getenv("AIGC_GITEE_API_KEY") and os.getenv("GITEE_API_TOKEN"):
@@ -483,12 +725,15 @@ def main() -> None:
     ap.add_argument("--temperature", type=float, default=0.25)
     ap.add_argument("--max-tokens", type=int, default=24576)
     ap.add_argument("--timeout", type=int, default=600)
+    ap.add_argument("--max-shot-duration", type=float, default=15.0,
+                    help="Target max shot duration for recommended_shot_count (default 15s). "
+                         "Lower values produce finer granularity. Independent of API video max.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
     seg_path = args.segment_interpretation.resolve()
     seg_data = load_segment_interpretation(seg_path)
-    qwen_input = build_qwen_input(seg_data)
+    qwen_input = build_qwen_input(seg_data, args.max_shot_duration)
 
     song_title = seg_data.get("song_title", seg_path.stem)
 
@@ -503,9 +748,10 @@ def main() -> None:
         "constraints": {
             "shot_duration_range": "5–14 seconds per shot",
             "one_primary_motion_per_shot": True,
-            "imagery_style": "imagery-type MV: silhouettes, light threads, reflections, distant views, semi-transparent elements",
+            "imagery_style": "imagery-type MV: each frame must look like a standalone painting, not a lyric illustration; use full-scene compositions (foreground/midground/background); no isolated body parts as main subject; use environment, light, weather to convey emotion",
             "avoid_narrative_acting": True,
             "tile_parent_segment_completely": True,
+            "no_body_part_as_main_subject": True,
         },
         "song_title": song_title,
         "artist": seg_data.get("artist"),
@@ -545,7 +791,7 @@ def main() -> None:
             response = post_messages(qwen_cfg.API_URL, qwen_cfg.API_KEY, payload, timeout=args.timeout)
             assistant_text = extract_assistant_text(response)
             model_obj = parse_model_json(assistant_text)
-        except SystemExit as e:
+        except (SystemExit, RuntimeError) as e:
             msg = e.args[0] if e.args else "unknown"
             if attempt >= 2:
                 raise SystemExit(msg) from None
@@ -559,6 +805,7 @@ def main() -> None:
     model_shots = validate_and_fix_shots(model_shots, seg_data)
     all_shots = merge_and_sort(model_shots, seg_data)
     verify_coverage(all_shots, seg_data)
+    all_shots = merge_continuous_shots(all_shots, seg_data)
 
     out_obj = {
         "schema_version": "1.0",
@@ -568,7 +815,7 @@ def main() -> None:
         "shot_generation_rules": {
             "instrumental_hold_policy": "reuse_previous_visual_or_create_ambient_hold",
             "long_segment_policy": "split_before_shot_planning_if_over_40_seconds",
-            "video_max_duration_seconds": 8.0,
+            "video_max_duration_seconds": 15.0,
             "over_max_policy": "use_tail_frame_extension_then_trim_to_lyric_duration",
         },
         "shots": all_shots,

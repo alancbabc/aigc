@@ -85,14 +85,15 @@ def load_json(path: Path) -> dict[str, Any]:
 def unwrap_json_fence(text: str) -> str:
     text = text.strip()
     if text.startswith("```"):
-        lines = text.splitlines()
         stripped = []
-        for row in lines:
-            if stripped or not row.strip().startswith("```"):
-                stripped.append(row)
-            elif row.strip() == "```":
+        lines = text.splitlines()
+        for i, row in enumerate(lines):
+            if i == 0 and row.strip().startswith("```"):
+                continue
+            if row.strip() == "```":
                 break
-        text = "\n".join(stripped[1:] if stripped and stripped[0].strip() == "```" else stripped).strip()
+            stripped.append(row)
+        text = "\n".join(stripped).strip()
     return text
 
 
@@ -201,8 +202,12 @@ def make_instrumental_placeholder(
     refs = seg.get("line_refs", [])
     first_ln = by_id.get(str(refs[0])) if refs else None
     last_ln = by_id.get(str(refs[-1])) if refs else None
+    audio_end = timing.get("audio_duration_seconds", 0)
     start = float(first_ln.get("start_time", 0)) if first_ln else 0.0
-    end = float(last_ln.get("end_time", start)) if last_ln else 0.0
+    last_end = last_ln.get("end_time") if last_ln else None
+    if last_end is None:
+        last_end = audio_end
+    end = float(last_end) if last_end else start
 
     return {
         "segment_id": seg["segment_id"],
@@ -210,9 +215,9 @@ def make_instrumental_placeholder(
         "section_type": seg["section_type"],
         "is_instrumental": True,
         "time_range": {
-            "start_time": start,
-            "end_time": end,
-            "duration_seconds": round(end - start, 2),
+            "start_time": round(start, 3),
+            "end_time": round(end, 3),
+            "duration_seconds": round(end - start, 3),
         },
         "lyrics": {
             "line_refs": refs,
@@ -268,8 +273,12 @@ def inject_timing(
         refs = inp.get("line_refs", [])
         first_ln = by_id.get(str(refs[0])) if refs else None
         last_ln = by_id.get(str(refs[-1])) if refs else None
+        audio_end = timing.get("audio_duration_seconds", 0)
         start = float(first_ln.get("start_time", 0)) if first_ln else 0.0
-        end = float(last_ln.get("end_time", start)) if last_ln else 0.0
+        last_end = last_ln.get("end_time") if last_ln else None
+        if last_end is None:
+            last_end = audio_end
+        end = float(last_end) if last_end else start
 
         interp = model.get("interpretation", {})
         result.append({
@@ -278,9 +287,9 @@ def inject_timing(
             "section_type": inp.get("section_type", ""),
             "is_instrumental": False,
             "time_range": {
-                "start_time": start,
-                "end_time": end,
-                "duration_seconds": round(end - start, 2),
+                "start_time": round(start, 3),
+                "end_time": round(end, 3),
+                "duration_seconds": round(end - start, 3),
             },
             "lyrics": {
                 "line_refs": refs,
@@ -330,6 +339,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Qwen3.5 interprets visual segments from song-sections-llm.json v2.0")
     ap.add_argument("--song-sections-llm", required=True, type=Path, help="song-sections-llm.json (v2.0 with visual_segments)")
     ap.add_argument("--lyrics-timing", required=True, type=Path, help="lyrics-timing.json for timing injection")
+    ap.add_argument("--song-title", type=str, default=None, help="Song title (overrides auto-detection from filename)")
     ap.add_argument("--out", required=True, type=Path, help="Output segment-interpretation.json")
     ap.add_argument("--temperature", type=float, default=0.25)
     ap.add_argument("--max-tokens", type=int, default=16384)
@@ -342,7 +352,7 @@ def main() -> None:
     llm = load_sections_llm(llm_path)
     timing = load_timing(timing_path)
 
-    song_title = llm.get("song_title") or timing.get("song_title") or \
+    song_title = args.song_title or llm.get("song_title") or timing.get("song_title") or \
                  (Path(timing.get("source_file", "")).stem if timing.get("source_file") else llm_path.stem)
 
     qwen_input, instrumental_placeholders = extract_non_instrumental_segments(llm, timing)
@@ -426,7 +436,7 @@ def main() -> None:
             response = post_messages(qwen_cfg.API_URL, qwen_cfg.API_KEY, payload, timeout=args.timeout)
             assistant_text = extract_assistant_text(response)
             model_obj = parse_model_json(assistant_text)
-        except SystemExit as e:
+        except (SystemExit, RuntimeError) as e:
             msg = e.args[0] if e.args else "unknown"
             if attempt >= 2:
                 raise SystemExit(msg) from None

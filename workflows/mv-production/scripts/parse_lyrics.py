@@ -34,8 +34,12 @@ def is_metadata_line(text: str, timestamp: float) -> bool:
     stripped = text.strip()
     if not stripped:
         return False
+    # Only filter if the line is very short and matches metadata patterns
+    if len(stripped) > 30:
+        return False
     if METADATA_PATTERNS.search(stripped):
         return True
+    # Artist - Title (parenthetical info) at t=0:00 is usually metadata
     if " - " in stripped and ("(" in stripped or "（" in stripped):
         return True
     return False
@@ -157,6 +161,7 @@ def _parse_lrc_timed_lines(text: str) -> list[dict[str, Any]]:
     if lines:
         last = lines[-1]
         if "end_time" not in last:
+            # Will be filled later if --audio provides audio_duration_seconds
             last["end_time"] = None
             last["duration_seconds"] = None
 
@@ -198,9 +203,17 @@ def _merge_bilingual_lines(lines: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return merged
 
 
-def parse_plain_text(text: str) -> list[dict[str, Any]]:
+def parse_plain_text(text: str, audio_duration: float | None = None) -> list[dict[str, Any]]:
+    if not text.strip():
+        return []
     lines: list[dict[str, Any]] = []
     line_counter = 0
+    # Distribute duration evenly across lines if audio duration known
+    duration_per_line = None
+    if audio_duration:
+        non_empty = sum(1 for raw_line in text.splitlines() if raw_line.strip())
+        if non_empty:
+            duration_per_line = audio_duration / non_empty
 
     for raw_line in text.splitlines():
         content = raw_line.strip()
@@ -208,12 +221,14 @@ def parse_plain_text(text: str) -> list[dict[str, Any]]:
             continue
 
         line_counter += 1
+        start_time = round((line_counter - 1) * duration_per_line, 3) if duration_per_line else 0.0
+        end_time = round(line_counter * duration_per_line, 3) if duration_per_line else None
         lines.append({
             "line_id": f"line_{line_counter:02d}",
             "text": content,
-            "start_time": None,
-            "end_time": None,
-            "duration_seconds": None,
+            "start_time": start_time,
+            "end_time": end_time,
+            "duration_seconds": round(end_time - start_time, 3) if (end_time is not None and duration_per_line) else None,
             "is_instrumental": False,
         })
 
@@ -278,6 +293,17 @@ def main() -> None:
         probed = probe_audio_duration_seconds(Path(args.audio))
         if probed is not None:
             payload["audio_duration_seconds"] = probed
+            # For plain text, re-parse with known duration to assign timestamps
+            if fmt == "plain_text":
+                lines = parse_plain_text(text, probed)
+                payload["total_lines"] = len(lines)
+                payload["lines"] = lines
+                payload["has_timestamps"] = True
+            # Fill last line's end_time from audio duration
+            if payload.get("lines") and payload["lines"][-1].get("end_time") is None:
+                last = payload["lines"][-1]
+                last["end_time"] = round3(probed)
+                last["duration_seconds"] = round3(probed - last["start_time"])
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(

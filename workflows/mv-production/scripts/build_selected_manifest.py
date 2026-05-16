@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-"""Build selected-asset-manifest.json from selection-review.json.
+"""Build selected-asset-manifest.json from asset-manifest.json.
 
-Selects the highest-scoring candidate per shot. For reuse tasks,
-copies the selected_image from the reused shot.
+Auto-selects the single candidate image per shot, copies it to selected/
+(with _cN suffix stripped), and writes the manifest.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -18,79 +20,86 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build selected asset manifest from review")
+    ap = argparse.ArgumentParser(description="Build selected asset manifest")
     ap.add_argument("--asset-manifest", required=True, type=Path)
-    ap.add_argument("--selection-review", required=True, type=Path)
+    ap.add_argument("--project-root", required=True, type=Path,
+                    help="Project root for resolving/copying image files")
     ap.add_argument("--out", required=True, type=Path)
     args = ap.parse_args()
 
     manifest = load_json(args.asset_manifest.resolve())
-    review = load_json(args.selection_review.resolve())
-
-    # Build review lookup by shot_id
-    review_lookup: dict[str, dict[str, Any]] = {}
-    for r in review.get("reviews", []):
-        review_lookup[r["shot_id"]] = r
+    project_root = args.project_root.resolve()
 
     assets: list[dict[str, Any]] = []
     selected_lookup: dict[str, str] = {}  # shot_id → selected_image path
 
-    # Process generation shots
+    selected_dir = project_root / "assets" / "images" / "selected"
+    selected_dir.mkdir(parents=True, exist_ok=True)
+
+    # ── Process generation shots ──
     for asset in manifest.get("assets", []):
         sid = asset["shot_id"]
-        if asset["render_strategy"]["generate_new_image"]:
-            rv = review_lookup.get(sid, {})
-            best = None
-            best_score = -1.0
-            for c in rv.get("candidates", []):
-                if c.get("overall_score") is None:
-                    continue
-                score = float(c["overall_score"])
-                if score > best_score:
-                    best_score = score
-                    best = c
-            if best:
-                # Replace candidate path with selected path
-                sel_path = best["candidate_image"].replace("candidates", "selected").replace("_c1.", ".").replace("_c2.", ".").replace("_c3.", ".").replace("_c4.", ".")
+        if not asset["render_strategy"]["generate_new_image"]:
+            continue  # handled in reuse pass below
+
+        candidates = asset.get("candidate_images", [])
+        seq = asset.get("sequence_index", 0)
+
+        if candidates:
+            src = project_root / candidates[0]
+            name = re.sub(r"_c[1-9]$", "", Path(candidates[0]).stem)
+            dest = selected_dir / f"{name}.png"
+            if src.exists():
+                shutil.copy(str(src), str(dest))
+                sel_path = f"assets/images/selected/{name}.png"
                 selected_lookup[sid] = sel_path
                 assets.append({
                     "shot_id": sid,
                     "selected_image": sel_path,
                     "selection_status": "selected",
-                    "selection_reason": best.get("recommendation", ""),
-                    "overall_score": best_score,
-                    "scores": best.get("score", {}),
-                    "needs_regeneration": False,
-                    "candidates_reviewed": len(rv.get("candidates", [])),
-                })
-            else:
-                assets.append({
-                    "shot_id": sid,
-                    "selected_image": None,
-                    "selection_status": "pending_review",
-                    "selection_reason": "No scored candidates available.",
+                    "selection_reason": "Auto-selected (single candidate).",
                     "overall_score": None,
                     "scores": {},
-                    "needs_regeneration": True,
-                    "candidates_reviewed": 0,
+                    "needs_regeneration": False,
                 })
-            continue
+                continue
 
-    # Process reuse shots — resolve after generation shots are done
+        # No candidate available
+        assets.append({
+            "shot_id": sid,
+            "selected_image": None,
+            "selection_status": "pending_review",
+            "selection_reason": "No candidate image available.",
+            "overall_score": None,
+            "scores": {},
+            "needs_regeneration": True,
+        })
+
+    # ── Process reuse shots (ambient_holds) ──
     for asset in manifest.get("assets", []):
         sid = asset["shot_id"]
-        if not asset["render_strategy"]["generate_new_image"]:
-            reuse_id = asset["render_strategy"].get("reuse_from_shot_id", "")
-            reused_image = selected_lookup.get(reuse_id)
-            assets.append({
-                "shot_id": sid,
-                "selected_image": reused_image,
-                "selection_status": "reused" if reused_image else "reuse_pending",
-                "selection_reason": f"Reuses selected image from {reuse_id}." if reused_image else f"Waiting for {reuse_id} selection.",
-                "overall_score": None,
-                "scores": {},
-                "needs_regeneration": False,
-            })
+        if asset["render_strategy"]["generate_new_image"]:
+            continue
+        reuse_id = asset["render_strategy"].get("reuse_from_shot_id", "")
+        reused_image = selected_lookup.get(reuse_id)
+        # Also copy the reused image into selected/{sid}.png for timeline accessibility
+        if reused_image:
+            src = project_root / reused_image
+            seq = asset.get("sequence_index", 0)
+            dest_name = re.sub(r"_c[1-9]$", "", Path(reused_image).name)
+            dest = selected_dir / dest_name
+            if src.exists():
+                shutil.copy(str(src), str(dest))
+        assets.append({
+            "shot_id": sid,
+            "selected_image": reused_image,
+            "selection_status": "reused" if reused_image else "reuse_pending",
+            "selection_reason": f"Reuses image from {reuse_id}." if reused_image else (
+                f"Waiting for {reuse_id} selection." if reuse_id else "No source shot for reuse."),
+            "overall_score": None,
+            "scores": {},
+            "needs_regeneration": False,
+        })
 
     # Sort by shot_id for consistent ordering
     assets.sort(key=lambda a: a["shot_id"])
@@ -99,7 +108,7 @@ def main() -> None:
         "schema_version": "1.0",
         "song_title": manifest.get("song_title", ""),
         "source_manifest_ref": args.asset_manifest.name,
-        "source_review_ref": args.selection_review.name,
+        "selection_mode": "auto",
         "assets": assets,
     }
 

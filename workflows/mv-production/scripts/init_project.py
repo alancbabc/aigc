@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_RESOLUTION = {"width": 1024, "height": 576}
+DEFAULT_RESOLUTION = {"width": 1280, "height": 720}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -66,8 +66,6 @@ def validate_doc(doc: dict[str, Any]) -> None:
 
 def derive_song_title(lrc_path: Path, audio_path: Path) -> str:
     stem = lrc_path.stem
-    if stem.lower().endswith(".lrc"):
-        stem = stem[:-4]
     import re
     stem = re.sub(r"[_\-]+", " ", stem).strip()
     parts = [p for p in stem.split(" ") if p]
@@ -83,7 +81,11 @@ def derive_style_prefix(visual_style: str) -> str:
         "anime": "anime style, cel-shaded, vibrant palette, clean lines",
         "cartoon": "cartoon style, bold outlines, saturated colors, illustrated look",
     }
-    return mapping.get(visual_style, f"{visual_style} style, illustrated, non-photorealistic")
+    prefix = mapping.get(visual_style, f"{visual_style}, illustrated, non-photorealistic")
+    # Avoid double "style" (e.g. "Van Gogh style style")
+    import re
+    prefix = re.sub(r"\s+style\s+style", " style", prefix, flags=re.IGNORECASE)
+    return prefix
 
 
 def main() -> None:
@@ -109,6 +111,7 @@ def main() -> None:
     reference_images = doc.get("reference_images") or []
     song_background = doc.get("song_background", "")
     notes = doc.get("notes", "")
+    shot_overrides = doc.get("shot_overrides") or {}
 
     project_meta: dict[str, Any] = {
         "schema_version": "1.0",
@@ -135,12 +138,14 @@ def main() -> None:
         "reference_images": [str(Path(r).resolve()) for r in reference_images],
         "resolution": resolution,
         "keyframe_style_prefix": style_prefix,
-        "output_goal": "keyframes",
+        "output_goal": "final_video",
         "confirmation_mode": "auto",
         "song_background": song_background,
     }
     if notes:
         user_requirements["notes"] = notes
+    if shot_overrides:
+        user_requirements["shot_overrides"] = dict(shot_overrides)
 
     meta_path = project_root / "project_meta.json"
     meta_path.write_text(json.dumps(project_meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

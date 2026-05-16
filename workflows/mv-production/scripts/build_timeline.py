@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build timeline.json from video-prompts.json + selected-asset-manifest.json.
+"""Build timeline.json from shot-plan.json + selected-asset-manifest.json.
 
 Assembles a sequential timeline of video segments for final MV production.
-Aligns with lyrics-timing for subtitle synchronization.
+Aligns with lyrics-timing for lyric text synchronization.
 """
 
 from __future__ import annotations
@@ -18,9 +18,9 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build MV timeline from video prompts and assets")
+    ap = argparse.ArgumentParser(description="Build MV timeline from shot plan, prompts, and assets")
     ap.add_argument("--shot-plan", required=True, type=Path)
-    ap.add_argument("--video-prompts", required=True, type=Path)
+    ap.add_argument("--image-video-prompts", required=True, type=Path)
     ap.add_argument("--selected-manifest", required=True, type=Path)
     ap.add_argument("--lyrics-timing", required=True, type=Path)
     ap.add_argument("--song-audio", type=Path, default=None, help="Original song audio for final assembly reference")
@@ -28,49 +28,52 @@ def main() -> None:
     args = ap.parse_args()
 
     shot_data = load_json(args.shot_plan.resolve())
-    video_data = load_json(args.video_prompts.resolve())
     sel_data = load_json(args.selected_manifest.resolve())
     lyrics_data = load_json(args.lyrics_timing.resolve())
 
     # Lookup tables
-    vid_lookup = {v["shot_id"]: v for v in video_data.get("video_prompts", [])}
     sel_lookup = {a["shot_id"]: a for a in sel_data.get("assets", [])}
+
+    # Build line_id → text lookup from lyrics-timing
+    line_text: dict[str, str] = {}
+    for ln in lyrics_data.get("lines", []):
+        lid = ln.get("line_id", "")
+        text = ln.get("text", "")
+        if lid and text:
+            line_text[lid] = text
+
+    # Build shot_id → sequence index from shot-plan order
+    seq_lookup: dict[str, int] = {}
+    for i, s in enumerate(shot_data.get("shots", []), start=1):
+        seq_lookup[s["shot_id"]] = i
 
     segments: list[dict[str, Any]] = []
     for shot in shot_data.get("shots", []):
         sid = shot["shot_id"]
         tr = shot["time_range"]
-        vid = vid_lookup.get(sid, {})
         sel = sel_lookup.get(sid, {})
-        lyrics_text = ""
-        for rid in shot.get("lyric_refs", []):
-            for line in lyrics_data.get("lines", []):
-                if line.get("line_id") == rid:
-                    lt = line.get("text", "")
-                    if lt:
-                        lyrics_text += lt + "\n"
-                    break
+        seq = seq_lookup.get(sid, 0)
 
+        # Collect lyrics text from lyric_refs
+        lyrics_lines: list[str] = []
+        for rid in shot.get("lyric_refs", []):
+            lt = line_text.get(rid)
+            if lt:
+                lyrics_lines.append(lt)
+
+        fallback_img = f"assets/images/selected/{seq:03d}_{sid}.png" if seq else f"assets/images/selected/{sid}.png"
+        fallback_vid = f"assets/videos/candidates/{seq:03d}_{sid}.mp4" if seq else f"assets/videos/candidates/{sid}.mp4"
         segments.append({
             "shot_id": sid,
             "start_time": tr["start_time"],
             "end_time": tr["end_time"],
             "duration_seconds": tr["duration_seconds"],
-            "input_image": sel.get("selected_image", vid.get("input_image", "")),
-            "video_prompt": vid.get("video_prompt", ""),
-            "camera_motion": vid.get("camera_motion", ""),
-            "motion_intensity": vid.get("motion_intensity", ""),
-            "transition_out": vid.get("transition_out", ""),
-            "shot_role": shot.get("shot_role", ""),
-            "lyrics_text": lyrics_text.strip(),
+            "input_image": sel.get("selected_image", fallback_img),
+            "video_path": fallback_vid,
+            "lyrics_text": " / ".join(lyrics_lines) if lyrics_lines else "",
         })
 
     segments.sort(key=lambda s: s["start_time"])
-
-    # Build FFmpeg concat list
-    concat_files: list[str] = []
-    for i, seg in enumerate(segments):
-        concat_files.append(f"file '../segments/segment_{i:03d}_{seg['shot_id']}.mp4'")
 
     total_duration = max(s["end_time"] for s in segments) if segments else 0
 
@@ -80,7 +83,6 @@ def main() -> None:
         "song_audio_path": str(args.song_audio.resolve()) if args.song_audio else None,
         "total_duration_seconds": total_duration,
         "segments": segments,
-        "concat_list": concat_files,
         "assembly_notes": {
             "audio_track": "Replace all segment audio with original song.",
             "encode_mode": "re-encode (H.264 + AAC) for mixed-resolution safety.",

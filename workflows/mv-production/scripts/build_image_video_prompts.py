@@ -83,16 +83,36 @@ def translate_batch(
             {"role": "user", "content": f"Translate:\n{lines}"},
         ],
     }
-    resp = post_messages(api_url, api_key, payload, timeout=timeout)
-    text = extract_assistant_text(resp).strip()
-    if text.startswith("```"): 
+
+    last_error = ""
+    for attempt in range(3):
+        try:
+            resp = post_messages(api_url, api_key, payload, timeout=timeout)
+            text = extract_assistant_text(resp).strip()
+        except (SystemExit, RuntimeError) as e:
+            last_error = str(e)
+            if attempt < 2:
+                print(f"  [retry] translation attempt {attempt+1} failed: {str(e)[:60]}")
+                continue
+            print(f"  [warn] Translation failed after 3 attempts: {last_error[:80]}")
+            return {idx: cn for idx, cn in texts}
+
+    # Remove code fences robustly
+    if "```" in text:
         lines_t = text.splitlines()
-        text = "\n".join(lines_t[1:]) if lines_t[0].strip() in ("```","```json") else text
-        if text.endswith("```"): text = text[:text.rindex("```")].strip()
+        cleaned = []
+        in_fence = False
+        for row in lines_t:
+            if row.strip().startswith("```"):
+                in_fence = not in_fence
+                continue
+            if not in_fence:
+                cleaned.append(row)
+        text = "\n".join(cleaned).strip()
     try:
         translations = json.loads(text)
     except json.JSONDecodeError:
-        print("[warn] Translation parse failed")
+        print("[warn] Translation parse failed, using Chinese originals")
         return {idx: cn for idx, cn in texts}
     result: dict[str, str] = {}
     for idx, cn in texts:
@@ -111,26 +131,34 @@ def make_video_prompt(sd: dict[str, Any]) -> str:
         parts.append(f"camera {cm.replace('_', ' ')}, {speed}")
 
     import re
-    # Subject motion — translate CN → EN using word map
+
+    # Build regex pattern: match longest CN keys first to avoid partial overlaps
+    _cn_keys = sorted(MOTION_CN_EN.keys(), key=lambda k: -len(k))
+    _cn_pattern = re.compile("|".join(re.escape(k) for k in _cn_keys))
+
+    def _translate_cn(text: str) -> str:
+        """Replace known Chinese motion terms with English, strip remaining Chinese."""
+        if not text:
+            return ""
+        pre = text
+        result = _cn_pattern.sub(lambda m: MOTION_CN_EN[m.group(0)] + " ", text)
+        result = re.sub(r"[\u4e00-\u9fff]+", "", result)
+        cleaned = " ".join(result.split()).strip()
+        if cleaned != pre.strip() and re.search(r"[\u4e00-\u9fff]", pre):
+            pass  # unmapped Chinese removed
+        return cleaned
+
+    # Subject motion
     sm = sd.get("subject_motion", "")
     if sm:
-        translated = sm
-        for cn, en in sorted(MOTION_CN_EN.items(), key=lambda x: -len(x[0])):
-            translated = translated.replace(cn, en + " ")
-        translated = " ".join(translated.split())
-        # Strip remaining Chinese characters (unmapped words)
-        translated = re.sub(r"[\u4e00-\u9fff]+", "", translated).strip()
+        translated = _translate_cn(sm)
         if translated:
             parts.append(f"subject: {translated}")
 
     # Environment motion
     em = sd.get("environment_motion", "")
     if em:
-        translated = em
-        for cn, en in sorted(MOTION_CN_EN.items(), key=lambda x: -len(x[0])):
-            translated = translated.replace(cn, en + " ")
-        translated = " ".join(translated.split())
-        translated = re.sub(r"[\u4e00-\u9fff]+", "", translated).strip()
+        translated = _translate_cn(em)
         if translated:
             parts.append(f"environment: {translated}")
 
@@ -187,19 +215,28 @@ def main() -> None:
         sid = shot["shot_id"]
         tr = shot["time_range"]
         is_hold = shot.get("shot_role") == "ambient_hold"
+        ext_strategy = shot.get("extension_strategy", "none")
+        # Read reuse_from_shot_id from top level (merged shots) or generation_notes (ambient holds)
+        reuse_id = shot.get("reuse_from_shot_id") or shot.get("generation_notes", {}).get("reuse_from_shot_id")
+        # Read generate_new_image: top-level overrides generation_notes, fall back to not-hold
+        gen_notes = shot.get("generation_notes", {})
+        gn_gen = gen_notes.get("generate_new_image")
+        top_gen = shot.get("generate_new_image")
+        gen_new = top_gen if top_gen is not None else (gn_gen if gn_gen is not None else not is_hold)
 
         frame_en = trans.get(sid, shot.get("static_frame_description", ""))
         image_prompt = f"{style_prefix}, {frame_en}" if style_prefix else frame_en
-        if not is_hold:
+        if not is_hold and gen_new:
             comp = shot.get("composition", {})
             size = comp.get("shot_size", "").replace("_", " ")
             image_prompt = f"{image_prompt}, {size}, 16:9"
 
         video_prompt = make_video_prompt(shot.get("shot_direction", {})) if not is_hold else "static hold."
 
-        prompts.append({
+        entry: dict[str, Any] = {
             "shot_id": sid,
             "parent_segment_id": shot.get("parent_segment_id", ""),
+            "parent_section_id": shot.get("parent_section_id", ""),
             "shot_type": shot.get("shot_type", "lyric_imagery"),
             "shot_role": shot.get("shot_role", ""),
             "time_range": {
@@ -208,14 +245,31 @@ def main() -> None:
                 "duration_seconds": tr["duration_seconds"],
             },
             "lyric_refs": shot.get("lyric_refs", []),
+            "lyrics_text": shot.get("lyrics_text", ""),
             "literal_meaning_zh": shot.get("literal_meaning_zh", ""),
             "image_prompt": image_prompt,
             "video_prompt": video_prompt,
             "key_imagery": shot.get("key_imagery", []),
             "composition": shot.get("composition", {}),
             "shot_direction": shot.get("shot_direction", {}),
-            "generate_new_image": not is_hold,
-        })
+            "generate_new_image": gen_new,
+        }
+        if ext_strategy and ext_strategy != "none":
+            entry["extension_strategy"] = ext_strategy
+        if reuse_id:
+            # Prevent reuse chains longer than 1 hop
+            prompts_lookup = {x["shot_id"]: x for x in prompts}
+            if reuse_id in prompts_lookup and not prompts_lookup[reuse_id].get("generate_new_image", True):
+                # Reuse target is itself a reuse shot — find the original
+                original_id = prompts_lookup[reuse_id].get("reuse_from_shot_id")
+                if original_id:
+                    reuse_id = original_id
+            entry["reuse_from_shot_id"] = reuse_id
+            entry["render_strategy"] = {
+                "generate_new_image": False,
+                "reuse_from_shot_id": reuse_id,
+            }
+        prompts.append(entry)
 
     out = {
         "schema_version": "1.0",

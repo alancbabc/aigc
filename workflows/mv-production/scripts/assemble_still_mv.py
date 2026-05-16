@@ -12,6 +12,13 @@ from pathlib import Path
 from typing import Any
 
 
+def check_ffmpeg(ffmpeg_bin: str = "ffmpeg") -> None:
+    try:
+        subprocess.run([ffmpeg_bin, "-version"], capture_output=True, check=True)
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        raise SystemExit(f"FFmpeg not found: '{ffmpeg_bin}' is not installed or not in PATH.")
+
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -33,22 +40,19 @@ def still_to_video(
 ) -> bool:
     """Convert a still image to video with slow Ken Burns zoom."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    # Ken Burns: slow zoom in (scale from 1.0 to 1.05 over duration)
     dur = max(duration, 1.0)
-    zoom_factor = 1.05
     fps = 24
-    frames = int(dur * fps)
-    
-    # Build zoompan filter: zoom from 1.0 to ~1.05 over N frames, then pad to target size
-    z = f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1"
+    frames = int(dur * fps + 0.5)  # round to nearest frame
+    zoom_end = 1.03
+
     zoom_filter = (
-        f"scale=8000:-1,"
-        f"zoompan=z='min(zoom+0.0003,1.05)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':fps={fps}:s={width}x{height}"
+        f"zoompan=z='if(eq(on,1),1,min(zoom+({zoom_end}-1)/{frames},{zoom_end}))':"
+        f"d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
+        f"fps={fps}:s={width}x{height}"
     )
-    # Actually, a simpler approach: direct scale + pad, then slight zoompan
     cmd = [
         "ffmpeg", "-y",
-        "-loop", "1", "-i", str(image_path),
+        "-loop", "1", "-r", str(fps), "-i", str(image_path),
         "-vf", zoom_filter,
         "-t", str(dur),
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
@@ -62,6 +66,7 @@ def still_to_video(
 def build_segments_video(
     segments: list[dict], project_root: Path, work_dir: Path,
     width: int, height: int,
+    seq_lookup: dict[str, int] | None = None,
 ) -> list[Path]:
     """Create video segments from still images."""
     video_paths: list[Path] = []
@@ -69,7 +74,9 @@ def build_segments_video(
         dur = max(seg["duration_seconds"], 1.0)
         img_str = seg.get("input_image", "")
         if not img_str:
-            img_str = f"assets/images/selected/{seg['shot_id']}.png"
+            sid = seg["shot_id"]
+            seq = seq_lookup.get(sid, 0) if seq_lookup else 0
+            img_str = f"assets/images/selected/{seq:03d}_{sid}.png" if seq else f"assets/images/selected/{sid}.png"
         img_path = project_root / img_str
         
         if not img_path.exists():
@@ -77,7 +84,9 @@ def build_segments_video(
             # Create a black placeholder
             placeholder = work_dir / f"_black_{i}.png"
             cmd = ["ffmpeg", "-y", "-f", "lavfi", "-i", f"color=black:size={width}x{height}:duration=1", "-frames:v", "1", str(placeholder)]
-            subprocess.run(cmd, capture_output=True)
+            r = subprocess.run(cmd, capture_output=True)
+            if r.returncode != 0:
+                print(f"  [warn] Failed to create black placeholder: {r.stderr.decode(errors='replace')[:100]}")
             img_path = placeholder
         
         out_path = work_dir / f"seg_{i:03d}_{seg['shot_id']}.mp4"
@@ -91,7 +100,7 @@ def concat_and_mux(
 ) -> bool:
     """Concatenate video segments and overlay audio."""
     list_file = work_dir / "segments.txt"
-    list_file.write_text("\n".join(f"file '{p.as_posix()}'" for p in video_paths), encoding="utf-8")
+    list_file.write_text("\n".join(f"file '{p.as_posix()}'" for p in video_paths) + "\n", encoding="utf-8")
     
     concat_path = work_dir / "concat.mp4"
     cmd = [
@@ -120,9 +129,11 @@ def main() -> None:
     ap.add_argument("--song-audio", required=True, type=Path)
     ap.add_argument("--output", type=Path, default=None)
     ap.add_argument("--project-root", type=Path, default=None)
-    ap.add_argument("--width", type=int, default=1024)
-    ap.add_argument("--height", type=int, default=576)
+    ap.add_argument("--width", type=int, default=1920)
+    ap.add_argument("--height", type=int, default=1080)
     args = ap.parse_args()
+
+    check_ffmpeg()
 
     timeline = load_json(args.timeline.resolve())
     project_root = (args.project_root or args.timeline.parent).resolve()
@@ -135,7 +146,10 @@ def main() -> None:
     segments.sort(key=lambda s: s["start_time"])
     print(f"Building {len(segments)} segments...")
 
-    video_paths = build_segments_video(segments, project_root, work_dir, args.width, args.height)
+    # Build shot_id → sequence from segment order
+    seq_lookup = {seg.get("shot_id", ""): i + 1 for i, seg in enumerate(segments)}
+
+    video_paths = build_segments_video(segments, project_root, work_dir, args.width, args.height, seq_lookup)
 
     if not video_paths:
         print("No video segments created.")
