@@ -1,0 +1,16 @@
+{
+  "song_audio_path": "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_vincent/song/Don McLean - Vincent.flac",
+  "lyrics_lrc_path": "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_vincent/song/Don McLean - Vincent.lrc",
+  "song_background": "Don McLean's 'Vincent' (Starry Starry Night) is a tribute to Vincent van Gogh. The lyrics walk through Van Gogh's paintings — starry nights, sunflowers, wheat fields, portraits — while reflecting on his mental suffering and the world's failure to understand him. The song's core is not biography but emotional resonance: how a hypersensitive soul perceived the world, burned with creation, and was ultimately destroyed by indifference. Key themes: the beauty of the world only the sensitive can see, the loneliness of genius, art as emotional truth rather than representation, and the eternal question of why the world cannot hold someone so beautiful.",
+  "visual_style": "Van Gogh's oil painting style,Dynamic swirling brushstrokes,short and energetic lines,Thick impasto technique,heavy paint texture",
+  "reference_images": [
+    "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_vincent/singer/1.png",
+    "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_vincent/singer/2.png",
+    "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_vincent/singer/3.png",
+    "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_vincent/singer/4.png",
+    "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_vincent/singer/5.png",
+    "C:/Users/15712/Desktop/沐曦日常工作/jinyi/aigc/test_vincent/singer/6.png"
+  ],
+  "resolution": {"width": 1024, "height": 576},
+  "notes": "意象型MV — not a biographical documentary but a visual journey through Van Gogh's emotional perception of the world."
+}
